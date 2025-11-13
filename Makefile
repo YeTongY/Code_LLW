@@ -1,24 +1,29 @@
 # ==============================================================================
-# LLW_Project 的 Makefile (适用于 Windows + GCC/MinGW-w64)
+# LLW_Project 的 Makefile (适用于 Windows + MSYS2)
 #
 # [使用方法]
-# 1. 确保你已经安装了 MSYS2 或 Git for Windows (提供了 bash 环境)。
-# 2. 确保 make 和 g++ 已经添加到了系统的 PATH 环境变量中。
-# 3. 在 MSYS2 MinGW64 终端（或 Git Bash）中，进入项目根目录，然后：
+# 在 PowerShell 或任何终端中，进入项目根目录，然后：
 #    - 输入 `make` 或 `make all` 来编译整个项目。
 #    - 输入 `make clean` 来删除所有编译生成的文件。
 #    - 编译后，可执行文件会生成在 `build/` 文件夹中。
 #
-# [环境要求]
-# - 推荐使用 MSYS2 MinGW64 终端，命令：
-#   pacman -S mingw-w64-x86_64-gcc mingw-w64-x86_64-make
-# - 或使用 Git Bash (Git for Windows 自带)
-# - 不支持原生 Windows cmd/PowerShell（因为缺少 Unix 命令）
+# [环境安装]
+# 1. 下载安装 MSYS2: https://www.msys2.org/
+# 2. 打开 "MSYS2 MSYS" 终端（注意不是 UCRT64 或 MINGW64），运行：
+#    pacman -Syu
+#    pacman -S make
+# 3. 打开 "MSYS2 UCRT64" 终端，运行：
+#    pacman -S mingw-w64-ucrt-x86_64-gcc
+# 4. 将以下路径添加到系统环境变量 PATH（按顺序）：
+#    C:\msys64\usr\bin
+#    C:\msys64\ucrt64\bin
+# 5. 重启 VS Code 或终端，验证安装：
+#    make --version
+#    gcc --version
 #
-# [常见问题]
-# - 如果编译时输出的中文显示为乱码（如 "姝ｅ湪缂栬瘧"），这是正常现象。
-#   原因：make 使用 UTF-8 编码，而终端可能使用其他编码。
-#   注意：乱码不影响编译结果，只是显示问题，可以忽略。
+# [注意事项]
+# - 必须从 MSYS2 的 MSYS 环境安装 make（不是 UCRT64 的 mingw32-make）
+# - 配置 PATH 后可以在任何终端（PowerShell/cmd）中使用 make 命令
 # ==============================================================================
 
 # 1. 编译器和编译参数

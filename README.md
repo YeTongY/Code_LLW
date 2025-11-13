@@ -9,13 +9,12 @@
 ## 开发环境要求
 
 - **操作系统**: Windows
-- **编译器**: GCC (MinGW-w64)
-- **构建工具**: Make
-- **终端环境**: **MSYS2 MinGW64** 或 **Git Bash** (必需)
+- **编译器**: GCC (MSYS2 UCRT64)
+- **构建工具**: Make (MSYS2)
 - **图形库**: Raylib (已包含在 `lib/raylib/` 目录中)
 - **版本控制**: Git
 
-**重要**: 本项目的 Makefile 使用 Unix 命令（如 `mkdir -p`, `rm -rf`），必须在 MSYS2 MinGW64 终端或 Git Bash 中运行，不支持 Windows 原生的 cmd 或 PowerShell。
+**重要**: 配置好 MSYS2 环境和 PATH 后，可以在任何终端（PowerShell/cmd/VS Code）中使用 `make` 命令编译。
 
 ## 项目结构
 
@@ -64,35 +63,61 @@ git clone https://github.com/YeTongY/Code_LLW.git
 cd Code_LLW
 ```
 
-### 2. 确保环境配置正确
+### 2. 安装 MSYS2 开发环境
 
-**安装 MSYS2（推荐）**：
+**步骤 1：安装 MSYS2**
 
-1. 访问 [https://www.msys2.org/](https://www.msys2.org/) 下载安装 MSYS2
-2. 安装完成后，打开 "MSYS2 MinGW64" 终端（不是 UCRT64 或 MSYS）
-3. 运行以下命令安装工具链：
+访问 [https://www.msys2.org/](https://www.msys2.org/) 下载并安装 MSYS2。
+
+**步骤 2：安装 Make**
+
+打开 **"MSYS2 MSYS"** 终端（注意：不是 UCRT64 或 MINGW64），运行：
 
 ```bash
-pacman -Syu                                    # 更新系统
-pacman -S mingw-w64-x86_64-gcc mingw-w64-x86_64-make   # 安装 GCC 和 Make
+pacman -Syu          # 更新系统（可能需要运行两次）
+pacman -S make       # 安装 make 工具
 ```
 
-4. 确认安装成功：
+**步骤 3：安装 GCC 编译器**
+
+打开 **"MSYS2 UCRT64"** 终端，运行：
 
 ```bash
-gcc --version
+pacman -S mingw-w64-ucrt-x86_64-gcc    # 安装 GCC 编译器
+```
+
+**步骤 4：配置系统环境变量**
+
+将以下两个路径添加到系统环境变量 `PATH` 中（**按顺序，usr\bin 必须在前**）：
+
+```
+C:\msys64\usr\bin
+C:\msys64\ucrt64\bin
+```
+
+添加方法：
+1. 按 `Win + R`，输入 `sysdm.cpl`，回车
+2. 点击 "高级" → "环境变量"
+3. 在 "系统变量" 中找到 `Path`，双击编辑
+4. 点击 "新建"，依次添加上面两个路径
+5. 确定保存
+
+**步骤 5：验证安装**
+
+重启 VS Code（或重启电脑），然后在 PowerShell 中运行：
+
+```bash
 make --version
+gcc --version
 ```
 
-**或者使用 Git Bash**：
-- 如果你已经安装了 Git for Windows，可以直接使用 Git Bash
-- 但需要单独安装 MinGW-w64 工具链
+如果都显示版本信息，说明安装成功。
 
 **重要**: 确保 Raylib 库文件在 `lib/raylib/` 目录中（include/ 和 lib/ 文件夹）。
 
 ### 3. 编译项目
 
-在 MSYS2 MinGW64 终端或 Git Bash 中，进入项目根目录运行:
+在 PowerShell 或任何终端中，进入项目根目录运行:
 
 ```bash
 make
@@ -100,14 +125,12 @@ make
 
 编译成功后,可执行文件会生成在 `build/LLW.exe`。
 
-**注意**: 在 Windows 上,make 工具通常叫 `make`,不是 `mingw32-make`（在 MSYS2 中）。
-
 ### 4. 运行游戏
 
-在 MSYS2/Git Bash 中：
+在 PowerShell 中：
 
-```bash
-./build/LLW.exe
+```powershell
+build\LLW.exe
 ```
 
 或者直接双击 `build/LLW.exe` 文件。
