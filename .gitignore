@@ -1,0 +1,13 @@
+# 忽略编译输出文件夹
+build/
+
+# 忽略所有 .exe 文件
+*.exe
+
+# 忽略所有 .o 编译缓存
+*.o
+
+# 忽略 VS 的缓存文件
+.vs/
+*.VC.db
+*.sln.docstates
