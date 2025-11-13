@@ -1,6 +1,7 @@
 # 忽略编译输出文件夹
 build/
 test/
+
 # 忽略所有 .exe 文件
 *.exe
 
@@ -8,6 +9,7 @@ test/
 *.o
 
 # 忽略 VS 的缓存文件
+.vscode/
 .vs/
 *.VC.db
 *.sln.docstates
