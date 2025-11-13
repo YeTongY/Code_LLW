@@ -66,18 +66,20 @@ cd Code_LLW
 
 ### 3. 编译项目
 
-在项目根目录 (`LLW_Project/`) 打开终端,运行:
+在项目根目录打开终端,运行:
 
 ```powershell
-make
+mingw32-make
 ```
 
 编译成功后,可执行文件会生成在 `build/LLW.exe`。
 
+**注意**: 在 Windows 上,make 工具通常叫 `mingw32-make`,不是 `make`。
+
 ### 4. 运行游戏
 
 ```powershell
-.\build\LLW.exe
+& ".\build\LLW.exe"
 ```
 
 或者直接双击 `build/LLW.exe` 文件。
@@ -87,7 +89,7 @@ make
 如果需要清理所有编译生成的文件:
 
 ```powershell
-make clean
+mingw32-make clean
 ```
 
 ---
@@ -197,8 +199,8 @@ make clean
 
 3. **测试编译**:
    ```powershell
-   make
-   .\build\LLW.exe
+   mingw32-make
+   & ".\build\LLW.exe"
    ```
 
 4. **提交代码**:
