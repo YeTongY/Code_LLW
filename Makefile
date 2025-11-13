@@ -2,17 +2,22 @@
 # LLW_Project 的 Makefile (适用于 Windows + GCC/MinGW-w64)
 #
 # [使用方法]
-# 1. 确保你已经安装了 MinGW-w64 (提供了 gcc, g++ 和 make 工具)。
-# 2. 确保 mingw32-make 和 g++ 已经添加到了系统的 PATH 环境变量中。
-# 3. 在项目根目录打开终端，然后：
-#    - 输入 `mingw32-make` 或 `mingw32-make all` 来编译整个项目。
-#    - 输入 `mingw32-make clean` 来删除所有编译生成的文件。
+# 1. 确保你已经安装了 MSYS2 或 Git for Windows (提供了 bash 环境)。
+# 2. 确保 make 和 g++ 已经添加到了系统的 PATH 环境变量中。
+# 3. 在 MSYS2 MinGW64 终端（或 Git Bash）中，进入项目根目录，然后：
+#    - 输入 `make` 或 `make all` 来编译整个项目。
+#    - 输入 `make clean` 来删除所有编译生成的文件。
 #    - 编译后，可执行文件会生成在 `build/` 文件夹中。
+#
+# [环境要求]
+# - 推荐使用 MSYS2 MinGW64 终端，命令：
+#   pacman -S mingw-w64-x86_64-gcc mingw-w64-x86_64-make
+# - 或使用 Git Bash (Git for Windows 自带)
+# - 不支持原生 Windows cmd/PowerShell（因为缺少 Unix 命令）
 #
 # [常见问题]
 # - 如果编译时输出的中文显示为乱码（如 "姝ｅ湪缂栬瘧"），这是正常现象。
-#   原因：mingw32-make 使用 UTF-8 编码，而 PowerShell 默认使用 GBK 编码。
-#   解决方法：编译前在 PowerShell 中运行 `chcp 65001` 切换到 UTF-8 编码。
+#   原因：make 使用 UTF-8 编码，而终端可能使用其他编码。
 #   注意：乱码不影响编译结果，只是显示问题，可以忽略。
 # ==============================================================================
 
@@ -77,14 +82,14 @@ $(TARGET): $(OBJS)
 # $< 代表依赖文件 (即 .cpp)，$@ 代表目标文件 (即 .o)
 $(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp
 	@echo "正在编译: $<"
-	@if not exist $(BUILD_DIR) mkdir $(BUILD_DIR)
+	@mkdir -p $(BUILD_DIR)
 	$(CC) $(CFLAGS) $(CPPFLAGS) $(INCLUDES) -c $< -o $@
 
 # 清理规则：用于删除所有编译产物
 # 当你运行 "make clean" 时，会执行这里的命令
 clean:
 	@echo "正在清理项目..."
-	@if exist $(BUILD_DIR) rmdir /s /q $(BUILD_DIR)
+	@rm -rf $(BUILD_DIR)
 	@echo "清理完成。"
 
 # .PHONY 用于声明一个"伪目标"，它不是一个真正的文件名。

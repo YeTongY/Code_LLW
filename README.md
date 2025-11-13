@@ -11,8 +11,11 @@
 - **操作系统**: Windows
 - **编译器**: GCC (MinGW-w64)
 - **构建工具**: Make
+- **终端环境**: **MSYS2 MinGW64** 或 **Git Bash** (必需)
 - **图形库**: Raylib (已包含在 `lib/raylib/` 目录中)
 - **版本控制**: Git
+
+**重要**: 本项目的 Makefile 使用 Unix 命令（如 `mkdir -p`, `rm -rf`），必须在 MSYS2 MinGW64 终端或 Git Bash 中运行，不支持 Windows 原生的 cmd 或 PowerShell。
 
 ## 项目结构
 
@@ -54,32 +57,57 @@ LLW_Project/
 
 ### 1. 克隆项目(首次使用)
 
-```powershell
+在 Git Bash 或终端中运行：
+
+```bash
 git clone https://github.com/YeTongY/Code_LLW.git
 cd Code_LLW
 ```
 
 ### 2. 确保环境配置正确
 
-- 确保 `make` 和 `g++` 已安装并添加到系统 PATH。
-- 确保 `lib/raylib/` 文件夹中已有 Raylib 库文件。
+**安装 MSYS2（推荐）**：
+
+1. 访问 [https://www.msys2.org/](https://www.msys2.org/) 下载安装 MSYS2
+2. 安装完成后，打开 "MSYS2 MinGW64" 终端（不是 UCRT64 或 MSYS）
+3. 运行以下命令安装工具链：
+
+```bash
+pacman -Syu                                    # 更新系统
+pacman -S mingw-w64-x86_64-gcc mingw-w64-x86_64-make   # 安装 GCC 和 Make
+```
+
+4. 确认安装成功：
+
+```bash
+gcc --version
+make --version
+```
+
+**或者使用 Git Bash**：
+- 如果你已经安装了 Git for Windows，可以直接使用 Git Bash
+- 但需要单独安装 MinGW-w64 工具链
+
+**重要**: 确保 Raylib 库文件在 `lib/raylib/` 目录中（include/ 和 lib/ 文件夹）。
 
 ### 3. 编译项目
 
-在项目根目录打开终端,运行:
+在 MSYS2 MinGW64 终端或 Git Bash 中，进入项目根目录运行:
 
-```powershell
-mingw32-make
+```bash
+make
 ```
 
 编译成功后,可执行文件会生成在 `build/LLW.exe`。
 
-**注意**: 在 Windows 上,make 工具通常叫 `mingw32-make`,不是 `make`。
+**注意**: 在 Windows 上,make 工具通常叫 `make`,不是 `mingw32-make`（在 MSYS2 中）。
 
 ### 4. 运行游戏
 
-```powershell
-& ".\build\LLW.exe"
+在 MSYS2/Git Bash 中：
+
+```bash
+./build/LLW.exe
 ```
 
 或者直接双击 `build/LLW.exe` 文件。
@@ -88,8 +116,8 @@ mingw32-make
 
 如果需要清理所有编译生成的文件:
 
-```powershell
-mingw32-make clean
+```bash
+make clean
 ```
 
 ---
@@ -198,9 +226,10 @@ mingw32-make clean
    - 使用相对路径加载资源: `../res/graphics/player/xxx.png`
 
 3. **测试编译**:
-   ```powershell
-   mingw32-make
-   & ".\build\LLW.exe"
+
+   ```bash
+   make
+   ./build/LLW.exe
    ```
 
 4. **提交代码**:
