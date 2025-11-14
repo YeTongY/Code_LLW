@@ -27,6 +27,7 @@ LLW_Project/
 ├── src/                # 源代码目录
 │   ├── main.cpp        # 主程序入口
 │   ├── GameState.h     # 游戏状态定义
+│   ├── FontLoader.h/cpp# 字体加载器
 │   ├── Map.h/cpp       # 地图系统
 │   ├── Combat.h/cpp    # 战斗系统
 │   ├── Player.h/cpp    # 玩家角色
@@ -42,7 +43,8 @@ LLW_Project/
 │   │   └── sfx/        # 音效
 │   └── data/           # 游戏数据
 │       ├── maps/       # 地图数据文件
-│       └── dialogue/   # 对话脚本
+│       ├── dialogue/   # 对话脚本
+│       └── fonts/      # 字体文件
 ├── lib/                # 第三方库
 │   └── raylib/         # Raylib 库文件
 │       ├── include/    # 头文件
