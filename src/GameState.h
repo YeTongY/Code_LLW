@@ -28,15 +28,16 @@ typedef void (*StateEnterFunc)(GameContext* ctx, void* state_data);
 typedef void (*StateExitFunc)(GameContext* ctx, void* state_data);
 typedef void (*StateUpdateFunc)(GameContext* ctx, void* state_data);
 
-}
-#endif // GAMESTATE_H
+#ifdef __cplusplus
+}  // 结束 extern "C" 块
+#endif
 
 // 【核心】
 // 先定义一个 GameEngine 结构体
 // 其他人以后可以在这里添加他需要的所有东西
 struct GameEngine {
     
-    Font mainFont; // 这是“字体加载器”唯一需要的东西：
+    Font mainFont; // 这是"字体加载器"唯一需要的东西：
     
     // 可以在这里添加...
     // enum GameState currentState;
@@ -45,3 +46,5 @@ struct GameEngine {
     // vector<vector<int>> currentMapData;
     // ...等等
 };
+
+#endif // GAMESTATE_H - 头文件保护结束，确保此文件内容只被包含一次
