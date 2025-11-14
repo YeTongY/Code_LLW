@@ -6,8 +6,6 @@
  * 
  * @param engine Gamestate里的engine核心数据文件
  */
-
-
 void loadGameFont (GameEngine &engine);
 
 /**
