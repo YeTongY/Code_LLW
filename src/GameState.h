@@ -1,5 +1,6 @@
 /*
 2025/11/13 Waring开始编写 游戏状态机
+2025/11/14 wyt 修改了头文件保护使其正常生效
 */
 #ifndef GAMESTATE_H //头文件保护
 #define GAMESTATE_H 

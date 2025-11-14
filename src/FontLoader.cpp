@@ -40,8 +40,6 @@ static string textLoader(const char* text_address){
  * 
  * @param engine Gamestate里的engine核心数据文件
  */
-
-
 void loadGameFont (GameEngine &engine){
     const char* fontFile_Address = "res/data/fonts/SourceHanSansSC-Regular.otf";//加载思源黑体字体文件
     const char* allGameText_Address = "res/data/dialogue/all_game_script.txt";//加载全文本文件
@@ -69,7 +67,7 @@ void loadGameFont (GameEngine &engine){
 }
 
 /**
- * @brief 卸载已烘焙的字体
+ * @brief 卸载已烘焙的文件
  * 
  * @param engine Gamestate里的engine核心数据文件
  */
