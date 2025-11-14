@@ -4,7 +4,17 @@
 #ifndef GAMESTATE_H //头文件保护
 #define GAMESTATE_H 
 
+//! 在下面引入其它库
+
 #include <stddef.h> //引入size_t
+#include "raylib.h"//引入raylib库以使用font字体文件
+
+//引入常用库
+#include <vector>
+#include <map>
+#include <string>
+
+//! 在上面引入其它库
 
 #ifdef __cplusplus //这段代码在c++环境下编译
 extern "C" {  //使编译器以c风格调用函数而不是c++风格 因为c++支持函数重载而c不支持 c++编译器会对函数进行名称修饰
@@ -20,3 +30,18 @@ typedef void (*StateUpdateFunc)(GameContext* ctx, void* state_data);
 
 }
 #endif // GAMESTATE_H
+
+// 【核心】
+// 先定义一个 GameEngine 结构体
+// 其他人以后可以在这里添加他需要的所有东西
+struct GameEngine {
+    
+    Font mainFont; // 这是“字体加载器”唯一需要的东西：
+    
+    // 可以在这里添加...
+    // enum GameState currentState;
+    // Player* player;
+    // Camera2D camera;
+    // vector<vector<int>> currentMapData;
+    // ...等等
+};
