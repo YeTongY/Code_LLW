@@ -39,7 +39,7 @@ typedef void (*StateUpdateFunc)(GameContext* ctx, void* state_data);
 struct GameEngine {
     
     Font mainFont; // 这是"字体加载器"唯一需要的东西：
-    
+    Player player;//玩家属性结构体
     // 可以在这里添加...
     // enum GameState currentState;
     // Player* player;
