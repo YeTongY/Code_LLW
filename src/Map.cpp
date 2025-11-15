@@ -6,6 +6,8 @@
 
 using namespace std;
 
+std::vector<std::vector<TileType>>tiles;
+
 /**
  * @brief 构造函数：初始化地图
  * 
@@ -13,16 +15,16 @@ using namespace std;
  * @param h 高
  * @param size 单位块的像素个数
  */
-Map(int w,int h,int size),width(w), height(h), tileSize(size) {
+Map::Map(int w,int h,int size):width(w), height(h), tileSize(size) {
     //对地图块进行初始化
     if(width < 0) width = 0;
     if(height < 0) height = 0;
     if(tileSize < 0) tileSize = 0;
 
     //初始化vector容器，将位置全部改成EMPTY
-    TileType.resize(height);                         //初始化行
+    tiles.resize(height);                            //初始化行
 
-    for(auto& row : TileType){
+    for(auto& row : tiles){
         row.resize(width, TileType::EMPTY);     //初始化每一列
     }
 }
@@ -31,7 +33,7 @@ Map(int w,int h,int size),width(w), height(h), tileSize(size) {
  * @brief 析构函数：清理资源
  * 
  */
-~Map() {
+Map::~Map() {
     
 }
 
@@ -49,7 +51,7 @@ bool Load(const char* filepath) {
     }
 
     // 清空原有地图数据
-    tileMap.clear();
+    tiles.clear();
     std::string line;
 
     //逐行读取数据
@@ -76,7 +78,7 @@ bool Load(const char* filepath) {
             }
             }
         }
-        tileMap.push_back(currentRow);
+        tiles.push_back(currentRow);
     }
 
     //关闭文件
@@ -84,7 +86,7 @@ bool Load(const char* filepath) {
     return true;
 }
 
-void Draw(const Camera2D& Camera) {
+void Draw() {
     
 }
 
@@ -95,7 +97,7 @@ void Draw(const Camera2D& Camera) {
  * @param tileY y坐标
  * @param tileMap 地图块坐标
  */
-void DrawSingleTile(const int tileX, const int tileY, int tileType) {
+void DrawSingleTile(int tileX,int tileY,TileType type, int tileSize) {
 
 }
 
