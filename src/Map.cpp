@@ -48,12 +48,12 @@ bool Load(const char* filepath) {
         return false;
     }
 
-    //清空原有地图数据
+    // 清空原有地图数据
     tileMap.clear();
     std::string line;
 
     //逐行读取数据
-    while(){
+    while(std::getline(file, line)){
         std::vector<TileType> currentRow;
         for(char c : line){
             //后期会对不同地块进行分类
@@ -61,15 +61,19 @@ bool Load(const char* filepath) {
             {
             case '0':{
                 currentRow.push_back(TileType::EMPTY);
-                break;}
+                break;
+            }
             case '1':{
                 currentRow.push_back(TileType::GRASS);
-                break;}
+                break;
+            }
             case '2':{
                 currentRow.push_back(TileType::WALL);
-                break;}
-            default:
                 break;
+            }
+            default:{
+                break;
+            }
             }
         }
         tileMap.push_back(currentRow);
@@ -77,6 +81,7 @@ bool Load(const char* filepath) {
 
     //关闭文件
     file.close();
+    return true;
 }
 
 void Draw(const Camera2D& Camera) {
