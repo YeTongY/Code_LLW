@@ -41,10 +41,10 @@ Map(int w,int h,int size),width(w), height(h), tileSize(size) {
  * @param filepath 
  */
 bool Load(const char* filepath) {
-    //打开文件（只读）
+    // 打开文件流
     std::ifstream file(filepath);
-    if(!file.is_open()){
-        std::cout<<"错误"<< filepath << std::endl;  //打开错误进行报错
+    if (!file.is_open()) {
+        std::cout << "错误" << filepath << std::endl;  // 打开错误进行报错
         return false;
     }
 
@@ -57,17 +57,17 @@ bool Load(const char* filepath) {
         std::vector<TileType> currentRow;
         for(char c : line){
             //后期会对不同地块进行分类
-            switch (c)
+            switch(c)
             {
-            case '0':
+            case '0':{
                 currentRow.push_back(TileType::EMPTY);
-                break;
-            case '1':
+                break;}
+            case '1':{
                 currentRow.push_back(TileType::GRASS);
-                break;
-            case '2':
+                break;}
+            case '2':{
                 currentRow.push_back(TileType::WALL);
-                break;
+                break;}
             default:
                 break;
             }
@@ -77,11 +77,6 @@ bool Load(const char* filepath) {
 
     //关闭文件
     file.close();
-
-    //检验结果
-    
-    cout<<"成功读取"<<std::endl;
-    return true;
 }
 
 void Draw(const Camera2D& Camera) {
