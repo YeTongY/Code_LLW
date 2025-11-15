@@ -37,21 +37,29 @@ void updatePlayer(GameEngine& engine){
 
     bool canMove = false; //初始化为：不可移动
 
+    //【修复】安全检查顺序：先检查 Y，再用该行的实际宽度检查 X
+    //这样可以处理"锯齿状"地图（不同行宽度不同的情况）
+
     //检查地图是否为空
-    if(engine.currentMapData.empty() || engine.currentMapData[0].empty()){
+    if(engine.currentMapData.empty()){
         TraceLog(LOG_FATAL,"[PlayerMove] Map data is empty!");
         canMove = false;
     }
-    //检测是否超出地图限制
+    //【第一步】检测 Y 轴是否超出地图限制
     else if(nextY < 0 || nextY >= (int)engine.currentMapData.size()){
         TraceLog(LOG_WARNING,"[PlayerMove] Invalid move attempt! Out of map bounds of Y. Target position:(%d,%d)",nextX,nextY);
         canMove = false;
     }
-    else if(nextX < 0 || nextX >= (int)engine.currentMapData[0].size()){
+    //【第二步】Y 轴安全，现在用 nextY 这一行来检查 X 的实际宽度
+    else if(engine.currentMapData[nextY].empty()){
+        TraceLog(LOG_WARNING,"[PlayerMove] Invalid move attempt! Row %d is empty. Target position:(%d,%d)",nextY,nextX,nextY);
+        canMove = false;
+    }
+    else if(nextX < 0 || nextX >= (int)engine.currentMapData[nextY].size()){
         TraceLog(LOG_WARNING,"[PlayerMove] Invalid move attempt! Out of map bounds of X. Target position:(%d,%d)",nextX,nextY);
         canMove = false;
     }
-    //检测目标位置是否可移动
+    //【第三步】X 和 Y 都安全，检测目标位置是否可移动
     else if(engine.currentMapData[nextY][nextX] != 0){
         TraceLog(LOG_WARNING,"[PlayerMove] Invalid move attempt! Target tile is not walkable. Target position:(%d,%d)",nextX,nextY);
         canMove = false;
