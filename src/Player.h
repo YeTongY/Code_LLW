@@ -1,4 +1,5 @@
 #pragma once
+#include "GameState.h"
 
 struct Stats {//声明玩家基础属性
     int hp;//当前hp
@@ -16,3 +17,12 @@ struct Player {//声明玩家主结构体
     // (P1 阶段)
     // Texture2D playerTexture; // P1: 玩家的贴图
 };
+
+ /**
+  * @brief 用于读取键盘输入来更新玩家位置
+  * 
+  * @param engine Gamestate里的engine核心数据文件
+  */
+void updatePlayer(GameEngine& engine);
+
+void drawPlayer(const GameEngine& engine);
