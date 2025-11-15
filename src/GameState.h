@@ -80,7 +80,7 @@ using namespace std;
 // 【核心】
 //  GameContext 结构体 包含此游戏所有资源
 // 其他人以后可以在这里添加他需要的所有东西
-struct GameContext {
+struct GameContext {//? 某个小可爱写错变量名了，记得不要手滑写成content
     
     Font mainFont; // 这是"字体加载器"唯一需要的东西：
     Player player;//玩家属性结构体
