@@ -1,5 +1,7 @@
 #pragma once
-#include "GameState.h"
+
+// 前向声明（打破循环依赖）
+struct GameEngine;
 
 struct Stats {//声明玩家基础属性
     int hp;//当前hp
