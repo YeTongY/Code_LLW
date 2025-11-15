@@ -7,76 +7,75 @@
 using namespace std;
 
 /**
- * @brief 构造函数：初始化地图
+ * @brief 初始化地图
  * 
+ * @param map 地图指针
  * @param w 宽
  * @param h 高
  * @param size 单位块的像素个数
  */
-Map(int w,int h,int size),width(w), height(h), tileSize(size) {
+void InitMap(Map* map, int w, int h, int size) {
     //对地图块进行初始化
-    if(width < 0) width = 0;
-    if(height < 0) height = 0;
-    if(tileSize < 0) tileSize = 0;
+    map->width = (w < 0) ? 0 : w;
+    map->height = (h < 0) ? 0 : h;
+    map->tileSize = (size < 0) ? 0 : size;
 
     //初始化vector容器，将位置全部改成EMPTY
-    TileType.resize(height);                         //初始化行
+    map->tiles.resize(map->height);
 
-    for(auto& row : TileType){
-        row.resize(width, TileType::EMPTY);     //初始化每一列
+    for(auto& row : map->tiles){
+        row.resize(map->width, TileType::EMPTY);
     }
 }
 
 /**
- * @brief 析构函数：清理资源
+ * @brief 清理地图资源
  * 
+ * @param map 地图指针
  */
-~Map() {
-    
+void CleanupMap(Map* map) {
+    map->tiles.clear();
 }
 
 /**
  * @brief TODO: 从文件加载地图数据
  * 
- * @param filepath 
+ * @param map 地图指针
+ * @param filepath 文件路径
  */
-bool Load(const char* filepath) {
+bool LoadMap(Map* map, const char* filepath) {
     // 打开文件流
-    std::ifstream file(filepath);
+    ifstream file(filepath);
     if (!file.is_open()) {
-        std::cout << "错误" << filepath << std::endl;  // 打开错误进行报错
+        cout << "错误: 无法打开文件 " << filepath << endl;
         return false;
     }
 
     // 清空原有地图数据
-    tileMap.clear();
-    std::string line;
+    map->tiles.clear();
+    string line;
 
     //逐行读取数据
-    while(std::getline(file, line)){
-        std::vector<TileType> currentRow;
+    while(getline(file, line)){
+        vector<TileType> currentRow;
         for(char c : line){
             //后期会对不同地块进行分类
             switch(c)
             {
-            case '0':{
+            case '0':
                 currentRow.push_back(TileType::EMPTY);
                 break;
-            }
-            case '1':{
+            case '1':
                 currentRow.push_back(TileType::GRASS);
                 break;
-            }
-            case '2':{
+            case '2':
                 currentRow.push_back(TileType::WALL);
                 break;
-            }
-            default:{
+            default:
                 break;
             }
-            }
         }
-        tileMap.push_back(currentRow);
+        map->tiles.push_back(currentRow);
     }
 
     //关闭文件
@@ -84,38 +83,65 @@ bool Load(const char* filepath) {
     return true;
 }
 
-void Draw(const Camera2D& Camera) {
-    
+/**
+ * @brief 绘制地图
+ * 
+ * @param map 地图指针
+ */
+void DrawMap(Map* map) {
+    // TODO: 实现绘制逻辑
 }
 
 /**
  * @brief 绘制单个块
  * 
+ * @param map 地图指针
  * @param tileX x坐标
  * @param tileY y坐标
- * @param tileMap 地图块坐标
+ * @param type 地图块类型
  */
-void DrawSingleTile(const int tileX, const int tileY, int tileType) {
-
+void DrawSingleTile(Map* map, int tileX, int tileY, TileType type) {
+    // TODO: 实现单个块绘制逻辑
 }
 
 /**
  * @brief 更新地图状态
  * 
+ * @param map 地图指针
  */
-bool Map::Update() {
-
+bool UpdateMap(Map* map) {
+    // TODO: 实现更新逻辑
     return true;
 }
 
 /**
  * @brief TODO: 检测碰撞
  * 
+ * @param map 地图指针
  * @param position 位置信息
- * @return true 
- * @return false 
  */
-bool CheckCollision(Vector2 position) {
-    
+bool CheckMapCollision(Map* map, Vector2 position) {
+    // TODO: 实现碰撞检测逻辑
     return false;
+}
+
+/**
+ * @brief 获取地图宽度
+ */
+int GetMapWidth(const Map* map) {
+    return map->width;
+}
+
+/**
+ * @brief 获取地图高度
+ */
+int GetMapHeight(const Map* map) {
+    return map->height;
+}
+
+/**
+ * @brief 获取地图块大小
+ */
+int GetMapTileSize(const Map* map) {
+    return map->tileSize;
 }

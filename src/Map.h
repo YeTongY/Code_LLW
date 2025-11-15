@@ -16,25 +16,24 @@ typedef enum {
 
 // 地图结构体声明
 typedef struct Map{
-    int width = 60;
-    int height = 33;
-    int tileSize = 32;
+    int width;
+    int height;
+    int tileSize;
     std::vector<std::vector<TileType>> tiles;//存储所有地块类型
-
-    //成员函数声明
-    Map(int width,int height,int tileSize);
-     ~Map();
-    bool Load(const char* filepath);
-    void Draw();
-    void DrawSingleTile(int tileX, int tileY, TileType type, int tileSize);
-    bool Update();
-    bool CheckCollision(Vector2 position);
-
-    // Getter接口
-    int GetWidth() const { return width; }
-    int GetHeight() const { return height; }
-    int GetTileSize() const { return tileSize; }
-
 } Map;
+
+// C风格函数声明（第一个参数是结构体指针）
+void InitMap(Map* map, int width, int height, int tileSize);
+void CleanupMap(Map* map);
+bool LoadMap(Map* map, const char* filepath);
+void DrawMap(Map* map);
+void DrawSingleTile(Map* map, int tileX, int tileY, TileType type);
+bool UpdateMap(Map* map);
+bool CheckMapCollision(Map* map, Vector2 position);
+
+// Getter函数
+int GetMapWidth(const Map* map);
+int GetMapHeight(const Map* map);
+int GetMapTileSize(const Map* map);
 
 #endif // MAP_H
