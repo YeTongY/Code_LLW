@@ -4,13 +4,13 @@
 /**
  * @brief 用于加载字体
  * 
- * @param engine Gamestate里的engine核心数据文件
+ * @param ctx Gamestate里的GameContext核心数据文件
  */
-void loadGameFont (GameEngine &engine);
+void loadGameFont (GameContext &ctx);
 
 /**
  * @brief 卸载已烘焙的字体
  * 
- * @param engine Gamestate里的engine核心数据文件
+ * @param ctx Gamestate里的GameContext核心数据文件
  */
-void unloadGameFont (GameEngine &engine);
+void unloadGameFont (GameContext &ctx);

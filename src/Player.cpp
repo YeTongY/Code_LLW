@@ -8,12 +8,12 @@ const int TILE_SIZE = 32;//标准图块大小
  /**
   * @brief 用于读取键盘输入来更新玩家位置
   * 
-  * @param engine Gamestate里的engine核心数据文件
+  * @param ctx Gamestate里的GameContext核心数据文件
   */
-void updatePlayer(GameEngine& engine){
+void updatePlayer(GameContext& ctx){
     //初始化移动意图
-    int nextX = engine.player.gridX;
-    int nextY = engine.player.gridY;
+    int nextX = ctx.player.gridX;
+    int nextY = ctx.player.gridY;
 
     //将按键转化为移动意图
     if(IsKeyPressed(KEY_W)){//当W键按下 一次 时，仅一次向上移动一格
@@ -41,26 +41,26 @@ void updatePlayer(GameEngine& engine){
     //这样可以处理"锯齿状"地图（不同行宽度不同的情况）
 
     //检查地图是否为空
-    if(engine.currentMapData.empty()){
+    if(ctx.currentMapData.empty()){
         TraceLog(LOG_FATAL,"[PlayerMove] Map data is empty!");
         canMove = false;
     }
     //【第一步】检测 Y 轴是否超出地图限制
-    else if(nextY < 0 || nextY >= (int)engine.currentMapData.size()){
+    else if(nextY < 0 || nextY >= (int)ctx.currentMapData.size()){
         TraceLog(LOG_WARNING,"[PlayerMove] Invalid move attempt! Out of map bounds of Y. Target position:(%d,%d)",nextX,nextY);
         canMove = false;
     }
     //【第二步】Y 轴安全，现在用 nextY 这一行来检查 X 的实际宽度
-    else if(engine.currentMapData[nextY].empty()){
+    else if(ctx.currentMapData[nextY].empty()){
         TraceLog(LOG_WARNING,"[PlayerMove] Invalid move attempt! Row %d is empty. Target position:(%d,%d)",nextY,nextX,nextY);
         canMove = false;
     }
-    else if(nextX < 0 || nextX >= (int)engine.currentMapData[nextY].size()){
+    else if(nextX < 0 || nextX >= (int)ctx.currentMapData[nextY].size()){
         TraceLog(LOG_WARNING,"[PlayerMove] Invalid move attempt! Out of map bounds of X. Target position:(%d,%d)",nextX,nextY);
         canMove = false;
     }
     //【第三步】X 和 Y 都安全，检测目标位置是否可移动
-    else if(engine.currentMapData[nextY][nextX] != 0){
+    else if(ctx.currentMapData[nextY][nextX] != 0){
         TraceLog(LOG_WARNING,"[PlayerMove] Invalid move attempt! Target tile is not walkable. Target position:(%d,%d)",nextX,nextY);
         canMove = false;
     }
@@ -72,8 +72,8 @@ void updatePlayer(GameEngine& engine){
 
     //------开始执行移动------
     if(canMove){
-    engine.player.gridX = nextX;
-    engine.player.gridY = nextY;
+    ctx.player.gridX = nextX;
+    ctx.player.gridY = nextY;
     }
     //------移动结束------
 }
@@ -81,17 +81,17 @@ void updatePlayer(GameEngine& engine){
 /**
  * @brief 角色摄像机，负责绘制非战斗情况，即大地图时的画面
  * 
- * @param engine Gamestate里的engine核心数据文件
+ * @param ctx Gamestate里的GameContext核心数据文件
  */
-void drawPlayer(const GameEngine& engine){
-    Camera2D camera = engine.camera;//创建一个camera的副本
+void drawPlayer(const GameContext& ctx){
+    Camera2D camera = ctx.camera;//创建一个camera的副本
 
     //------开始设置角色摄像机------
     camera.zoom = 3.0f;//?为啥要加f--->因为zoom本身就是个float量，3.0这样会默认为double
     camera.offset = {1920/2.0f, 1080/2.0f};
     camera.target = { 
-        (float)(engine.player.gridX * TILE_SIZE) + (TILE_SIZE / 2.0f),
-        (float)(engine.player.gridY * TILE_SIZE) + (TILE_SIZE / 2.0f)
+        (float)(ctx.player.gridX * TILE_SIZE) + (TILE_SIZE / 2.0f),
+        (float)(ctx.player.gridY * TILE_SIZE) + (TILE_SIZE / 2.0f)
     };
     //------结束角色摄像机设置------
 
@@ -102,7 +102,7 @@ void drawPlayer(const GameEngine& engine){
     DrawMap();//TODO 这个函数的参数有问题，待修改正确后再写入参数
 
     //绘制角色
-    DrawRectangle(engine.player.gridX * TILE_SIZE, engine.player.gridY * TILE_SIZE,TILE_SIZE,TILE_SIZE,RED);
+    DrawRectangle(ctx.player.gridX * TILE_SIZE, ctx.player.gridY * TILE_SIZE,TILE_SIZE,TILE_SIZE,RED);
 
     //结束角色渲染，恢复到正常尺寸以备之后绘制ui
     EndMode2D();

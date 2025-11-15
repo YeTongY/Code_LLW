@@ -1,7 +1,7 @@
 #pragma once
 
 // 前向声明（打破循环依赖）
-struct GameEngine;
+struct GameContext;
 
 struct Stats {//声明玩家基础属性
     int hp;//当前hp
@@ -23,8 +23,8 @@ struct Player {//声明玩家主结构体
  /**
   * @brief 用于读取键盘输入来更新玩家位置
   * 
-  * @param engine Gamestate里的engine核心数据文件
+  * @param ctx Gamestate里的GameContext核心数据文件
   */
-void updatePlayer(GameEngine& engine);
+void updatePlayer(GameContext& ctx);
 
-void drawPlayer(const GameEngine& engine);
+void drawPlayer(const GameContext& ctx);

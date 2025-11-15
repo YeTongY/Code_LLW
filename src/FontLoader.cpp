@@ -38,9 +38,9 @@ static string textLoader(const char* text_address){
 /**
  * @brief 用于加载字体
  * 
- * @param engine Gamestate里的engine核心数据文件
+ * @param ctx Gamestate里的GameContext核心数据文件
  */
-void loadGameFont (GameEngine &engine){
+void loadGameFont (GameContext &ctx){
     const char* fontFile_Address = "res/data/fonts/SourceHanSansSC-Regular.otf";//加载思源黑体字体文件
     const char* allGameText_Address = "res/data/dialogue/all_game_script.txt";//加载全文本文件
 
@@ -51,14 +51,14 @@ void loadGameFont (GameEngine &engine){
     int* codepoints = LoadCodepoints(allGameText.c_str(), &codepointCount);//从文本文档里读取全部码点
     TraceLog(LOG_INFO, "[FontLoader] Found %d unique codepoints in script file.", codepointCount);//读取码点的日志输出
 
-    engine.mainFont = LoadFontEx(//烘焙字体
+    ctx.mainFont = LoadFontEx(//烘焙字体
         fontFile_Address, //字体地址
         48, //字体大小
         codepoints, //要烘焙的码点
         codepointCount //码点数
     );
     UnloadCodepoints(codepoints); //释放码点
-    if (engine.mainFont.texture.id != 0) {//检查字体是否被成功烘焙
+    if (ctx.mainFont.texture.id != 0) {//检查字体是否被成功烘焙
         TraceLog(LOG_INFO, "[FontLoader] Font '%s' loaded successfully.", fontFile_Address);
     } else {
         TraceLog(LOG_ERROR, "[FontLoader] FAILED to load font: %s", fontFile_Address);
@@ -69,11 +69,11 @@ void loadGameFont (GameEngine &engine){
 /**
  * @brief 卸载已烘焙的文件
  * 
- * @param engine Gamestate里的engine核心数据文件
+ * @param ctx Gamestate里的GameContext核心数据文件
  */
-void unloadGameFont (GameEngine &engine){
-    if(engine.mainFont.texture.id != 0){//检查字体是否被成功烘焙
-        UnloadFont(engine.mainFont);
+void unloadGameFont (GameContext &ctx){
+    if(ctx.mainFont.texture.id != 0){//检查字体是否被成功烘焙
+        UnloadFont(ctx.mainFont);
         TraceLog(LOG_INFO, "[FontLoader] Unloaded game font.");
     }
 }
