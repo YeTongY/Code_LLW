@@ -13,16 +13,16 @@ using namespace std;
  * @param h 高
  * @param size 单位块的像素个数
  */
-Map::Map(int w, int h, int size) : width(w), height(h), tileSize(size) {
+Map(int w,int h,int size),width(w), height(h), tileSize(size) {
     //对地图块进行初始化
     if(width < 0) width = 0;
     if(height < 0) height = 0;
     if(tileSize < 0) tileSize = 0;
 
     //初始化vector容器，将位置全部改成EMPTY
-    tileMap.resize(height);                         //初始化行
+    TileType.resize(height);                         //初始化行
 
-    for(auto& row : tileMap){
+    for(auto& row : TileType){
         row.resize(width, TileType::EMPTY);     //初始化每一列
     }
 }
@@ -31,7 +31,7 @@ Map::Map(int w, int h, int size) : width(w), height(h), tileSize(size) {
  * @brief 析构函数：清理资源
  * 
  */
-Map::~Map() {
+~Map() {
     
 }
 
@@ -40,7 +40,7 @@ Map::~Map() {
  * 
  * @param filepath 
  */
-bool Map::Load(const char* filepath) {
+bool Load(const char* filepath) {
     //打开文件（只读）
     std::ifstream file(filepath);
     if(!file.is_open()){
@@ -53,7 +53,7 @@ bool Map::Load(const char* filepath) {
     std::string line;
 
     //逐行读取数据
-    while(std::getline(file,line)){
+    while(){
         std::vector<TileType> currentRow;
         for(char c : line){
             //后期会对不同地块进行分类
@@ -79,20 +79,24 @@ bool Map::Load(const char* filepath) {
     file.close();
 
     //检验结果
-    for(const  auto& row : tileMap){
-        if(row.size()!=width){
-            std::cout<<"错误"<<std::endl;
-        }
-    }
-    std::cout<<"成功读取"<<std::endl;
+    
+    cout<<"成功读取"<<std::endl;
+    return true;
+}
+
+void Draw(const Camera2D& Camera) {
+    
 }
 
 /**
- * @brief 绘制地图
+ * @brief 绘制单个块
  * 
+ * @param tileX x坐标
+ * @param tileY y坐标
+ * @param tileMap 地图块坐标
  */
-void Map::Draw() {
-    
+void DrawSingleTile(const int tileX, const int tileY, int tileType) {
+
 }
 
 /**
@@ -100,7 +104,8 @@ void Map::Draw() {
  * 
  */
 bool Map::Update() {
-    
+
+    return true;
 }
 
 /**
@@ -110,7 +115,7 @@ bool Map::Update() {
  * @return true 
  * @return false 
  */
-bool Map::CheckCollision(Vector2 position) {
+bool CheckCollision(Vector2 position) {
     
     return false;
 }
