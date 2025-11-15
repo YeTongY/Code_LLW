@@ -9,6 +9,7 @@
 
 #include <stddef.h> //引入size_t
 #include "raylib.h"//引入raylib库以使用font字体文件
+#include "Player.h"
 
 //引入常用库
 #include <vector>
@@ -33,6 +34,8 @@ typedef void (*StateUpdateFunc)(GameContext* ctx, void* state_data);
 }  // 结束 extern "C" 块
 #endif
 
+using namespace std;
+
 // 【核心】
 // 先定义一个 GameEngine 结构体
 // 其他人以后可以在这里添加他需要的所有东西
@@ -40,11 +43,10 @@ struct GameEngine {
     
     Font mainFont; // 这是"字体加载器"唯一需要的东西：
     Player player;//玩家属性结构体
+    vector<vector<int>> currentMapData;//当前地图数据
+    Camera2D camera;//raylib 的 2D 摄像机结构体
     // 可以在这里添加...
     // enum GameState currentState;
-    // Player* player;
-    // Camera2D camera;
-    // vector<vector<int>> currentMapData;
     // ...等等
 };
 
