@@ -116,17 +116,6 @@ bool UpdateMap(Map* map) {
 }
 
 /**
- * @brief TODO: 检测碰撞
- * 
- * @param map 地图指针
- * @param position 位置信息
- */
-bool CheckMapCollision(Map* map, Vector2 position) {
-    // TODO: 实现碰撞检测逻辑
-    return false;
-}
-
-/**
  * @brief 获取地图宽度
  */
 int GetMapWidth(const Map* map) {
