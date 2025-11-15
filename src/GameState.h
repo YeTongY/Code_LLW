@@ -34,6 +34,8 @@ typedef void (*StateUpdateFunc)(GameContext* ctx, void* state_data);
 }  // 结束 extern "C" 块
 #endif
 
+using namespace std;
+
 // 【核心】
 // 先定义一个 GameEngine 结构体
 // 其他人以后可以在这里添加他需要的所有东西
