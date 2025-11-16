@@ -14,6 +14,7 @@
 #include "ExplorationState.h"
 #include "Player.h"
 #include "Map.h"
+#include "Enemy.h"          //未完成敌人模块
 #include <cstdio>
 #include <cstring>
 

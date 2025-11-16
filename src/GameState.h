@@ -16,6 +16,7 @@
 #include "raylib.h"
 #include "Player.h"
 #include "Map.h"
+#include "Enemy.h"
 
 using namespace std;
 
@@ -80,8 +81,11 @@ struct GameContext
     int width;
     int height;
     int tileSize;
-    vector<vector<TileType>> tiles;// 地图数据
-    unordered_map<TileType, Texture2D> mapTextures;// 地图资产
+    vector<vector<TileType>> tiles;                     // 地图数据
+    unordered_map<TileType, Texture2D> mapTextures;     // 地图资产
+
+    vector<Enemy> enemies;              //敌人列表
+    Enemy* currentCombatant;            //当前战斗的敌人指针
     
     // 摄像机
     Camera2D camera;
