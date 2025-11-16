@@ -103,7 +103,7 @@ void drawPlayer(const GameContext& ctx){
 
     //------开始设置角色摄像机------
     camera.zoom = 3.0f;//? 为啥要加f--->因为zoom本身就是个float量，3.0这样会默认为double
-    camera.offset = {1920/2.0f, 1080/2.0f}; // 摄像机偏移量，设置为屏幕中心（屏幕宽高的一半）
+    camera.offset = {ctx.screenWidth/2.0f, ctx.screenHeight/2.0f}; // 摄像机偏移量，设置为屏幕中心（屏幕宽高的一半）
     camera.target = { // 摄像机目标位置，指向玩家所在瓦片的中心点
         (float)(ctx.player.gridX * TILE_SIZE) + (TILE_SIZE / 2.0f), // 玩家网格X坐标 * 瓦片大小 + 瓦片中心偏移
         (float)(ctx.player.gridY * TILE_SIZE) + (TILE_SIZE / 2.0f)  // 玩家网格Y坐标 * 瓦片大小 + 瓦片中心偏移

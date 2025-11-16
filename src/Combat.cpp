@@ -18,6 +18,6 @@ void updateCombat(GameContext& ctx){
  */
 void drawCombat(const GameContext& ctx){
     ClearBackground(BLACK);// 初始化屏幕为黑屏
-    DrawTextEx(ctx.mainFont,"战斗开始！",{1920/2.0f,1080/2.0f},48,2,WHITE);
-    DrawTextEx(ctx.mainFont,"按ENTER退出",{1920/2.0f - 200.0f, 1080/2.0f + 100.0f},32,2,GRAY);
+    DrawTextEx(ctx.mainFont,"战斗开始！",{ctx.screenWidth/2.0f,ctx.screenHeight/2.0f},48,2,WHITE);
+    DrawTextEx(ctx.mainFont,"按ENTER退出",{ctx.screenWidth/2.0f - 200.0f, ctx.screenHeight/2.0f + 100.0f},32,2,GRAY);
 }
