@@ -93,17 +93,17 @@ void exploration_render(GameContext* ctx, void* state_data)
     //显示玩家坐标
     char posText[64];
     std::sprintf(posText, "位置: (%d, %d)", ctx->player.gridX, ctx->player.gridY);
-    DrawText(posText, 10, ctx->screenHeight - 60, 16, DARKGREEN);
+    DrawText(posText, 10, static_cast<int>(ctx->screenHeight) - 60, 16, DARKGREEN);
     
     //显示玩家属性
     char hpText[64];
     std::sprintf(hpText, "HP: %d/%d", ctx->player.stats.hp, ctx->player.stats.maxHp);
-    DrawText(hpText, 10, ctx->screenHeight - 40, 16, RED);
+    DrawText(hpText, 10, static_cast<int>(ctx->screenHeight) - 40, 16, RED);
     
     //显示运行时间
     char timeText[64];
     std::sprintf(timeText, "时间: %.1fs", expd->elapsedTime);
-    DrawText(timeText, 10, ctx->screenHeight - 20, 14, DARKGRAY);
+    DrawText(timeText, 10, static_cast<int>(ctx->screenHeight) - 20, 14, DARKGRAY);
 }
 
 //探索状态创建函数

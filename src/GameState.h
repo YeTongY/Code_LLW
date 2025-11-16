@@ -90,8 +90,8 @@ struct GameContext
     GameStateMachine state_machine;
     
     // 窗口配置
-    float screenWidth = screenWidth;
-    float screenHeight = screenHeight;
+    float screenWidth = 1920.0f;
+    float screenHeight = 1080.0f;
     bool isRunning = true;
 };
 
