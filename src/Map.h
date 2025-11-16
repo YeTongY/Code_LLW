@@ -17,26 +17,26 @@ typedef enum {
 } TileType;
 
 // 地图结构体声明
-typedef struct Map{
-    int width;
-    int height;
-    int tileSize;
-    vector<std::vector<TileType>> tiles;                    //存储所有地块类型
-    unordered_map<TileType, Texture2D> mapTextures;         //地图资产
-} Map;
+//typedef struct Map{
+    //int width;
+    //int height;
+    //int tileSize;
+    //vector<std::vector<TileType>> tiles;                    //存储所有地块类型
+    //unordered_map<TileType, Texture2D> mapTextures;         //地图资产
+//} Map;
 
 // C风格函数声明（第一个参数是结构体指针）
-void InitMap(Map* map, int width, int height, int tileSize);        //初始化地图
-void CleanupMap(Map* map);                                          //清理地图资源
-bool LoadMap(Map* map, const char* filepath);                       //加载地图
-void LoadMapTextures(Map* map);                                     //加载纹理
-void DrawMap(Map* map);                                             //绘图
-void DrawSingleTile(Map* map, int tileX, int tileY);                //绘制单个块
-bool UpdateMap(Map* map);                                           //更新地图
+void InitMap(GameContext& map, int width, int height, int tileSize);        //初始化地图
+void CleanupMap(GameContext& map);                                          //清理地图资源
+bool LoadMap(GameContext& map, const char* filepath);                       //加载地图
+void LoadMapTextures(GameContext& map);                                     //加载纹理
+void DrawMap(GameContext& map);                                             //绘图
+void DrawSingleTile(GameContext& map, int tileX, int tileY);                //绘制单个块
+bool UpdateMap(GameContext& map);                                           //更新地图
 
 // Getter函数
-int GetMapWidth(const Map* map);
-int GetMapHeight(const Map* map);
-int GetMapTileSize(const Map* map);
+int GetMapWidth(const GameContext& map);
+int GetMapHeight(const GameContext& map);
+int GetMapTileSize(const GameContext& map);
 
 #endif // MAP_H

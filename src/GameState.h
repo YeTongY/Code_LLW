@@ -10,11 +10,13 @@
 #include <stddef.h> //引入size_t
 #include "raylib.h"//引入raylib库以使用font字体文件
 #include "Player.h"
+#include "Map.h"
 
 //引入常用库
 #include <vector>
 #include <map>
 #include <string>
+#include <unordered_map>
 
 //! 在上面引入其它库
 
@@ -85,9 +87,12 @@ struct GameContext {                                        //核心数据库  �
     Font mainFont;                                          // 这是"字体加载器"唯一需要的东西：
     Player player;                                          //玩家属性结构体
     Camera2D camera;                                        //raylib 的 2D 摄像机结构体
-    
+
     vector<std::vector<TileType>> tiles;                    //存储所有地块类型
     unordered_map<TileType, Texture2D> mapTextures;         //地图资产
+    int width;
+    int height;
+    int tileSize;
 
     // 可以在这里添加...
     // enum GameState currentState;
