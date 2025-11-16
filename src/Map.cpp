@@ -94,7 +94,7 @@ bool LoadMap(GameContext& map, const char* filepath) {
  * 
  * @param map 地图指针
  */
-void DrawMap(GameContext& map) {
+void DrawMap(const GameContext& map) {
     // TODO: 实现绘制逻辑
     for(int y = 0;y < map.height;y++){
         for(int x = 0;x < map.width;x++){
@@ -111,7 +111,7 @@ void DrawMap(GameContext& map) {
  * @param tileY y坐标
  * @param type 地图块类型
  */
-void DrawSingleTile(GameContext& map, int tileX, int tileY) {
+void DrawSingleTile(const GameContext& map, int tileX, int tileY) {
     //获取纹理坐标
     TileType type = map.tiles[tileY][tileX];
     //判断纹理是否存在

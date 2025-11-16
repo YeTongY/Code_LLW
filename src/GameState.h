@@ -15,6 +15,7 @@
 //引入第三方库
 #include "raylib.h"
 #include "Player.h"
+#include "Map.h"
 
 using namespace std;
 
@@ -81,7 +82,7 @@ struct GameContext
     int tileSize;
     vector<vector<TileType>> tiles;// 地图数据
     unordered_map<TileType, Texture2D> mapTextures;// 地图资产
-
+    
     // 摄像机
     Camera2D camera;
     

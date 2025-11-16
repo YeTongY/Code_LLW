@@ -30,8 +30,8 @@ void InitMap(GameContext& map, int width, int height, int tileSize);        //�
 void CleanupMap(GameContext& map);                                          //清理地图资源
 bool LoadMap(GameContext& map, const char* filepath);                       //加载地图
 void LoadMapTextures(GameContext& map);                                     //加载纹理
-void DrawMap(GameContext& map);                                             //绘图
-void DrawSingleTile(GameContext& map, int tileX, int tileY);                //绘制单个块
+void DrawMap(const GameContext& map);                                             //绘图
+void DrawSingleTile(const GameContext& map, int tileX, int tileY);                //绘制单个块
 bool UpdateMap(GameContext& map);                                           //更新地图
 
 // Getter函数
