@@ -30,12 +30,17 @@ void InitMap(Map* map, int w, int h, int size) {
 }
 
 /**
- * @brief 清理地图资源
+ * @brief 清理地图资源，卸载地图纹理，防止内存溢出
  * 
  * @param map 地图指针
  */
 void CleanupMap(Map* map) {
-    map->tiles.clear();
+    for (auto const& [key, val] : map->mapTextures) {
+        UnloadTexture(val);
+    }
+    //卸载地图纹理
+    map->tiles.clear();             //释放内存
+    map->mapTextures.clear();       //释放内存
 }
 
 /**
@@ -91,6 +96,11 @@ bool LoadMap(Map* map, const char* filepath) {
  */
 void DrawMap(Map* map) {
     // TODO: 实现绘制逻辑
+    for(int y = 0;y < map->height;y++){
+        for(int x = 0;x < map->width;x++){
+            DrawSingleTile(map,x,y);
+        }
+    }
 }
 
 /**
@@ -101,10 +111,33 @@ void DrawMap(Map* map) {
  * @param tileY y坐标
  * @param type 地图块类型
  */
-void DrawSingleTile(Map* map, int tileX, int tileY, TileType type) {
-    // TODO: 实现单个块绘制逻辑
-
+void DrawSingleTile(Map* map, int tileX, int tileY) {
+    //获取纹理坐标
+    TileType type = map->tiles[tileY][tileX];
+    //判断纹理是否存在
+    if(map->mapTextures.count(type)){
+        Texture2D Texture = map->mapTextures.at(type);
+        //计算世界坐标
+        int worldX = tileX * map->tileSize;
+        int worldY = tileY * map->tileSize;
+        //绘制
+        DrawTexture(Texture,worldX,worldY,WHITE);
+    }
 }
+
+/**
+ * @brief 加载地图纹理
+ * 将地图纹理放置在maps文件下，注意png格式
+ * 在这个函数后添加读取地图
+ * 直接复制粘贴即可，修改map.h库里面TileType中的地图类型
+ * 
+ * @param map 
+ */
+void LoadMapTextures(Map* map){
+    map->mapTextures[TileType::EMPTY] = LoadTexture("res/data/maps/empty.png");
+    map->mapTextures[TileType::GRASS] = LoadTexture("res/data/maps/grass.png");
+    map->mapTextures[TileType::WALL] = LoadTexture("res/data/maps/wall.png");
+}                                   
 
 /**
  * @brief 更新地图状态

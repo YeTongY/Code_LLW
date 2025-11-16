@@ -80,12 +80,13 @@ using namespace std;
 // 【核心】
 //  GameContext 结构体 包含此游戏所有资源
 // 其他人以后可以在这里添加他需要的所有东西
-struct GameContext {                            //? 某个小可爱写错变量名了，记得不要手滑写成content
+struct GameContext {                                        //核心数据库  某个小可爱写错变量名了，记得不要手滑写成content  
     
-    Font mainFont;                              // 这是"字体加载器"唯一需要的东西：
-    Player player;                              //玩家属性结构体
-    vector<vector<int>> currentMapData;         //当前地图数据
-    Camera2D camera;                            //raylib 的 2D 摄像机结构体
+    Font mainFont;                                          // 这是"字体加载器"唯一需要的东西：
+    Player player;                                          //玩家属性结构体
+    vector<vector<int>> currentMapData;                     //当前地图数据
+    Camera2D camera;                                        //raylib 的 2D 摄像机结构体
+
     // 可以在这里添加...
     // enum GameState currentState;
     // ...等等
