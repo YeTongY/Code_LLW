@@ -4,6 +4,7 @@
 #include <fstream>  // 文件操作核心库
 #include <vector>   // 用vector存储地图的行（动态数组，比普通数组灵活）
 #include <string>   // 存储每行的字符串
+#include <set>
 
 using namespace std;
 
@@ -35,12 +36,16 @@ void InitMap(GameContext& map, int width, int height, int tileSize) {
  * @param map 地图指针
  */
 void CleanupMap(GameContext& map) {
+    // 避免对同一 GPU 纹理 ID 重复调用 UnloadTexture
+    std::set<unsigned int> unloadedIds;
     for (auto const& [key, val] : map.mapTextures) {
-        UnloadTexture(val);
+        if (unloadedIds.find(val.id) == unloadedIds.end()) {
+            UnloadTexture(val);
+            unloadedIds.insert(val.id);
+        }
     }
-    //卸载地图纹理
-    map.tiles.clear();             //释放内存
-    map.mapTextures.clear();       //释放内存
+    map.tiles.clear();
+    map.mapTextures.clear();
 }
 
 /**
@@ -86,6 +91,10 @@ bool LoadMap(GameContext& map, const char* filepath) {
 
     //关闭文件
     file.close();
+    // 设置 map 的宽高（以读取到的数据为准）
+    map.height = static_cast<int>(map.tiles.size());
+    map.width = (map.height > 0) ? static_cast<int>(map.tiles[0].size()) : 0;
+
     return true;
 }
 
@@ -95,7 +104,6 @@ bool LoadMap(GameContext& map, const char* filepath) {
  * @param map 地图指针
  */
 void DrawMap(const GameContext& map) {
-    // TODO: 实现绘制逻辑
     for(int y = 0;y < map.height;y++){
         for(int x = 0;x < map.width;x++){
             DrawSingleTile(map,x,y);
@@ -112,17 +120,41 @@ void DrawMap(const GameContext& map) {
  * @param type 地图块类型
  */
 void DrawSingleTile(const GameContext& map, int tileX, int tileY) {
-    //获取纹理坐标
+    // 获取 tile type
     TileType type = map.tiles[tileY][tileX];
-    //判断纹理是否存在
-    if(map.mapTextures.count(type)){
-        Texture2D Texture = map.mapTextures.at(type);
-        //计算世界坐标
-        int worldX = tileX * map.tileSize;
-        int worldY = tileY * map.tileSize;
-        //绘制
-        DrawTexture(Texture,worldX,worldY,WHITE);
+    // 如果没有纹理映射，直接返回
+    if (map.mapTextures.count(type) == 0) return;
+
+    Texture2D tileset = map.mapTextures.at(type);
+
+    // 计算在 tileset 中的位置（以 tileSize 为单位）
+    int tileSetX = 0;
+    int tileSetY = 0;
+
+    //需要什么类型就在这里添加 然后对素材图进行行列匹配
+    switch (type) {
+    case TileType::EMPTY: tileSetX = 0; tileSetY = 0; break;
+    case TileType::GRASS: tileSetX = 1; tileSetY = 0; break;
+    case TileType::WALL:  tileSetX = 2; tileSetY = 0; break;
+    default: break;
     }
+
+    //计算在素材图中的位置（以 tileSize 为单位）
+    Rectangle sourceRect = {
+        static_cast<float>(tileSetX * map.tileSize),
+        static_cast<float>(tileSetY * map.tileSize),
+        static_cast<float>(map.tileSize),
+        static_cast<float>(map.tileSize)
+    };
+
+    //计算在屏幕中的位置（以像素为单位）
+    Vector2 destPos = {
+        static_cast<float>(tileX * map.tileSize),
+        static_cast<float>(tileY * map.tileSize)
+    };
+
+    // 只绘制切割出来的小块
+    DrawTextureRec(tileset, sourceRect, destPos, WHITE);
 }
 
 /**
@@ -134,9 +166,12 @@ void DrawSingleTile(const GameContext& map, int tileX, int tileY) {
  * @param map 
  */
 void LoadMapTextures(GameContext& map) {
-    map.mapTextures[TileType::EMPTY] = LoadTexture("res/data/maps/empty.png");
-    map.mapTextures[TileType::GRASS] = LoadTexture("res/data/maps/grass.png");
-    map.mapTextures[TileType::WALL] = LoadTexture("res/data/maps/wall.png");
+    map.mapTextures.clear();
+    // 加载整个 tileset 图集，并指向到所有 TileType（复用同一 GPU 纹理）
+    Texture2D tileset = LoadTexture("res/data/maps/tileset.png");
+    map.mapTextures[TileType::EMPTY] = tileset;
+    map.mapTextures[TileType::GRASS] = tileset;
+    map.mapTextures[TileType::WALL] = tileset;
 }                                   
 
 /**
