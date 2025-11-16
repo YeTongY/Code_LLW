@@ -167,8 +167,29 @@ void DrawSingleTile(const GameContext& map, int tileX, int tileY) {
  */
 void LoadMapTextures(GameContext& map) {
     map.mapTextures.clear();
+    
+    // 尝试多个可能的路径加载纹理
+    const char* texturePaths[] = {
+        "res/data/maps/Godot_Autotiles_32x32.png",
+        "../res/data/maps/Godot_Autotiles_32x32.png",
+        "../../res/data/maps/Godot_Autotiles_32x32.png"
+    };
+    
+    Texture2D tileset = {0};
+    for (int i = 0; i < 3; i++) {
+        tileset = LoadTexture(texturePaths[i]);
+        if (tileset.id > 0) {
+            TraceLog(LOG_INFO, "[Map] 纹理加载成功，路径: %s", texturePaths[i]);
+            break;
+        }
+    }
+    
+    if (tileset.id == 0) {
+        TraceLog(LOG_ERROR, "[Map] 无法加载地图纹理!");
+        return;
+    }
+    
     // 加载整个 tileset 图集，并指向到所有 TileType（复用同一 GPU 纹理）
-    Texture2D tileset = LoadTexture("res/data/maps/Godot_Autotiles_32x32.png");
     map.mapTextures[TileType::EMPTY] = tileset;
     map.mapTextures[TileType::GRASS] = tileset;
     map.mapTextures[TileType::WALL] = tileset;

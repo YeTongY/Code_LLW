@@ -15,6 +15,7 @@
 #include "Player.h"
 #include "Map.h"
 #include <cstdio>
+#include <cstring>
 
 int main(void)
 {
@@ -32,8 +33,8 @@ int main(void)
     ctx.isRunning = true;
     
     //==========初始化玩家==========
-    ctx.player.gridX = 5;
-    ctx.player.gridY = 5;
+    ctx.player.gridX = 2;  // 修改为安全位置（草地区域）
+    ctx.player.gridY = 2;  // 修改为安全位置（草地区域）
     ctx.player.stats.hp = 100;
     ctx.player.stats.maxHp = 100;
     ctx.player.stats.attack = 15;
@@ -42,29 +43,62 @@ int main(void)
     TraceLog(LOG_INFO, "[Main] 玩家初始化完成 - 位置: (%d, %d), HP: %d/%d", 
              ctx.player.gridX, ctx.player.gridY, 
              ctx.player.stats.hp, ctx.player.stats.maxHp);
-    
-    //==========创建测试地图==========
-    // 创建一个 20x15 的测试地图
-    // EMPTY = 可行走的地板
-    // WALL = 墙壁（不可行走）
-    ctx.tiles = {
-        {WALL, WALL, WALL, WALL, WALL, WALL, WALL, WALL, WALL, WALL, WALL, WALL, WALL, WALL, WALL, WALL, WALL, WALL, WALL, WALL},
-        {WALL, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, WALL},
-        {WALL, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, WALL},
-        {WALL, EMPTY, EMPTY, WALL, WALL, WALL, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, WALL, WALL, WALL, EMPTY, EMPTY, EMPTY, WALL},
-        {WALL, EMPTY, EMPTY, WALL, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, WALL, EMPTY, EMPTY, EMPTY, WALL},
-        {WALL, EMPTY, EMPTY, WALL, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, WALL, EMPTY, EMPTY, EMPTY, WALL},
-        {WALL, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, WALL, WALL, WALL, WALL, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, WALL},
-        {WALL, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, WALL, EMPTY, EMPTY, WALL, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, WALL},
-        {WALL, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, WALL, EMPTY, EMPTY, WALL, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, WALL},
-        {WALL, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, WALL, WALL, WALL, WALL, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, WALL},
-        {WALL, EMPTY, EMPTY, WALL, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, WALL, EMPTY, EMPTY, EMPTY, WALL},
-        {WALL, EMPTY, EMPTY, WALL, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, WALL, EMPTY, EMPTY, EMPTY, WALL},
-        {WALL, EMPTY, EMPTY, WALL, WALL, WALL, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, WALL, WALL, WALL, EMPTY, EMPTY, EMPTY, WALL},
-        {WALL, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, WALL},
-        {WALL, WALL, WALL, WALL, WALL, WALL, WALL, WALL, WALL, WALL, WALL, WALL, WALL, WALL, WALL, WALL, WALL, WALL, WALL, WALL}
+   
+    //===========================从文件加载地图
+    // 尝试多个可能的路径（支持从build目录或项目根目录运行）
+    const char* possiblePaths[] = {
+        "res/data/maps/home.txt",
+        "../res/data/maps/home.txt",
+        "../../res/data/maps/home.txt"
     };
     
+    bool mapLoaded = false;
+    for (int i = 0; i < 3; i++) {
+        if (LoadMap(ctx, possiblePaths[i])) {
+            TraceLog(LOG_INFO, "[Main] 地图加载成功，路径: %s", possiblePaths[i]);
+            mapLoaded = true;
+            break;
+        }
+    }
+    
+    if (!mapLoaded) {
+        TraceLog(LOG_ERROR, "[Main] 地图加载失败! 请确保从项目根目录运行程序");
+        TraceLog(LOG_ERROR, "[Main] 当前工作目录: %s", GetWorkingDirectory());
+        
+        BeginDrawing();
+        ClearBackground(BLACK);
+        DrawText("ERROR: 地图文件加载失败!", 50, 50, 30, RED);
+        DrawText("请从项目根目录运行程序，或检查 res/data/maps/home.txt 是否存在", 50, 100, 20, RED);
+        DrawText("5秒后自动退出...", 50, 150, 20, YELLOW);
+        EndDrawing();
+        
+        WaitTime(5.0);  // 等待5秒让用户看到错误信息
+        CloseWindow();
+        return -1;
+    }
+
+    TraceLog(LOG_INFO, "[Main] 地图加载成功 - 大小：%dx%d", ctx.width, ctx.height);
+
+    // 调试：检查玩家初始位置的地形
+    if (ctx.player.gridY < (int)ctx.tiles.size() && 
+        ctx.player.gridX < (int)ctx.tiles[ctx.player.gridY].size()) {
+        int tileValue = (int)ctx.tiles[ctx.player.gridY][ctx.player.gridX];
+        TraceLog(LOG_INFO, "[Main] 玩家位置 (%d,%d) 的地形类型: %d (0=EMPTY, 1=GRASS, 2=WALL)", 
+                 ctx.player.gridX, ctx.player.gridY, tileValue);
+        
+        // 调试：打印玩家周围的地形
+        TraceLog(LOG_INFO, "[Main] 调试 - 打印地图前3行前10列:");
+        for (int y = 0; y < 3 && y < (int)ctx.tiles.size(); y++) {
+            char rowStr[256] = "";
+            for (int x = 0; x < 10 && x < (int)ctx.tiles[y].size(); x++) {
+                char temp[8];
+                sprintf(temp, "%d ", (int)ctx.tiles[y][x]);
+                strcat(rowStr, temp);
+            }
+            TraceLog(LOG_INFO, "[Main]   行%d: %s", y, rowStr);
+        }
+    }
+
     // 设置地图的宽度、高度和瓦片大小
     ctx.height = static_cast<int>(ctx.tiles.size());
     ctx.width = (ctx.height > 0) ? static_cast<int>(ctx.tiles[0].size()) : 0;
@@ -72,6 +106,10 @@ int main(void)
     
     TraceLog(LOG_INFO, "[Main] 地图初始化完成 - 大小: %dx%d, 瓦片大小: %d", 
              ctx.width, ctx.height, ctx.tileSize);
+    
+    //==========加载地图纹理==========
+    LoadMapTextures(ctx);
+    TraceLog(LOG_INFO, "[Main] 地图纹理加载完成");
     
     //==========初始化状态机==========
     GameStateMachine_init(&ctx.state_machine);
@@ -108,9 +146,6 @@ int main(void)
     //==========主游戏循环==========
     float elapsedTime = 0.0f;
     int frameCount = 0;
-    
-    //====================初始化调用map纹理加载
-    LoadMapTextures(ctx);
 
     while (ctx.isRunning && !WindowShouldClose())
     {

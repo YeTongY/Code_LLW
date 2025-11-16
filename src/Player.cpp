@@ -64,7 +64,7 @@ void updatePlayer(GameContext& ctx){
         canMove = false;
     }
     //【第三步】X 和 Y 都安全，检测目标位置是否可移动
-    else if(ctx.tiles[nextY][nextX] != EMPTY){
+    else if(ctx.tiles[nextY][nextX] != EMPTY && ctx.tiles[nextY][nextX] != GRASS){
         TraceLog(LOG_WARNING,"[PlayerMove] Invalid move attempt! Target tile is not walkable. Target position:(%d,%d)",nextX,nextY);
         canMove = false;
     }
