@@ -8,12 +8,36 @@ const char* playerSpriteAddress = "res/graphics/player/Pixel_Taffy/Pixel_Taffy_S
 
 /**
  * @brief (P1) 加载玩家所需的美术资源 (贴图)
- * (这个函数必须在 main() 的“初始化”中被调用)
+ * (这个函数必须在 main() 的"初始化"中被调用)
  * @param ctx 
  */
 void LoadPlayerAssets(GameContext& ctx){
-    ctx.player.spriteSheet = LoadTexture(playerSpriteAddress);
+    // 尝试多个可能的路径（支持从build目录或项目根目录运行）
+    const char* possiblePaths[] = {
+        "res/graphics/player/Pixel_Taffy/Pixel_Taffy_Sprite.png",
+        "../res/graphics/player/Pixel_Taffy/Pixel_Taffy_Sprite.png",
+        "../../res/graphics/player/Pixel_Taffy/Pixel_Taffy_Sprite.png"
+    };
     
+    bool loaded = false;
+    for (int i = 0; i < 3; i++) {
+        ctx.player.spriteSheet = LoadTexture(possiblePaths[i]);
+        if(ctx.player.spriteSheet.id != 0){
+            TraceLog(LOG_INFO, "[Player] 玩家精灵图加载成功: %s (ID: %d, 尺寸: %dx%d)", 
+                     possiblePaths[i], 
+                     ctx.player.spriteSheet.id,
+                     ctx.player.spriteSheet.width,
+                     ctx.player.spriteSheet.height);
+            loaded = true;
+            break;
+        }
+    }
+    
+    if(!loaded){
+        TraceLog(LOG_ERROR, "[Player] 玩家精灵图加载失败，尝试了所有路径");
+        TraceLog(LOG_ERROR, "[Player] 当前工作目录: %s", GetWorkingDirectory());
+        TraceLog(LOG_ERROR, "[Player] 将使用红色方块作为占位符");
+    }
 }
 
 /**
@@ -167,21 +191,38 @@ void drawPlayer(const GameContext& ctx){
         case PLAYER_DIR_RIGHT:
             source.x = 64.0f;  // 2 * 32
             break;
-        // “合同”：第 4 帧 (x=96) 是 "Up"
+        // "合同"：第 4 帧 (x=96) 是 "Up"
         case PLAYER_DIR_UP:
             source.x = 96.0f;  // 3 * 32
             break;
+        
+        // 【P1 安全网】防止未初始化或垃圾值导致的花屏 Bug
+        default:
+            source.x = 32.0f;  // 默认朝下 (Down)
+            TraceLog(LOG_WARNING, "[Player] 检测到异常的 currentDirection 值: %d, 使用默认朝向", ctx.player.currentDirection);
+            break;
     }
 
-    //必须“向上偏移” 1 格 (TILE_SIZE)
-    // 这样“32x64”的“脚”才能“踩”在“32x32”的 P0 格子上
+    //必须"向上偏移" 1 格 (TILE_SIZE)
+    // 这样"32x64"的"脚"才能"踩"在"32x32"的 P0 格子上
     Vector2 drawDestPosition = {//仅渲染用坐标
         (float)ctx.player.gridX * TILE_SIZE,
         (float)ctx.player.gridY * TILE_SIZE - TILE_SIZE // 【【【向上偏移！】】】
     };
 
-    //调用raylib绘制函数
-    DrawTextureRec(ctx.player.spriteSheet,source,drawDestPosition,WHITE);
+    // 【调试】绘制玩家精灵图
+    if(ctx.player.spriteSheet.id != 0){
+        // 纹理加载成功，绘制精灵图
+        DrawTextureRec(ctx.player.spriteSheet, source, drawDestPosition, WHITE);
+    } else {
+        // 【备用方案】纹理未加载，绘制红色方块作为占位符
+        DrawRectangle(
+            ctx.player.gridX * TILE_SIZE, 
+            ctx.player.gridY * TILE_SIZE - TILE_SIZE,
+            32, 64, RED
+        );
+        DrawText("NO SPRITE", ctx.player.gridX * TILE_SIZE, ctx.player.gridY * TILE_SIZE, 10, WHITE);
+    }
 
     //结束角色渲染，恢复到正常尺寸以备之后绘制ui
     EndMode2D();

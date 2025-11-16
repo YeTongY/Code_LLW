@@ -1,5 +1,7 @@
 #pragma once
 
+#include "raylib.h"  // 需要 Texture2D 类型定义
+
 // 前向声明（打破循环依赖）
 struct GameContext;
 
@@ -20,14 +22,14 @@ struct Stats {//声明玩家基础属性
 
 
 struct Player {//声明玩家主结构体
-    int gridX; // 玩家在“网格”上的 X 坐标 (逻辑)
-    int gridY; // 玩家在“网格”上的 Y 坐标 (逻辑)
-    Texture2D spriteSheet;//玩家的sprite贴图
+    int gridX; // 玩家在"网格"上的 X 坐标 (逻辑)
+    int gridY; // 玩家在"网格"上的 Y 坐标 (逻辑)
+    
     Stats stats; // 玩家的属性
     
     // (P1 阶段)
-    Texture2D spriteSheet; // P1: 玩家的贴图  
-    PlayerDirection currentDirection; // 玩家“当前”的方向
+    Texture2D spriteSheet; // P1: 玩家的精灵图贴图
+    PlayerDirection currentDirection; // 玩家"当前"的方向
 };
 
 
