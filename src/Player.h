@@ -17,7 +17,7 @@ struct Player {//声明玩家主结构体
     Stats stats; // 玩家的属性
     
     // (P1 阶段)
-    // Texture2D playerTexture; // P1: 玩家的贴图
+    Texture2D playerTexture; // P1: 玩家的贴图  
 };
 
  /**
@@ -33,3 +33,17 @@ void updatePlayer(GameContext& ctx);
  * @param ctx Gamestate里的GameContext核心数据文件
  */
 void drawPlayer(const GameContext& ctx);
+
+/**
+ * @brief (P1) 加载玩家所需的美术资源 (贴图)
+ * (这个函数必须在 main() 的“初始化”中被调用)
+ * @param ctx 
+ */
+void LoadPlayerAssets(GameContext& ctx);
+
+/**
+ * @brief (P1) 卸载玩家的美术资源
+ * (这个函数必须在 main() 的“清理”中被调用)
+ * @param ctx 
+ */
+void UnloadPlayerAssets(GameContext& ctx);
