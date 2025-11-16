@@ -7,6 +7,8 @@
 #include "raylib.h"
 #include <unordered_map>  // 新增：用于存储纹理
 
+struct GameContext;
+
 // 地块类型枚举
 typedef enum {
     EMPTY,
@@ -29,7 +31,7 @@ void CleanupMap(Map* map);                                          //清理地�
 bool LoadMap(Map* map, const char* filepath);                       //加载地图
 void LoadMapTextures(Map* map);                                     //加载纹理
 void DrawMap(Map* map);                                             //绘图
-void DrawSingleTile(Map* map, int tileX, int tileY); //绘制单个块
+void DrawSingleTile(Map* map, int tileX, int tileY);                //绘制单个块
 bool UpdateMap(Map* map);                                           //更新地图
 
 // Getter函数

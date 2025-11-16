@@ -84,8 +84,10 @@ struct GameContext {                                        //核心数据库  �
     
     Font mainFont;                                          // 这是"字体加载器"唯一需要的东西：
     Player player;                                          //玩家属性结构体
-    vector<vector<int>> currentMapData;                     //当前地图数据
     Camera2D camera;                                        //raylib 的 2D 摄像机结构体
+    
+    vector<std::vector<TileType>> tiles;                    //存储所有地块类型
+    unordered_map<TileType, Texture2D> mapTextures;         //地图资产
 
     // 可以在这里添加...
     // enum GameState currentState;
