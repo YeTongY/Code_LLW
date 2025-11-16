@@ -1,28 +1,16 @@
 /*
 2025/11/13 Waring开始编写 游戏状态机
 2025/11/14 wyt 修改了头文件保护使其正常生效
-2025/11/16 改为纯 C++ 风格
+2025/11/16 Warning被兼容搞红温 遂把状态机代码改为纯C++
 */
 #ifndef GAMESTATE_H
 #define GAMESTATE_H
 
-<<<<<<< Updated upstream
-//! 在下面引入其它库
-
-#include <stddef.h> //引入size_t
-#include "raylib.h"//引入raylib库以使用font字体文件
-#include "Player.h"
-#include "Map.h"
-
-//引入常用库
-=======
 //引入标准库
 #include <cstddef>     // size_t
->>>>>>> Stashed changes
 #include <vector>
 #include <map>
 #include <string>
-#include <unordered_map>
 
 //引入第三方库
 #include "raylib.h"
@@ -85,23 +73,6 @@ struct GameContext
     // 字体资源
     Font mainFont;
     
-<<<<<<< Updated upstream
-    Font mainFont;                                          // 这是"字体加载器"唯一需要的东西：
-    Player player;                                          //玩家属性结构体
-    Camera2D camera;                                        //raylib 的 2D 摄像机结构体
-
-    vector<std::vector<TileType>> tiles;                    //存储所有地块类型
-    unordered_map<TileType, Texture2D> mapTextures;         //地图资产
-    int width;
-    int height;
-    int tileSize;
-
-    // 可以在这里添加...
-    // enum GameState currentState;
-    // ...等等
-
-    //状态机
-=======
     // 玩家相关
     Player player;
     
@@ -112,7 +83,6 @@ struct GameContext
     Camera2D camera;
     
     // 状态机
->>>>>>> Stashed changes
     GameStateMachine state_machine;
     
     // 窗口配置
