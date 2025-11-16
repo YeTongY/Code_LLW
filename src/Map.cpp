@@ -168,7 +168,7 @@ void DrawSingleTile(const GameContext& map, int tileX, int tileY) {
 void LoadMapTextures(GameContext& map) {
     map.mapTextures.clear();
     // 加载整个 tileset 图集，并指向到所有 TileType（复用同一 GPU 纹理）
-    Texture2D tileset = LoadTexture("res/data/maps/tileset.png");
+    Texture2D tileset = LoadTexture("res/data/maps/Godot_Autotiles_32x32.png");
     map.mapTextures[TileType::EMPTY] = tileset;
     map.mapTextures[TileType::GRASS] = tileset;
     map.mapTextures[TileType::WALL] = tileset;
