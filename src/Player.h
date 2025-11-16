@@ -22,7 +22,7 @@ struct Stats {//声明玩家基础属性
 struct Player {//声明玩家主结构体
     int gridX; // 玩家在“网格”上的 X 坐标 (逻辑)
     int gridY; // 玩家在“网格”上的 Y 坐标 (逻辑)
-    
+    Texture2D spriteSheet;//玩家的sprite贴图
     Stats stats; // 玩家的属性
     
     // (P1 阶段)
