@@ -87,7 +87,7 @@ void drawPlayer(const GameContext& ctx){
     Camera2D camera = ctx.camera;//创建一个camera的副本
 
     //------开始设置角色摄像机------
-    camera.zoom = 3.0f;//?为啥要加f--->因为zoom本身就是个float量，3.0这样会默认为double
+    camera.zoom = 3.0f;//? 为啥要加f--->因为zoom本身就是个float量，3.0这样会默认为double
     camera.offset = {1920/2.0f, 1080/2.0f};
     camera.target = { 
         (float)(ctx.player.gridX * TILE_SIZE) + (TILE_SIZE / 2.0f),

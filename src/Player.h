@@ -27,4 +27,9 @@ struct Player {//声明玩家主结构体
   */
 void updatePlayer(GameContext& ctx);
 
+/**
+ * @brief 角色摄像机，负责绘制非战斗情况，即大地图时的画面
+ * 
+ * @param ctx Gamestate里的GameContext核心数据文件
+ */
 void drawPlayer(const GameContext& ctx);
