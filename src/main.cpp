@@ -18,8 +18,21 @@
 #include <cstdio>
 #include <cstring>
 
+// 前向声明 Windows API 函数，避免包含整个 windows.h
+#ifdef _WIN32
+extern "C" {
+    __declspec(dllimport) int __stdcall SetConsoleOutputCP(unsigned int);
+}
+#define CP_UTF8 65001
+#endif
+
 int main(void)
 {
+#ifdef _WIN32
+    // 设置控制台输出为 UTF-8 编码，解决中文日志乱码问题
+    SetConsoleOutputCP(CP_UTF8);
+#endif
+    
     //==========初始化窗口==========
     const int screenWidth = 1920;
     const int screenHeight = 1080;

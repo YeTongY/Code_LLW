@@ -23,7 +23,7 @@ void LoadPlayerAssets(GameContext& ctx){
     for (int i = 0; i < 3; i++) {
         ctx.player.spriteSheet = LoadTexture(possiblePaths[i]);
         if(ctx.player.spriteSheet.id != 0){
-            TraceLog(LOG_INFO, "[Player] 玩家精灵图加载成功: %s (ID: %d, 尺寸: %dx%d)", 
+            TraceLog(LOG_INFO, "[Player] Sprite sheet loaded successfully: %s (ID: %d, Size: %dx%d)", 
                      possiblePaths[i], 
                      ctx.player.spriteSheet.id,
                      ctx.player.spriteSheet.width,
@@ -34,9 +34,9 @@ void LoadPlayerAssets(GameContext& ctx){
     }
     
     if(!loaded){
-        TraceLog(LOG_ERROR, "[Player] 玩家精灵图加载失败，尝试了所有路径");
-        TraceLog(LOG_ERROR, "[Player] 当前工作目录: %s", GetWorkingDirectory());
-        TraceLog(LOG_ERROR, "[Player] 将使用红色方块作为占位符");
+        TraceLog(LOG_ERROR, "[Player] Failed to load sprite sheet from all paths");
+        TraceLog(LOG_ERROR, "[Player] Current working directory: %s", GetWorkingDirectory());
+        TraceLog(LOG_ERROR, "[Player] Will use red rectangle as placeholder");
     }
 }
 
@@ -196,10 +196,10 @@ void drawPlayer(const GameContext& ctx){
             source.x = 96.0f;  // 3 * 32
             break;
         
-        // 【P1 安全网】防止未初始化或垃圾值导致的花屏 Bug
+        // [P1 Safety Net] Prevent rendering bugs from uninitialized or garbage values
         default:
-            source.x = 32.0f;  // 默认朝下 (Down)
-            TraceLog(LOG_WARNING, "[Player] 检测到异常的 currentDirection 值: %d, 使用默认朝向", ctx.player.currentDirection);
+            source.x = 32.0f;  // Default to Down direction
+            TraceLog(LOG_WARNING, "[Player] Abnormal currentDirection value detected: %d, using default direction", ctx.player.currentDirection);
             break;
     }
 
