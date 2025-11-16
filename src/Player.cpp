@@ -11,6 +11,10 @@ const int TILE_SIZE = 32;//标准图块大小
   * @param ctx Gamestate里的GameContext核心数据文件
   */
 void updatePlayer(GameContext& ctx){
+
+
+    //------开始移动状态更新------
+
     //初始化移动意图
     int nextX = ctx.player.gridX;
     int nextY = ctx.player.gridY;
@@ -76,6 +80,17 @@ void updatePlayer(GameContext& ctx){
     ctx.player.gridY = nextY;
     }
     //------移动结束------
+
+    //------移动状态更新结束------
+
+
+    //------开始战斗状态更新------
+
+    if(IsKeyPressed(KEY_E)){
+        //TODO 在这里进入战斗状态
+    }
+
+    //------结束战斗状态更新------
 }
 
 /**
