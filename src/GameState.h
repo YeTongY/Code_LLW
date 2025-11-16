@@ -76,9 +76,12 @@ struct GameContext
     // 玩家相关
     Player player;
     
-    // 地图数据
-    vector<vector<int>> currentMapData;
-    
+    int width;
+    int height;
+    int tileSize;
+    vector<vector<TileType>> tiles;// 地图数据
+    unordered_map<TileType, Texture2D> mapTextures;// 地图资产
+
     // 摄像机
     Camera2D camera;
     
