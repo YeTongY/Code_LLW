@@ -35,8 +35,8 @@ void updatePlayer(GameContext& ctx){
 
     //------开始进行碰撞检测------
     //TODO 需等待map完成
-    //假设engine.currentMapData[y][x]存在，他的声明如下
-    //vector<vector<int>> currentMapData;
+    //假设engine.tiles[y][x]存在，他的声明如下
+    //vector<vector<int>> tiles;
     //假设0为可移动地板
 
     bool canMove = false; //初始化为：不可移动
@@ -45,26 +45,26 @@ void updatePlayer(GameContext& ctx){
     //这样可以处理"锯齿状"地图（不同行宽度不同的情况）
 
     //检查地图是否为空
-    if(ctx.currentMapData.empty()){
+    if(ctx.tiles.empty()){
         TraceLog(LOG_FATAL,"[PlayerMove] Map data is empty!");
         canMove = false;
     }
     //【第一步】检测 Y 轴是否超出地图限制
-    else if(nextY < 0 || nextY >= (int)ctx.currentMapData.size()){
+    else if(nextY < 0 || nextY >= (int)ctx.tiles.size()){
         TraceLog(LOG_WARNING,"[PlayerMove] Invalid move attempt! Out of map bounds of Y. Target position:(%d,%d)",nextX,nextY);
         canMove = false;
     }
     //【第二步】Y 轴安全，现在用 nextY 这一行来检查 X 的实际宽度
-    else if(ctx.currentMapData[nextY].empty()){
+    else if(ctx.tiles[nextY].empty()){
         TraceLog(LOG_WARNING,"[PlayerMove] Invalid move attempt! Row %d is empty. Target position:(%d,%d)",nextY,nextX,nextY);
         canMove = false;
     }
-    else if(nextX < 0 || nextX >= (int)ctx.currentMapData[nextY].size()){
+    else if(nextX < 0 || nextX >= (int)ctx.tiles[nextY].size()){
         TraceLog(LOG_WARNING,"[PlayerMove] Invalid move attempt! Out of map bounds of X. Target position:(%d,%d)",nextX,nextY);
         canMove = false;
     }
     //【第三步】X 和 Y 都安全，检测目标位置是否可移动
-    else if(ctx.currentMapData[nextY][nextX] != 0){
+    else if(ctx.tiles[nextY][nextX] != 0){
         TraceLog(LOG_WARNING,"[PlayerMove] Invalid move attempt! Target tile is not walkable. Target position:(%d,%d)",nextX,nextY);
         canMove = false;
     }
@@ -114,7 +114,7 @@ void drawPlayer(const GameContext& ctx){
     BeginMode2D(camera);
 
     //绘制地图
-    DrawMap();//TODO 这个函数的参数有问题，待修改正确后再写入参数
+    DrawMap(ctx);
 
     //绘制角色
     DrawRectangle(ctx.player.gridX * TILE_SIZE, ctx.player.gridY * TILE_SIZE,TILE_SIZE,TILE_SIZE,RED);
