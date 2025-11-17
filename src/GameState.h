@@ -102,7 +102,7 @@ struct GameContext
     unordered_map<TileType, Texture2D> mapTextures;     // 地图资产
 
     Enemy* currentCombatant;            //当前战斗的敌人指针
-    vector<Enemy> enemy;
+    vector<Enemy> enemies;
     Texture2D enemySpriteSheet;
     
     // 摄像机
@@ -120,12 +120,10 @@ struct GameContext
     float screenHeight = 1080.0f;
     bool isRunning = true;
 
-
     //UI纹理
     Texture2D dialogueBoxTexture;
     Texture2D portraitFrameTexture;
 
-    
 };
 
 #endif // GAMESTATE_H
