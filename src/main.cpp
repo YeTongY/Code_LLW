@@ -14,7 +14,7 @@
 // (我们“定义” RAYGUI_IMPLEMENTATION，
 //  来“命令” raygui.h 在“这里”施工它的“厨房”)
 #define RAYGUI_IMPLEMENTATION
-#include "raygui.h"
+#include "../lib/raylib/include/raygui.h"
 
 #include "GameState.h"
 #include "ExplorationState.h"

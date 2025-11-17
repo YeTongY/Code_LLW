@@ -3,7 +3,7 @@
 #include <sstream>   // 包含 C++ 字符串流库
 #include <string>    // 包含 C++ 字符串库
 #include <raylib.h>
-#include "raygui.h"
+#include "../lib/raylib/include/raygui.h"
 
 using namespace std;
 
