@@ -342,6 +342,7 @@ void DrawMapScene(const GameContext& ctx){
 
     // ====== P1 实体绘制区域（按 GDD v3.13 架构） ======
     DrawPlayerSprite(ctx.player);
+    DrawEnemy(ctx);
     
     // TODO: 未来添加敌人绘制和 Y-Sorting
 
