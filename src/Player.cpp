@@ -214,11 +214,60 @@ void updatePlayer(GameContext& ctx){
 
 
 /**
- * @brief 角色摄像机，负责绘制非战斗情况，即大地图时的画面
+ * @brief 纯粹的玩家精灵绘制函数（按 GDD v3.13 两步走方案）
+ * 
+ * @param player 玩家数据（只读）
+ * 
+ * @note 该函数只负责绘制玩家精灵图，不管摄像机、滤镜等
+ * @note 调用前必须已经处于 BeginMode2D() 状态
+ */
+void DrawPlayerSprite(const Player& player)
+{
+    Rectangle source = { 0.0f, 0.0f, 32.0f, 64.0f };
+
+    switch (player.currentDirection)
+    {
+        case PLAYER_DIR_LEFT:
+            source.x = 0.0f;
+            break;
+        case PLAYER_DIR_DOWN:
+            source.x = 32.0f;
+            break;
+        case PLAYER_DIR_RIGHT:
+            source.x = 64.0f;
+            break;
+        case PLAYER_DIR_UP:
+            source.x = 96.0f;
+            break;
+        default:
+            source.x = 32.0f;
+            TraceLog(LOG_WARNING, "[Player] 检测到异常的 currentDirection 值: %d, 使用默认朝向", player.currentDirection);
+            break;
+    }
+
+    Vector2 drawDestPosition = {
+        player.visualPosition.x,
+        player.visualPosition.y - TILE_SIZE
+    };
+
+    if (player.spriteSheet.id != 0) {
+        DrawTextureRec(player.spriteSheet, source, drawDestPosition, WHITE);
+    } else {
+        DrawRectangle((int)drawDestPosition.x, (int)drawDestPosition.y, 32, 64, RED);
+        DrawText("NO SPRITE", (int)player.visualPosition.x, (int)player.visualPosition.y, 10, WHITE);
+    }
+}
+
+
+/**
+ * @brief 场景渲染总指挥（按 GDD v3.13 两步走方案）
  * 
  * @param ctx Gamestate里的GameContext核心数据文件
+ * 
+ * @note 该函数负责：摄像机设置、滤镜应用、地图绘制、实体绘制编排
+ * @note 为未来的 Y-Sorting 做准备（预留 P1 实体绘制区域）
  */
-void drawPlayer(const GameContext& ctx){
+void DrawMapScene(const GameContext& ctx){
     Camera2D camera = ctx.camera;//创建一个camera的副本
 
 
@@ -282,61 +331,10 @@ void drawPlayer(const GameContext& ctx){
         BeginMode2D(camera);
     }
 
-    //绘制角色
-    Rectangle source;//声明绘制源
-    source.width = 32.0f;
-    source.height = 64.0f;
-    source.y = 0.0f;
-
-
-    // 根据“当前方向” (已在 updatePlayer 设置)
-    // 修改 source.x 来“裁剪”正确的帧
-    switch (ctx.player.currentDirection)
-    {
-        // “合同”：第 1 帧 (x=0) 是 "Left"
-        case PLAYER_DIR_LEFT:
-            source.x = 0.0f;   // 0 * 32
-            break;
-            
-        // “合同”：第 2 帧 (x=32) 是 "Down"
-        case PLAYER_DIR_DOWN:
-            source.x = 32.0f;  // 1 * 32
-            break;                
-            // “合同”：第 3 帧 (x=64) 是 "Right"
-        case PLAYER_DIR_RIGHT:
-            source.x = 64.0f;  // 2 * 32
-            break;
-        // "合同"：第 4 帧 (x=96) 是 "Up"
-        case PLAYER_DIR_UP:
-            source.x = 96.0f;  // 3 * 32
-            break;
-        
-        // 【P1 安全网】防止未初始化或垃圾值导致的花屏 Bug
-        default:
-            source.x = 32.0f;  // 默认朝下 (Down)
-            TraceLog(LOG_WARNING, "[Player] 检测到异常的 currentDirection 值: %d, 使用默认朝向", ctx.player.currentDirection);
-            break;
-    }
-
-    ///  让角色精灵图绘制在平滑的“视觉位置”上
-    Vector2 drawDestPosition = {
-        ctx.player.visualPosition.x,
-        ctx.player.visualPosition.y - TILE_SIZE // 向上偏移一个瓦片高度，使脚踩在格子上
-    };
-
-    // 【调试】绘制玩家精灵图（不受滤镜影响）
-    if(ctx.player.spriteSheet.id != 0){
-        // 纹理加载成功，绘制精灵图
-        DrawTextureRec(ctx.player.spriteSheet, source, drawDestPosition, WHITE);
-    } else {
-        // 【备用方案】纹理未加载，绘制红色方块作为占位符
-        DrawRectangle(
-            (int)drawDestPosition.x,
-            (int)drawDestPosition.y,
-            32, 64, RED
-        );
-        DrawText("NO SPRITE", ctx.player.gridX * TILE_SIZE, ctx.player.gridY * TILE_SIZE, 10, WHITE);
-    }
+    // ====== P1 实体绘制区域（按 GDD v3.13 架构） ======
+    DrawPlayerSprite(ctx.player);
+    
+    // TODO: 未来添加敌人绘制和 Y-Sorting
 
     //结束角色渲染，恢复到正常尺寸以备之后绘制ui
     EndMode2D();
