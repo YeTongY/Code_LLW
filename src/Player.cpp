@@ -14,9 +14,9 @@ const char* playerSpriteAddress = "res/graphics/player/Pixel_Taffy/Pixel_Taffy_S
 void LoadPlayerAssets(GameContext& ctx){
     // 尝试多个可能的路径（支持从build目录或项目根目录运行）
     const char* possiblePaths[] = {
-        "res/graphics/player/Pixel_Taffy/Pixel_Taffy_Sprite.png",
-        "../res/graphics/player/Pixel_Taffy/Pixel_Taffy_Sprite.png",
-        "../../res/graphics/player/Pixel_Taffy/Pixel_Taffy_Sprite.png"
+        "res/graphics/player/Pixel_Taffy/Pixel_Taffy_Sprite_v3_XIXI.png",
+        "../res/graphics/player/Pixel_Taffy/Pixel_Taffy_Sprite_v3_XIXI.png",
+        "../../res/graphics/player/Pixel_Taffy/Pixel_Taffy_Sprite_v3_XIXI.png"
     };
     
     bool loaded = false;
