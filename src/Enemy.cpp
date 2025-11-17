@@ -4,6 +4,7 @@
 #include "Player.h"
 #include "GameState.h"
 #include "Enemy.h"
+#include "raymath.h"// 包含向量数学函数
 #include <vector>
 
 const int TILE_SIZE = 32;//标准图块大小
@@ -19,7 +20,7 @@ using namespace std;
  * @return false 
  */
 bool isActive(const GameContext& enemy){
-    for(const Enemy& enemyl : enemy.enemy){
+    for(const Enemy& enemyl : enemy.enemies){
         if(enemyl.isActive){
             return true;
         }
@@ -42,11 +43,18 @@ void InitEnemy(GameContext& enemy, int x, int y,const Stats& stats,Texture2D tex
     enemy1.gridY = 10;
     enemy1.isActive = true;                     //存活
     enemy1.isMoving = false;                    //移动
+
+    enemy1.patrolPoints = { (float)enemy1.gridX * TILE_SIZE, (float)enemy1.gridY * TILE_SIZE};               //巡逻点
+    enemy1.visualPosition = { (float)enemy1.gridX * TILE_SIZE, (float)enemy1.gridY * TILE_SIZE};            //渲染位置
+    enemy1.moveTarget = enemy1.visualPosition;      //目标位置
+    enemy1.moveSpeed = 2.0f;                    //敌人移动速度
     enemy1.stats = {50,50,10,5};                //属性
+    enemy1.aiState = AI_STATE_PATROL;           //设置AI状态：是否巡逻
+
     enemy1.Enemytexture = texture;              //贴图
     enemy1.currentDirection = ENEMY_DIR_DOWN;   //敌人朝向
 
-    enemy.enemy.push_back(enemy1);
+    enemy.enemies.push_back(enemy1);
 
     //可以在下面添加更多敌人
 }
@@ -58,10 +66,11 @@ void InitEnemy(GameContext& enemy, int x, int y,const Stats& stats,Texture2D tex
  * @param enemy 
  */
 void DrawEnemy(const GameContext& ctx){
-    for(const Enemy& enemy : ctx.enemy){
+    for(const Enemy& enemy : ctx.enemies){
         if(enemy.isActive){
 
             //绘制角色
+            Rectangle source = {0,0,32,64};
             Rectangle source;//声明绘制源
             source.width = 32.0f;
             source.height = 64.0f;
@@ -96,6 +105,8 @@ void DrawEnemy(const GameContext& ctx){
         
             }
 
+            Vector2 drawPos = { enemy.visualPosition.x, enemy.visualPosition.y - TILE_SIZE};
+
             //  让角色精灵图绘制在平滑的“视觉位置”上
             Vector2 drawDestPosition = {
                 enemy.visualPosition.x,
@@ -103,9 +114,9 @@ void DrawEnemy(const GameContext& ctx){
             };
 
             // 绘制玩家精灵图
-            if(enemy.Enemytexture.id != 0){
+            if(ctx.enemySpriteSheet.id != 0){
             // 纹理加载成功，绘制精灵图
-                DrawTextureRec(enemy.Enemytexture, source, drawDestPosition, WHITE);
+                DrawTextureRec(ctx.enemySpriteSheet, source, drawDestPosition, WHITE);
             } else {
             // 纹理未加载，绘制蓝色方块作为占位符
             DrawRectangle(
@@ -114,6 +125,66 @@ void DrawEnemy(const GameContext& ctx){
                 32, 64, BLUE
             );
             DrawText("NO SPRITE", enemy.gridX * TILE_SIZE, enemy.gridY * TILE_SIZE, 10, WHITE);
+            }
+        }
+    }
+}
+
+/**
+ * @brief 更新敌人状态
+ * 
+ * @param ctx 
+ */
+void UpdateEnemies(GameContext& ctx){
+    float dt = GetFrameTime(); // 帧时间增量
+
+    for(Enemy& enemy : ctx.enemies){
+        if(enemy.isActive){
+            float distanceToPlayer = Vector2Distance(enemy.visualPosition, ctx.player.visualPosition); // 计算敌人与玩家之间的距离
+
+            switch (enemy.aiState)//切换敌人AI状态
+            {
+            case AI_STATE_PATROL://巡逻模式
+                if(distanceToPlayer < enemy.aggroRange){
+                    enemy.aiState = AI_STATE_CHASING;       //如果进入索敌范围，自动切换为追击模式
+                }else if(!enemy.isMoving){
+                    Vector2 randomPoint = {
+                        randomPoint.x = enemy.patrolPoints.x + GetRandomValue(-enemy.patrolRange, enemy.patrolRange),
+                        randomPoint.y = enemy.patrolPoints.y + GetRandomValue(-enemy.patrolRange, enemy.patrolRange)
+                    };      // 随机巡逻点
+
+                    enemy.moveTarget = (randomPoint);
+                    enemy.isMoving = true;
+                }
+                break;
+            case AI_STATE_CHASING://追击模式
+                if(distanceToPlayer > enemy.aggroRange){
+                    enemy.aiState = AI_STATE_PATROL;       //如果玩家离开索敌范围，切换回巡逻模式
+                }else {
+                    enemy.moveTarget = ctx.player.visualPosition;   //更新移动目标为玩家位置
+                    enemy.isMoving = true;
+                }
+                break;
+            default:
+                break;
+            }
+
+            if(enemy.isMoving){
+                //使用跟玩家移动相同的平滑移动逻辑
+                enemy.visualPosition = Vector2MoveTowards(
+                    enemy.visualPosition,
+                    enemy.moveTarget,
+                    enemy.moveSpeed * dt
+                );
+
+                //检查是否到达目标位置
+                if(Vector2Distance(enemy.visualPosition, enemy.moveTarget) < 2.0f){
+                    //如果没有追击玩家，则停止移动
+                    if(enemy.aiState != AI_STATE_CHASING){
+                        enemy.isMoving = false;
+                        enemy.visualPosition = enemy.moveTarget; // 校准位置
+                    }
+                }
             }
         }
     }
