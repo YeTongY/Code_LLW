@@ -15,6 +15,7 @@
 #include "Player.h"
 #include "Map.h"
 #include "Enemy.h"          //未完成敌人模块
+#include "FontLoader.h"     //字体加载
 #include <cstdio>
 #include <cstring>
 
@@ -130,6 +131,10 @@ int main(void)
     LoadMapTextures(ctx);
     TraceLog(LOG_INFO, "[Main] 地图纹理加载完成");
     
+    //==========加载字体==========
+    loadGameFont(ctx);
+    TraceLog(LOG_INFO, "[Main] 游戏字体加载完成");
+    
     //==========加载玩家资源==========
     TraceLog(LOG_INFO, "[Main] 准备加载玩家资源，当前屏幕尺寸: %.0fx%.0f", ctx.screenWidth, ctx.screenHeight);
     LoadPlayerAssets(ctx);
@@ -208,6 +213,9 @@ int main(void)
     
     UnloadPlayerAssets(ctx);
     TraceLog(LOG_INFO, "[Main] 玩家资源已释放");
+    
+    unloadGameFont(ctx);
+    TraceLog(LOG_INFO, "[Main] 字体资源已释放");
     
     GameStateMachine_shutdown(&ctx.state_machine, &ctx);
     TraceLog(LOG_INFO, "[Main] 状态机已关闭");

@@ -41,27 +41,63 @@ static string textLoader(const char* text_address){
  * @param ctx Gamestate里的GameContext核心数据文件
  */
 void loadGameFont (GameContext &ctx){
-    const char* fontFile_Address = "res/data/fonts/SourceHanSansSC-Regular.otf";//加载思源黑体字体文件
-    const char* allGameText_Address = "res/data/dialogue/all_game_script.txt";//加载全文本文件
-
-    string allGameText = textLoader(allGameText_Address);//读取全文本文件
+    // 尝试多个可能的路径（支持从不同目录运行）
+    const char* fontPaths[] = {
+        "res/data/fonts/SourceHanSansSC-Regular.otf",
+        "../res/data/fonts/SourceHanSansSC-Regular.otf",
+        "../../res/data/fonts/SourceHanSansSC-Regular.otf"
+    };
+    
+    const char* textPaths[] = {
+        "res/data/dialogue/all_game_script.txt",
+        "../res/data/dialogue/all_game_script.txt",
+        "../../res/data/dialogue/all_game_script.txt"
+    };
+    
+    // 查找文本文件
+    string allGameText = "";
+    for (int i = 0; i < 3; i++) {
+        allGameText = textLoader(textPaths[i]);
+        if (!allGameText.empty()) {
+            TraceLog(LOG_INFO, "[FontLoader] Text file loaded from: %s", textPaths[i]);
+            break;
+        }
+    }
+    
+    if (allGameText.empty()) {
+        TraceLog(LOG_WARNING, "[FontLoader] Could not load text file, using default character set");
+    }
+    
     allGameText += "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!?.,:;-()";//给全文本文件添加基本英文字符以防止潜在的错误
     
     int codepointCount = 0; //初始化码点数量
     int* codepoints = LoadCodepoints(allGameText.c_str(), &codepointCount);//从文本文档里读取全部码点
     TraceLog(LOG_INFO, "[FontLoader] Found %d unique codepoints in script file.", codepointCount);//读取码点的日志输出
 
-    ctx.mainFont = LoadFontEx(//烘焙字体
-        fontFile_Address, //字体地址
-        48, //字体大小
-        codepoints, //要烘焙的码点
-        codepointCount //码点数
-    );
+    // 尝试加载字体文件
+    bool fontLoaded = false;
+    for (int i = 0; i < 3; i++) {
+        ctx.mainFont = LoadFontEx(
+            fontPaths[i],
+            48,
+            codepoints,
+            codepointCount
+        );
+        
+        if (ctx.mainFont.texture.id != 0) {
+            TraceLog(LOG_INFO, "[FontLoader] Font loaded successfully from: %s", fontPaths[i]);
+            fontLoaded = true;
+            break;
+        }
+    }
+    
     UnloadCodepoints(codepoints); //释放码点
-    if (ctx.mainFont.texture.id != 0) {//检查字体是否被成功烘焙
-        TraceLog(LOG_INFO, "[FontLoader] Font '%s' loaded successfully.", fontFile_Address);
-    } else {
-        TraceLog(LOG_ERROR, "[FontLoader] FAILED to load font: %s", fontFile_Address);
+    
+    if (!fontLoaded) {
+        TraceLog(LOG_ERROR, "[FontLoader] FAILED to load font from all paths!");
+        // 使用raylib默认字体作为后备
+        ctx.mainFont = GetFontDefault();
+        TraceLog(LOG_WARNING, "[FontLoader] Using default font as fallback");
     }
 
 }

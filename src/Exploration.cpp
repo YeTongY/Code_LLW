@@ -2,6 +2,7 @@
 #include "Player.h" 
 #include "Map.h"
 #include "raylib.h"
+#include "GameState.h"
 #include <cstdlib>
 #include <cstdio>
 
@@ -84,11 +85,11 @@ void exploration_render(GameContext* ctx, void* state_data)
     drawPlayer(*ctx);
 
     //在 EndMode2D 之后，绘制 UI（不受摄像机和滤镜影响）
-    DrawText("探索模式", 10, 10, 20, BLACK);
-    DrawText("操作提示:", 10, 40, 16, DARKGRAY);
-    DrawText("  WASD - 移动", 10, 60, 14, DARKGRAY);
-    DrawText("  E - 交互", 10, 80, 14, DARKGRAY);
-    DrawText("  ESC - 退出", 10, 100, 14, DARKGRAY);
+    DrawTextEx(ctx->mainFont, "探索模式", Vector2{10, 10}, 30, 1, BLACK);
+    DrawTextEx(ctx->mainFont, "操作说明:", Vector2{10, 40}, 24, 1, DARKGRAY);
+    DrawTextEx(ctx->mainFont, "  WASD - 移动", Vector2{10, 60}, 24, 1, DARKGRAY);
+    DrawTextEx(ctx->mainFont, "  E - 交互", Vector2{10, 80}, 24, 1, DARKGRAY);
+    DrawTextEx(ctx->mainFont, "  ESC - 退出", Vector2{10, 100}, 24, 1, DARKGRAY);
     
     //显示玩家坐标
     char posText[64];
