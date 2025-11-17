@@ -54,11 +54,7 @@ void exploration_update(GameContext* ctx, void* state_data)
     // 包含：键盘输入、碰撞检测、位置更新
     updatePlayer(*ctx);
 
-    //更新摄像机跟随玩家
-    ctx->camera.target = Vector2{
-        static_cast<float>(ctx->player.gridX * TILE_SIZE) + (TILE_SIZE / 2.0f),
-        static_cast<float>(ctx->player.gridY * TILE_SIZE) + (TILE_SIZE / 2.0f)
-    };
+    // 摄像机在 drawPlayer() 中设置，无需在此更新
 
     //处理状态切换
     if (IsKeyPressed(KEY_E)) {
@@ -93,18 +89,21 @@ void exploration_render(GameContext* ctx, void* state_data)
     
     //显示玩家坐标
     char posText[64];
-    std::sprintf(posText, "位置: (%d, %d)", ctx->player.gridX, ctx->player.gridY);
-    DrawText(posText, 10, static_cast<int>(ctx->screenHeight) - 60, 16, DARKGREEN);
+    std::sprintf(posText, "(%d, %d)", ctx->player.gridX, ctx->player.gridY);
+    DrawTextEx(ctx->mainFont, "位置: ", Vector2{10, (float)ctx->screenHeight - 60}, 24, 1, DARKGREEN);
+    DrawText(posText, 80, static_cast<int>(ctx->screenHeight) - 60, 24, DARKGREEN);
     
     //显示玩家属性
     char hpText[64];
-    std::sprintf(hpText, "HP: %d/%d", ctx->player.stats.hp, ctx->player.stats.maxHp);
-    DrawText(hpText, 10, static_cast<int>(ctx->screenHeight) - 40, 16, RED);
+    std::sprintf(hpText, "%d/%d", ctx->player.stats.hp, ctx->player.stats.maxHp);
+    DrawTextEx(ctx->mainFont, "HP: ", Vector2{10, (float)ctx->screenHeight - 40}, 24, 1, RED);
+    DrawText(hpText, 80, static_cast<int>(ctx->screenHeight) - 40, 24, RED);
     
     //显示运行时间
     char timeText[64];
-    std::sprintf(timeText, "时间: %.1fs", expd->elapsedTime);
-    DrawText(timeText, 10, static_cast<int>(ctx->screenHeight) - 20, 14, DARKGRAY);
+    std::sprintf(timeText, "%.1fs", expd->elapsedTime);
+    DrawTextEx(ctx->mainFont, "时间: ", Vector2{10, (float)ctx->screenHeight - 20}, 20, 1, DARKGRAY);
+    DrawText(timeText, 80, static_cast<int>(ctx->screenHeight) - 20, 20, DARKGRAY);
 }
 
 //探索状态创建函数

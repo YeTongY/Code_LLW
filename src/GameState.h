@@ -18,6 +18,23 @@
 #include "Map.h"
 #include "Enemy.h"
 
+//颜色定义
+// 1. “主要”的“赛博朋克”辉光色 (明亮的青色)
+// (我们不“完全”用 0,255,255，我们用一个更“柔和”的青色)
+#define CYBER_CYAN (Color){ 0, 228, 228, 255 }
+
+// 2. “主要”的 UI 背景色 (非常暗的青色)
+#define UI_BACKGROUND (Color){ 10, 40, 45, 255 }
+
+// 3. “主要”的 UI 文字色 (干净的白色)
+#define UI_TEXT (Color){ 255, 255, 255, 255 }
+
+// 4. “P1 锦上添花”色 (用于 HP, MP, 警告)
+#define CYBER_LIME (Color){ 0, 255, 128, 255 }  // 亮绿色
+#define CYBER_MAGENTA (Color){ 255, 0, 255, 255 } // 品红/粉色
+#define CYBER_RED (Color){ 255, 50, 50, 255 }  // 亮红色
+
+
 using namespace std;
 
 //前向声明

@@ -1,6 +1,5 @@
-#include "Player.h"
+#include "GameState.h"  // 先包含 GameState.h，它会包含 Player.h
 #include "raylib.h"
-#include "GameState.h"
 #include "Map.h"//TODO 需等待map完成
 #include "raymath.h"
 
@@ -143,72 +142,62 @@ void updatePlayer(GameContext& ctx){
     float moveSpeed = ctx.player.moveSpeed; // 移动速度像素/秒
     Vector2 desiredMove = Vector2Scale(input, moveSpeed * dt);// (速度 * 时间 = 这一帧应该移动的“距离”)
 
+    if (ctx.player.isMoving == false)
+    {
+        // 初始化移动意图
+        int nextX = ctx.player.gridX;
+        int nextY = ctx.player.gridY;
+        
+        // 检测输入
+        if (IsKeyDown(KEY_W)) { nextY--; ctx.player.currentDirection = PLAYER_DIR_UP; }
+        else if (IsKeyDown(KEY_S)) { nextY++; ctx.player.currentDirection = PLAYER_DIR_DOWN; }
+        else if (IsKeyDown(KEY_A)) { nextX--; ctx.player.currentDirection = PLAYER_DIR_LEFT; }
+        else if (IsKeyDown(KEY_D)) { nextX++; ctx.player.currentDirection = PLAYER_DIR_RIGHT; }
+        
+        // 碰撞检测
+        if ((nextX != ctx.player.gridX || nextY != ctx.player.gridY) && // (玩家“真的”按键了)
+            (nextY >= 0 && nextY < ctx.tiles.size()) && // (Y 边界)
+            (nextX >= 0 && nextX < ctx.tiles[nextY].size()) && // (X 边界)
+            (ctx.tiles[nextY][nextX] == EMPTY || ctx.tiles[nextY][nextX] == GRASS)) // (障碍)
+        {
+            //开始移动，修改渲染位置
+            
+            // 1. “设置”动画“状态”
+            ctx.player.isMoving = true;
+            
+            // 2. “设置”动画“目标” (像素)
+            ctx.player.moveTarget = { (float)nextX * TILE_SIZE, (float)nextY * TILE_SIZE };
+        }
+    }
+    //  【【如果“正在动” -> “执行”动画】】
+    else // (if isMoving == true)
+    {
+        
+        
+        // “平滑”地“追”向“目标”
+        ctx.player.visualPosition = Vector2MoveTowards(
+            ctx.player.visualPosition, // (当前“视觉”位置)
+            ctx.player.moveTarget,     // (目标“像素”位置)
+            ctx.player.moveSpeed * dt  // (“追”的速度)
+        );
 
-    //初始化移动意图
-    int nextX = ctx.player.gridX;
-    int nextY = ctx.player.gridY;
-
-    //将按键转化为移动意图
-    if(IsKeyPressed(KEY_W)){//当W键按下 一次 时，仅一次向上移动一格
-        nextY--;//*注意，向上是减少Y坐标
-        ctx.player.currentDirection = PLAYER_DIR_UP;
+        // “检查”是否“到达”
+        if (Vector2Distance(ctx.player.visualPosition, ctx.player.moveTarget) < 1.0f) // (如果“足够近”)
+        {
+            // 停止移动
+            
+            // “重置”动画“状态”
+            ctx.player.isMoving = false;
+            
+            // “校准”视觉位置 (防止 0.001 的误差)
+            ctx.player.visualPosition = ctx.player.moveTarget;
+            
+            // 更新逻辑位置
+            ctx.player.gridX = (int)(ctx.player.moveTarget.x / TILE_SIZE);
+            ctx.player.gridY = (int)(ctx.player.moveTarget.y / TILE_SIZE);
+        }
     }
-    else if(IsKeyPressed(KEY_S)){//当S键按下 一次 时，仅一次向下移动一格
-        nextY++;//*注意，向下是增加Y坐标
-        ctx.player.currentDirection = PLAYER_DIR_DOWN;
-    }
-    else if(IsKeyPressed(KEY_A)){//当A键按下 一次 时，仅一次向左移动一格
-        nextX--;
-        ctx.player.currentDirection = PLAYER_DIR_LEFT;
-    }
-    else if(IsKeyPressed(KEY_D)){//当D键按下 一次 时，仅一次向右移动一格
-        nextX++;
-        ctx.player.currentDirection = PLAYER_DIR_RIGHT;
-    }
-
-    //------开始进行碰撞检测------
-
-    bool canMove = false; //初始化为：不可移动
-
-    //【修复】安全检查顺序：先检查 Y，再用该行的实际宽度检查 X
-    //这样可以处理"锯齿状"地图（不同行宽度不同的情况）
-
-    //检查地图是否为空
-    if(ctx.tiles.empty()){
-        TraceLog(LOG_FATAL,"[PlayerMove] Map data is empty!");
-        canMove = false;
-    }
-    //【第一步】检测 Y 轴是否超出地图限制
-    else if(nextY < 0 || nextY >= (int)ctx.tiles.size()){
-        TraceLog(LOG_WARNING,"[PlayerMove] Invalid move attempt! Out of map bounds of Y. Target position:(%d,%d)",nextX,nextY);
-        canMove = false;
-    }
-    //【第二步】Y 轴安全，现在用 nextY 这一行来检查 X 的实际宽度
-    else if(ctx.tiles[nextY].empty()){
-        TraceLog(LOG_WARNING,"[PlayerMove] Invalid move attempt! Row %d is empty. Target position:(%d,%d)",nextY,nextX,nextY);
-        canMove = false;
-    }
-    else if(nextX < 0 || nextX >= (int)ctx.tiles[nextY].size()){
-        TraceLog(LOG_WARNING,"[PlayerMove] Invalid move attempt! Out of map bounds of X. Target position:(%d,%d)",nextX,nextY);
-        canMove = false;
-    }
-    //【第三步】X 和 Y 都安全，检测目标位置是否可移动
-    else if(ctx.tiles[nextY][nextX] != EMPTY && ctx.tiles[nextY][nextX] != GRASS){
-        TraceLog(LOG_WARNING,"[PlayerMove] Invalid move attempt! Target tile is not walkable. Target position:(%d,%d)",nextX,nextY);
-        canMove = false;
-    }
-    else{
-        //所有检查通过，可以移动
-        canMove = true;
-    }
-    //------碰撞检测结束------
-
-    //------开始执行移动------
-    if(canMove){
-    ctx.player.gridX = nextX;
-    ctx.player.gridY = nextY;
-    }
-    //------移动结束------
+    
 
     //------移动状态更新结束------
 
@@ -232,14 +221,21 @@ void updatePlayer(GameContext& ctx){
 void drawPlayer(const GameContext& ctx){
     Camera2D camera = ctx.camera;//创建一个camera的副本
 
+
+
+
     //------开始设置角色摄像机------
     camera.zoom = 3.0f;//? 为啥要加f--->因为zoom本身就是个float量，3.0这样会默认为double
     camera.offset = {ctx.screenWidth/2.0f, ctx.screenHeight/2.0f}; // 摄像机偏移量，设置为屏幕中心（屏幕宽高的一半）
-    camera.target = { // 摄像机目标位置，指向玩家所在瓦片的中心点
-        (float)(ctx.player.gridX * TILE_SIZE) + (TILE_SIZE / 2.0f), // 玩家网格X坐标 * 瓦片大小 + 瓦片中心偏移
-        (float)(ctx.player.gridY * TILE_SIZE) + (TILE_SIZE / 2.0f)  // 玩家网格Y坐标 * 瓦片大小 + 瓦片中心偏移
+    //  让摄像机跟随平滑的“视觉位置”
+    camera.target = { 
+        ctx.player.visualPosition.x + (TILE_SIZE / 2.0f), // 使用 visualPosition.x
+        ctx.player.visualPosition.y + (TILE_SIZE / 2.0f)  // 使用 visualPosition.y
     };
     //------结束角色摄像机设置------
+
+
+
 
     //------开始角色摄像机绘制------
     BeginMode2D(camera);
@@ -322,11 +318,10 @@ void drawPlayer(const GameContext& ctx){
             break;
     }
 
-    //必须"向上偏移" 1 格 (TILE_SIZE)
-    // 这样"32x64"的"脚"才能"踩"在"32x32"的 P0 格子上
-    Vector2 drawDestPosition = {//仅渲染用坐标
-        (float)ctx.player.gridX * TILE_SIZE,
-        (float)ctx.player.gridY * TILE_SIZE - TILE_SIZE // 【【【向上偏移！】】】
+    ///  让角色精灵图绘制在平滑的“视觉位置”上
+    Vector2 drawDestPosition = {
+        ctx.player.visualPosition.x,
+        ctx.player.visualPosition.y - TILE_SIZE // 向上偏移一个瓦片高度，使脚踩在格子上
     };
 
     // 【调试】绘制玩家精灵图（不受滤镜影响）
@@ -336,8 +331,8 @@ void drawPlayer(const GameContext& ctx){
     } else {
         // 【备用方案】纹理未加载，绘制红色方块作为占位符
         DrawRectangle(
-            ctx.player.gridX * TILE_SIZE, 
-            ctx.player.gridY * TILE_SIZE - TILE_SIZE,
+            (int)drawDestPosition.x,
+            (int)drawDestPosition.y,
             32, 64, RED
         );
         DrawText("NO SPRITE", ctx.player.gridX * TILE_SIZE, ctx.player.gridY * TILE_SIZE, 10, WHITE);
