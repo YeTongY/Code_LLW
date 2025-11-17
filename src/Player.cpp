@@ -23,7 +23,7 @@ void LoadPlayerAssets(GameContext& ctx){
     for (int i = 0; i < 3; i++) {
         ctx.player.spriteSheet = LoadTexture(possiblePaths[i]);
         if(ctx.player.spriteSheet.id != 0){
-            TraceLog(LOG_INFO, "[Player] Sprite sheet loaded successfully: %s (ID: %d, Size: %dx%d)", 
+            TraceLog(LOG_INFO, "[Player] 玩家精灵图加载成功: %s (ID: %d, 尺寸: %dx%d)", 
                      possiblePaths[i], 
                      ctx.player.spriteSheet.id,
                      ctx.player.spriteSheet.width,
@@ -34,10 +34,54 @@ void LoadPlayerAssets(GameContext& ctx){
     }
     
     if(!loaded){
-        TraceLog(LOG_ERROR, "[Player] Failed to load sprite sheet from all paths");
-        TraceLog(LOG_ERROR, "[Player] Current working directory: %s", GetWorkingDirectory());
-        TraceLog(LOG_ERROR, "[Player] Will use red rectangle as placeholder");
+        TraceLog(LOG_ERROR, "[Player] 玩家精灵图加载失败，尝试了所有路径");
+        TraceLog(LOG_ERROR, "[Player] 当前工作目录: %s", GetWorkingDirectory());
+        TraceLog(LOG_ERROR, "[Player] 将使用红色方块作为占位符");
     }
+
+
+    //------开始加载滤镜------
+    TraceLog(LOG_INFO, "[Shader] 开始加载滤镜，屏幕尺寸: %.0fx%.0f", ctx.screenWidth, ctx.screenHeight);
+    
+    // 1. 创建渲染纹理（用于后处理）
+    int width = (int)ctx.screenWidth;
+    int height = (int)ctx.screenHeight;
+    
+    TraceLog(LOG_INFO, "[Shader] 转换后的整数尺寸: %dx%d", width, height);
+    
+    ctx.mapRenderTexture = LoadRenderTexture(width, height);
+    if(ctx.mapRenderTexture.id != 0){
+        TraceLog(LOG_INFO, "[Shader] 渲染纹理创建成功 (尺寸: %dx%d, ID: %d)", 
+                 width, height, ctx.mapRenderTexture.id);
+    } else {
+        TraceLog(LOG_ERROR, "[Shader] 渲染纹理创建失败！");
+    }
+
+    // 2. 加载"着色器" (Shader) - 尝试多个路径
+    const char* shaderPaths[] = {
+        "res/graphics/shaders/cyberpunk.fs",
+        "../res/graphics/shaders/cyberpunk.fs",
+        "../../res/graphics/shaders/cyberpunk.fs"
+    };
+    
+    bool shaderLoaded = false;
+    for (int i = 0; i < 3; i++) {
+        ctx.cyberpunkShader = LoadShader(0, shaderPaths[i]);
+        if(ctx.cyberpunkShader.id != 0){
+            TraceLog(LOG_INFO, "[Shader] 赛博朋克滤镜加载成功: %s (ID: %d)", 
+                     shaderPaths[i], ctx.cyberpunkShader.id);
+            shaderLoaded = true;
+            break;
+        }
+    }
+    
+    if(!shaderLoaded){
+        TraceLog(LOG_ERROR, "[Shader] 赛博朋克滤镜加载失败，尝试了所有路径");
+        TraceLog(LOG_ERROR, "[Shader] 当前工作目录: %s", GetWorkingDirectory());
+        TraceLog(LOG_ERROR, "[Shader] 将使用默认渲染（无滤镜效果）");
+    }
+    //------滤镜加载结束
+
 }
 
 /**
@@ -51,6 +95,15 @@ void UnloadPlayerAssets(GameContext& ctx){
     }
     else{
         TraceLog(LOG_ERROR,"[Player Texture Unloader] Trying to unload an empty texture!");
+    }
+    //卸载"全局"滤镜
+    if(ctx.cyberpunkShader.id != 0){
+        UnloadShader(ctx.cyberpunkShader);
+        TraceLog(LOG_INFO, "[Shader] 赛博朋克滤镜已卸载");
+    }
+    if(ctx.mapRenderTexture.id != 0){
+        UnloadRenderTexture(ctx.mapRenderTexture);
+        TraceLog(LOG_INFO, "[Shader] 渲染纹理已卸载");
     }
 }
 
@@ -164,8 +217,45 @@ void drawPlayer(const GameContext& ctx){
     //------开始角色摄像机绘制------
     BeginMode2D(camera);
 
-    //绘制地图
+    // 【P1 滤镜渲染流程 - 只对地图应用滤镜】
+    // 检查滤镜资源是否有效
+    bool useShader = (ctx.mapRenderTexture.id != 0 && ctx.cyberpunkShader.id != 0);
+    
+    if(useShader) {
+        // 第一步：先结束当前摄像机
+        EndMode2D();
+        
+        // 第二步：将地图渲染到纹理（使用摄像机）
+        BeginTextureMode(ctx.mapRenderTexture);
+        ClearBackground(RAYWHITE);
+        BeginMode2D(camera); // 在纹理中应用相同的摄像机
+    }
+
+    //绘制地图（如果使用滤镜，会渲染到纹理；否则直接到屏幕）
     DrawMap(ctx);
+
+    if(useShader) {
+        EndMode2D(); // 结束纹理中的摄像机
+        EndTextureMode(); // 结束渲染到纹理
+        
+        // 第三步：使用着色器将地图纹理绘制到屏幕（不使用摄像机，直接屏幕坐标）
+        BeginShaderMode(ctx.cyberpunkShader);
+        
+        // 将纹理以屏幕尺寸绘制
+        DrawTextureRec(
+            ctx.mapRenderTexture.texture,
+            Rectangle{ 0, 0, 
+                      (float)ctx.mapRenderTexture.texture.width, 
+                      -(float)ctx.mapRenderTexture.texture.height },
+            Vector2{ 0, 0 },
+            WHITE
+        );
+        
+        EndShaderMode();
+        
+        // 第四步：重新开启摄像机以绘制玩家
+        BeginMode2D(camera);
+    }
 
     //绘制角色
     Rectangle source;//声明绘制源
@@ -196,10 +286,10 @@ void drawPlayer(const GameContext& ctx){
             source.x = 96.0f;  // 3 * 32
             break;
         
-        // [P1 Safety Net] Prevent rendering bugs from uninitialized or garbage values
+        // 【P1 安全网】防止未初始化或垃圾值导致的花屏 Bug
         default:
-            source.x = 32.0f;  // Default to Down direction
-            TraceLog(LOG_WARNING, "[Player] Abnormal currentDirection value detected: %d, using default direction", ctx.player.currentDirection);
+            source.x = 32.0f;  // 默认朝下 (Down)
+            TraceLog(LOG_WARNING, "[Player] 检测到异常的 currentDirection 值: %d, 使用默认朝向", ctx.player.currentDirection);
             break;
     }
 
@@ -210,7 +300,7 @@ void drawPlayer(const GameContext& ctx){
         (float)ctx.player.gridY * TILE_SIZE - TILE_SIZE // 【【【向上偏移！】】】
     };
 
-    // 【调试】绘制玩家精灵图
+    // 【调试】绘制玩家精灵图（不受滤镜影响）
     if(ctx.player.spriteSheet.id != 0){
         // 纹理加载成功，绘制精灵图
         DrawTextureRec(ctx.player.spriteSheet, source, drawDestPosition, WHITE);

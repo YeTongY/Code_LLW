@@ -42,9 +42,13 @@ int main(void)
     
     //==========创建游戏上下文==========
     GameContext ctx;
+    TraceLog(LOG_INFO, "[Main] GameContext 创建后，默认尺寸: %.0fx%.0f", ctx.screenWidth, ctx.screenHeight);
+    
     ctx.screenWidth = screenWidth;
     ctx.screenHeight = screenHeight;
     ctx.isRunning = true;
+    
+    TraceLog(LOG_INFO, "[Main] 赋值后，屏幕尺寸: %.0fx%.0f", ctx.screenWidth, ctx.screenHeight);
     
     //==========初始化玩家==========
     ctx.player.gridX = 2;  // 修改为安全位置（草地区域）
@@ -127,6 +131,7 @@ int main(void)
     TraceLog(LOG_INFO, "[Main] 地图纹理加载完成");
     
     //==========加载玩家资源==========
+    TraceLog(LOG_INFO, "[Main] 准备加载玩家资源，当前屏幕尺寸: %.0fx%.0f", ctx.screenWidth, ctx.screenHeight);
     LoadPlayerAssets(ctx);
     TraceLog(LOG_INFO, "[Main] 玩家精灵图加载完成");
     

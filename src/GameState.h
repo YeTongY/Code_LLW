@@ -89,6 +89,10 @@ struct GameContext
     
     // 摄像机
     Camera2D camera;
+
+    //滤镜
+    Shader cyberpunkShader;          // “赛博朋克”滤镜
+    RenderTexture2D mapRenderTexture; // “P1 渲染画布”
     
     // 状态机
     GameStateMachine state_machine;

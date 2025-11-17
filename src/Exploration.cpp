@@ -80,10 +80,10 @@ void exploration_render(GameContext* ctx, void* state_data)
     if (!expd->isActive) return;
 
     //======核心：直接调用 Player 模块的渲染函数======
-    // 包含：BeginMode2D、DrawMap、绘制玩家、EndMode2D
+    // 包含：BeginMode2D、DrawMap、绘制玩家、EndMode2D（滤镜在内部应用）
     drawPlayer(*ctx);
 
-    //在 EndMode2D 之后，绘制 UI（不受摄像机影响）
+    //在 EndMode2D 之后，绘制 UI（不受摄像机和滤镜影响）
     DrawText("探索模式", 10, 10, 20, BLACK);
     DrawText("操作提示:", 10, 40, 16, DARKGRAY);
     DrawText("  WASD - 移动", 10, 60, 14, DARKGRAY);
