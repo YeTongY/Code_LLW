@@ -318,7 +318,7 @@ void drawPlayer(const GameContext& ctx){
             break;
     }
 
-    ///  让角色精灵图绘制在平滑的“视觉位置”上
+    //  让角色精灵图绘制在平滑的“视觉位置”上
     Vector2 drawDestPosition = {
         ctx.player.visualPosition.x,
         ctx.player.visualPosition.y - TILE_SIZE // 向上偏移一个瓦片高度，使脚踩在格子上
