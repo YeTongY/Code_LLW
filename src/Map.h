@@ -11,9 +11,9 @@ struct GameContext;
 
 // 地块类型枚举
 typedef enum {
-    EMPTY,
-    WALL,
-    GRASS
+    EMPTY = 0,
+    GRASS = 1,
+    WALL = 2
 } TileType;
 
 // 地图结构体声明
