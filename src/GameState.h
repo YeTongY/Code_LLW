@@ -103,6 +103,7 @@ struct GameContext
 
     Enemy* currentCombatant;            //当前战斗的敌人指针
     vector<Enemy> enemy;
+    Texture2D enemySpriteSheet;
     
     // 摄像机
     Camera2D camera;

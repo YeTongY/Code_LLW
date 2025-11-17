@@ -50,7 +50,9 @@ void updatePlayer(GameContext& ctx);
  * 
  * @param ctx Gamestate里的GameContext核心数据文件
  */
-void drawPlayer(const GameContext& ctx);
+// GDD v3.13 架构：职责分离
+void DrawPlayerSprite(const Player& player);  // 纯粹的精灵绘制
+void DrawMapScene(const GameContext& ctx);    // 场景渲染总指挥
 
 /**
  * @brief (P1) 加载玩家所需的美术资源 (贴图)

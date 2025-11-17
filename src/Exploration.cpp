@@ -78,7 +78,7 @@ void exploration_render(GameContext* ctx, void* state_data)
 
     //======核心：直接调用 Player 模块的渲染函数======
     // 包含：BeginMode2D、DrawMap、绘制玩家、EndMode2D（滤镜在内部应用）
-    drawPlayer(*ctx);
+    DrawMapScene(*ctx);
 
     //在 EndMode2D 之后，绘制 UI（不受摄像机和滤镜影响）
     DrawTextEx(ctx->mainFont, "探索模式", Vector2{10, 10}, 30, 1, BLACK);
