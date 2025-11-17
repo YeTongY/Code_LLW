@@ -101,8 +101,8 @@ struct GameContext
     vector<vector<TileType>> tiles;                     // 地图数据
     unordered_map<TileType, Texture2D> mapTextures;     // 地图资产
 
-    vector<Enemy> enemies;              //敌人列表
     Enemy* currentCombatant;            //当前战斗的敌人指针
+    vector<Enemy> enemy;
     
     // 摄像机
     Camera2D camera;

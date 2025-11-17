@@ -170,9 +170,9 @@ void LoadMapTextures(GameContext& map) {
     
     // 尝试多个可能的路径加载纹理
     const char* texturePaths[] = {
-        "res/data/maps/Godot_Autotiles_32x32.png",
-        "../res/data/maps/Godot_Autotiles_32x32.png",
-        "../../res/data/maps/Godot_Autotiles_32x32.png"
+        "res/graphics/tilesets/Godot_Autotiles_32x32.png",
+        "../res/graphics/tilesets/Godot_Autotiles_32x32.png",
+        "../../res/graphics/tilesets/Godot_Autotiles_32x32.png"
     };
     
     Texture2D tileset = {0};
