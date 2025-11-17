@@ -240,16 +240,18 @@ void drawPlayer(const GameContext& ctx){
         EndMode2D(); // 结束纹理中的摄像机
         EndTextureMode(); // 结束渲染到纹理
         
-        // 第三步：使用着色器将地图纹理绘制到屏幕（不使用摄像机，直接屏幕坐标）
+        // 第三步：使用着色器将地图纹理绘制到屏幕（全屏绘制）
         BeginShaderMode(ctx.cyberpunkShader);
         
-        // 将纹理以屏幕尺寸绘制
-        DrawTextureRec(
+        // 简单的全屏绘制 - 将纹理以屏幕尺寸1:1绘制
+        DrawTexturePro(
             ctx.mapRenderTexture.texture,
             Rectangle{ 0, 0, 
                       (float)ctx.mapRenderTexture.texture.width, 
-                      -(float)ctx.mapRenderTexture.texture.height },
-            Vector2{ 0, 0 },
+                      -(float)ctx.mapRenderTexture.texture.height },  // 源矩形（负高度=Y轴翻转）
+            Rectangle{ 0, 0, ctx.screenWidth, ctx.screenHeight },     // 目标矩形（全屏）
+            Vector2{ 0, 0 },     // 原点
+            0.0f,                // 旋转角度
             WHITE
         );
         
