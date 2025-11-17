@@ -43,6 +43,15 @@ void LoadPlayerAssets(GameContext& ctx){
     //------开始加载滤镜------
     TraceLog(LOG_INFO, "[Shader] 开始加载滤镜，屏幕尺寸: %.0fx%.0f", ctx.screenWidth, ctx.screenHeight);
     
+    // 检查屏幕尺寸是否有效
+    if (ctx.screenWidth <= 0 || ctx.screenHeight <= 0) {
+        TraceLog(LOG_WARNING, "[Shader] 屏幕尺寸无效 (%.0fx%.0f)，跳过滤镜初始化", 
+                 ctx.screenWidth, ctx.screenHeight);
+        ctx.mapRenderTexture.id = 0;
+        ctx.cyberpunkShader.id = 0;
+        return; // 提前返回，不加载滤镜
+    }
+    
     // 1. 创建渲染纹理（用于后处理）
     int width = (int)ctx.screenWidth;
     int height = (int)ctx.screenHeight;
@@ -276,8 +285,8 @@ void DrawMapScene(const GameContext& ctx){
     //------开始设置角色摄像机------
     camera.zoom = 3.0f;//? 为啥要加f--->因为zoom本身就是个float量，3.0这样会默认为double
     camera.offset = {ctx.screenWidth/2.0f, ctx.screenHeight/2.0f}; // 摄像机偏移量，设置为屏幕中心（屏幕宽高的一半）
-    //  让摄像机跟随平滑的“视觉位置”
-    camera.target = { 
+    //  让摄像机跟随平滑的"视觉位置"
+    camera.target = {
         ctx.player.visualPosition.x + (TILE_SIZE / 2.0f), // 使用 visualPosition.x
         ctx.player.visualPosition.y + (TILE_SIZE / 2.0f)  // 使用 visualPosition.y
     };
