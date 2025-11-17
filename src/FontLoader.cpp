@@ -3,6 +3,7 @@
 #include <sstream>   // 包含 C++ 字符串流库
 #include <string>    // 包含 C++ 字符串库
 #include <raylib.h>
+#include "raygui.h"
 
 using namespace std;
 
@@ -114,3 +115,46 @@ void unloadGameFont (GameContext &ctx){
     }
 }
 
+/**
+ * @brief (P1) 绘制“辉光”字体 (GDD v3.9d - 已修复 Fade())
+ */
+void DrawTextGlow(
+    Font font, 
+    const char* text, 
+    Vector2 position, 
+    float fontSize, 
+    float spacing, 
+    Color textColor, // (e.g., WHITE)
+    Color glowColor  // (e.g., CYAN)
+)
+{
+    // 【【【P1 施工：Task 1 - “辉光层” (Pass 1)】】】
+    
+    // 1. 计算“辉光”的位置
+    Vector2 glowPos = { position.x + 2.0f, position.y + 2.0f };
+    
+    // (Fade() 来自 raygui.h)
+    Color glowTint = Fade(glowColor, 0.4f); // (0.4f = 40% 透明度)
+
+    // 3. 绘制“辉光层”
+    DrawTextEx(
+        font,
+        text,
+        glowPos,
+        fontSize,
+        spacing,
+        glowTint  // <-- 使用“半透明”的辉光色
+    );
+
+    // 【【【P1 施工：Task 2 - “文字层” (Pass 2)】】】
+    
+    // 4. 绘制“主文本层”
+    DrawTextEx(
+        font,
+        text,
+        position, // <-- 使用“精确”的位置
+        fontSize,
+        spacing,
+        textColor // <-- 使用“不透明”的主颜色
+    );
+}

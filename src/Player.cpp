@@ -2,6 +2,7 @@
 #include "raylib.h"
 #include "GameState.h"
 #include "Map.h"//TODO 需等待map完成
+#include "raymath.h"
 
 const int TILE_SIZE = 32;//标准图块大小
 const char* playerSpriteAddress = "res/graphics/player/Pixel_Taffy/Pixel_Taffy_Sprite.png";//玩家精灵位置
@@ -86,6 +87,12 @@ void LoadPlayerAssets(GameContext& ctx){
 
 }
 
+
+
+
+
+
+
 /**
  * @brief (P1) 卸载玩家的美术资源
  * (这个函数必须在 main() 的“清理”中被调用)
@@ -109,6 +116,16 @@ void UnloadPlayerAssets(GameContext& ctx){
     }
 }
 
+
+
+
+
+
+
+
+
+
+
  /**
   * @brief 用于读取键盘输入来更新玩家位置
   * 
@@ -118,6 +135,14 @@ void updatePlayer(GameContext& ctx){
 
 
     //------开始移动状态更新------
+
+    
+    Vector2 input = { 0.0f, 0.0f }; // (0, 0) = 不动
+
+    float dt = GetFrameTime(); // 获取帧间时间
+    float moveSpeed = ctx.player.moveSpeed; // 移动速度像素/秒
+    Vector2 desiredMove = Vector2Scale(input, moveSpeed * dt);// (速度 * 时间 = 这一帧应该移动的“距离”)
+
 
     //初始化移动意图
     int nextX = ctx.player.gridX;
