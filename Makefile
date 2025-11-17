@@ -80,6 +80,9 @@ all: $(TARGET)
 $(TARGET): $(OBJS)
 	@echo "链接生成可执行文件: $(TARGET)"
 	$(CC) $(OBJS) -o $(TARGET) $(LDFLAGS) $(LIBS)
+	@echo "复制着色器文件到 build 目录..."
+	@mkdir -p $(BUILD_DIR)/res/graphics/shaders
+	@cp -f res/graphics/shaders/cyberpunk.fs $(BUILD_DIR)/res/graphics/shaders/
 	@echo "编译完成! 请运行: build\LLW.exe"
 
 # 模式规则：如何将一个 .cpp 文件编译成一个 .o 文件

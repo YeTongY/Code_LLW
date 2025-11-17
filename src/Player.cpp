@@ -59,13 +59,15 @@ void LoadPlayerAssets(GameContext& ctx){
 
     // 2. 加载"着色器" (Shader) - 尝试多个路径
     const char* shaderPaths[] = {
-        "res/graphics/shaders/cyberpunk.fs",
-        "../res/graphics/shaders/cyberpunk.fs",
-        "../../res/graphics/shaders/cyberpunk.fs"
+        "res/graphics/shaders/cyberpunk.fs",        // 从项目根目录运行
+        "../res/graphics/shaders/cyberpunk.fs",     // 从 build 目录运行
+        "../../res/graphics/shaders/cyberpunk.fs",  // 从更深的子目录运行
+        "Code_LLW_Project/res/graphics/shaders/cyberpunk.fs",  // 从父目录运行
+        "./res/graphics/shaders/cyberpunk.fs"       // 当前目录
     };
     
     bool shaderLoaded = false;
-    for (int i = 0; i < 3; i++) {
+    for (int i = 0; i < 5; i++) {
         ctx.cyberpunkShader = LoadShader(0, shaderPaths[i]);
         if(ctx.cyberpunkShader.id != 0){
             TraceLog(LOG_INFO, "[Shader] 赛博朋克滤镜加载成功: %s (ID: %d)", 

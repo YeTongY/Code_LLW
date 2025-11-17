@@ -29,13 +29,12 @@ void main()
     // 轻微降低整体亮度，营造氛围（而非完全变暗）
     color.rgb *= 0.75; // 降低25%亮度（稍微暗一点）
     
-    // 青绿霓虹色调 - 只在高光区域轻微应用
-    vec3 neonTeal = vec3(0.2, 1.3, 1.4); // 青绿霓虹
+    // 赛博朋克霓虹色调 - 青绿主调+微量红色点缀
+    vec3 neonColor = vec3(0.5, 1.3, 1.4); // 青绿霓虹主调，带一点红
     
-    // 只对原色稍微染色（混合比例很低，保留原色）
-    // 高亮区域多一些青绿色，暗区保持原色
-    float tintStrength = luma * 0.25; // 只对亮区染色，且强度只有25%
-    color.rgb = mix(color.rgb, color.rgb * neonTeal, tintStrength);
+    // 增强染色效果，让滤镜更明显
+    float tintStrength = luma * 0.4 + 0.15; // 基础15% + 亮度相关40%
+    color.rgb = mix(color.rgb, color.rgb * neonColor, tintStrength);
 
 
     // 【【"P1 施工"：效果 2 - 适度对比度（增强层次感）】】
