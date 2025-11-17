@@ -174,14 +174,14 @@ void updatePlayer(GameContext& ctx){
     {
         
         
-        // “平滑”地“追”向“目标”
+        // 1. “执行”一小步移动
         ctx.player.visualPosition = Vector2MoveTowards(
             ctx.player.visualPosition, // (当前“视觉”位置)
             ctx.player.moveTarget,     // (目标“像素”位置)
             ctx.player.moveSpeed * dt  // (“追”的速度)
         );
 
-        // “检查”是否“到达”
+        // 2. “检查”是否到达终点
         if (Vector2Distance(ctx.player.visualPosition, ctx.player.moveTarget) < 1.0f) // (如果“足够近”)
         {
             // 停止移动
