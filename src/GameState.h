@@ -119,6 +119,13 @@ struct GameContext
     float screenWidth = 1920.0f;
     float screenHeight = 1080.0f;
     bool isRunning = true;
+
+
+    //UI纹理
+    Texture2D dialogueBoxTexture;
+    Texture2D portraitFrameTexture;
+
+    
 };
 
 #endif // GAMESTATE_H
