@@ -7,7 +7,7 @@
 #include <cstdio>
 //================================
 #include "Event.h"
-#include "DialogueState.h"
+#include "Dialogue.h"
 
 
 

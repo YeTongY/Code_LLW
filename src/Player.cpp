@@ -223,7 +223,7 @@ void updatePlayer(GameContext& ctx){
 
 
 /**
- * @brief 纯粹的玩家精灵绘制函数（按 GDD v3.13 两步走方案）
+ * @brief 纯粹的玩家精灵绘制函数
  * 
  * @param player 玩家数据（只读）
  * 

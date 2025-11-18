@@ -24,4 +24,4 @@ struct DialogueData {
     float charsPerSecond;
 };
 
-void createDialogueState(const char* portrait_address, const char* lines);
+GameState* createDialogueState(const vector<DialogueLine>& script);
