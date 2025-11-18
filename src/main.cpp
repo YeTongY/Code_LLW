@@ -23,6 +23,8 @@
 #include "Map.h"
 #include "Enemy.h"          //未完成敌人模块
 #include "FontLoader.h"     //字体加载
+#include "Event.h"          //事件系统
+#include "UI.h"             //UI资源加载
 #include <cstdio>
 #include <cstring>
 
@@ -76,7 +78,7 @@ int main(void)
              ctx.player.stats.hp, ctx.player.stats.maxHp);
    
     //===========================从 Tiled 文件加载地图
-    // 尝试多个可能的路径（支持从build目录或项目根目录运行）
+    // 注意：程序从项目根目录运行，直接使用 res/ 路径
     const char* possiblePaths[] = {
         "res/Level 1.tmx",
         "../res/Level 1.tmx",
@@ -110,6 +112,16 @@ int main(void)
 
     TraceLog(LOG_INFO, "[Main] 地图加载成功 - 大小：%dx%d", ctx.width, ctx.height);
 
+    //==========初始化测试事件==========
+    GameEvent testEvent;
+    testEvent.triggerType = "npc_interaction";
+    testEvent.triggerValue = "test_npc";
+    testEvent.scriptPath = "../res/data/dialogues/test_script.csv";
+    ctx.gameEvents.push_back(testEvent);
+    
+    TraceLog(LOG_INFO, "[Main] 测试事件已添加 - 类型: %s, 脚本: %s", 
+             testEvent.triggerType.c_str(), testEvent.scriptPath.c_str());
+
     // 调试：检查玩家初始位置的地形
     if (ctx.player.gridY < (int)ctx.tiles.size() && 
         ctx.player.gridX < (int)ctx.tiles[ctx.player.gridY].size()) {
@@ -130,15 +142,11 @@ int main(void)
         }
     }
 
-    // LoadLevelFromTiled 已经设置了 ctx.width, ctx.height, ctx.tileSize
-    // 不需要再手动设置
+    // LoadLevelFromTiled 已经加载了地图数据、tileset 纹理
+    // 不需要再手动设置尺寸或加载纹理
     
     TraceLog(LOG_INFO, "[Main] 地图初始化完成 - 大小: %dx%d, 瓦片大小: %d", 
              ctx.width, ctx.height, ctx.tileSize);
-    
-    //==========加载地图纹理==========
-    LoadMapTextures(ctx);
-    TraceLog(LOG_INFO, "[Main] 地图纹理加载完成");
     
     //==========加载字体==========
     loadGameFont(ctx);
@@ -148,6 +156,10 @@ int main(void)
     TraceLog(LOG_INFO, "[Main] 准备加载玩家资源，当前屏幕尺寸: %.0fx%.0f", ctx.screenWidth, ctx.screenHeight);
     LoadPlayerAssets(ctx);
     TraceLog(LOG_INFO, "[Main] 玩家精灵图加载完成");
+    
+    //==========加载UI资源==========
+    LoadUIAssets(ctx);
+    TraceLog(LOG_INFO, "[Main] UI资源加载完成");
     
     //==========初始化状态机==========
     GameStateMachine_init(&ctx.state_machine);
@@ -222,6 +234,9 @@ int main(void)
     
     UnloadPlayerAssets(ctx);
     TraceLog(LOG_INFO, "[Main] 玩家资源已释放");
+    
+    UnloadUIAssets(ctx);
+    TraceLog(LOG_INFO, "[Main] UI资源已释放");
     
     unloadGameFont(ctx);
     TraceLog(LOG_INFO, "[Main] 字体资源已释放");

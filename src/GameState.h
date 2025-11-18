@@ -99,8 +99,11 @@ struct GameContext
     int width;
     int height;
     int tileSize;
-    vector<vector<TileType>> tiles;                     // 地图数据
+    vector<vector<TileType>> tiles;                     // 地图逻辑数据（碰撞检测用）
+    vector<vector<unsigned int>> tileGIDs;              // Tiled 原始 GID 数据（绘制用）
     unordered_map<TileType, Texture2D> mapTextures;     // 地图资产
+    vector<Texture2D> tilesetTextures;                  // Tiled tileset 纹理列表
+    vector<int> tilesetFirstGIDs;                       // 每个 tileset 的起始 GID
 
     Enemy* currentCombatant;            //当前战斗的敌人指针
     vector<Enemy> enemies;

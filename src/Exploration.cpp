@@ -112,7 +112,8 @@ void exploration_render(GameContext* ctx, void* state_data)
 {
     ExplorationData* expd = static_cast<ExplorationData*>(state_data);
     
-    if (!expd->isActive) return;
+    // 安全检查：允许从对话状态调用（此时 state_data 为 nullptr）
+    if (expd != nullptr && !expd->isActive) return;
 
     //======核心：直接调用 Player 模块的渲染函数======
     // 包含：BeginMode2D、DrawMap、绘制玩家、EndMode2D（滤镜在内部应用）
@@ -139,7 +140,7 @@ void exploration_render(GameContext* ctx, void* state_data)
     
     //显示运行时间
     char timeText[64];
-    std::sprintf(timeText, "%.1fs", expd->elapsedTime);
+    std::sprintf(timeText, "%.1fs", expd ? expd->elapsedTime : 0.0f);
     DrawTextEx(ctx->mainFont, "时间: ", Vector2{10, (float)ctx->screenHeight - 20}, 20, 1, DARKGRAY);
     DrawText(timeText, 80, static_cast<int>(ctx->screenHeight) - 20, 20, DARKGRAY);
 

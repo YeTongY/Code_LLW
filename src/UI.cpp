@@ -61,26 +61,20 @@ void DrawDialogueWithTemplate(const DialogueBoxTemplate_Normal& tpl, const strin
     //准备一些矩形
     Rectangle portrait_source = {0.0f, 0.0f, (float)portrait.width, (float)portrait.height};//不裁剪
     Rectangle portrait_dest = {tpl.portraitPosition.x, tpl.portraitPosition.y, tpl.portraitWidth, tpl.portraitHeight};
-    Rectangle boxRect = { 
-        tpl.dialogueBoxPosition.x, 
-        tpl.dialogueBoxPosition.y, 
-        tpl.dialogueBoxWidth, 
-        tpl.dialogueBoxHeight 
-    };
-    
-    Rectangle portraitFrameRect = { 
-        tpl.portraitFramePosition.x, 
-        tpl.portraitFramePosition.y, 
-        tpl.portraitFrameWidth, 
-        tpl.portraitFrameHeight 
-    };
 
 
     //准备文本的位置
     Vector2 textPosition;
 
-    //绘制对话框背景
-    DrawTexture(tpl.dialogueBoxTexture,tpl.dialogueBoxPosition.x,tpl.dialogueBoxPosition.y,WHITE);
+    //绘制对话框背景（使用 DrawTexturePro 按照模板尺寸缩放）
+    Rectangle dialogueBoxSource = {0.0f, 0.0f, (float)tpl.dialogueBoxTexture.width, (float)tpl.dialogueBoxTexture.height};
+    Rectangle dialogueBoxDest = {
+        tpl.dialogueBoxPosition.x,
+        tpl.dialogueBoxPosition.y,
+        tpl.dialogueBoxWidth,
+        tpl.dialogueBoxHeight
+    };
+    DrawTexturePro(tpl.dialogueBoxTexture, dialogueBoxSource, dialogueBoxDest, {0, 0}, 0.0f, WHITE);
 
     if (!speakerName.empty()) {//绘制名字
         // 计算名字的绝对屏幕位置
@@ -103,8 +97,15 @@ void DrawDialogueWithTemplate(const DialogueBoxTemplate_Normal& tpl, const strin
 
     if(portrait.id != 0){//绘制头像
         
-        //绘制头像框
-        DrawTexture(tpl.portraitFrameTexture,tpl.portraitFramePosition.x,tpl.portraitFramePosition.y,WHITE);
+        //绘制头像框（使用 DrawTexturePro 按照模板尺寸缩放）
+        Rectangle portraitFrameSource = {0.0f, 0.0f, (float)tpl.portraitFrameTexture.width, (float)tpl.portraitFrameTexture.height};
+        Rectangle portraitFrameDest = {
+            tpl.portraitFramePosition.x,
+            tpl.portraitFramePosition.y,
+            tpl.portraitFrameWidth,
+            tpl.portraitFrameHeight
+        };
+        DrawTexturePro(tpl.portraitFrameTexture, portraitFrameSource, portraitFrameDest, {0, 0}, 0.0f, WHITE);
 
         //绘制头像
         DrawTexturePro(portrait,portrait_source,portrait_dest,
@@ -125,7 +126,37 @@ void DrawDialogueWithTemplate(const DialogueBoxTemplate_Normal& tpl, const strin
     }
 
     //准备要绘制的文本,以实现流式文字绘制
-    string textToDraw = text.substr(0, charsToShow);
+    // 安全的 UTF-8 字符截断（避免截断多字节字符）
+    string textToDraw;
+    int charCount = 0;
+    
+    for (size_t i = 0; i < text.length() && charCount < charsToShow; ) {
+        unsigned char c = text[i];
+        int charBytes = 1;
+        
+        // 判断 UTF-8 字符的字节数
+        if ((c & 0x80) == 0) {
+            // ASCII 字符 (0xxxxxxx)
+            charBytes = 1;
+        } else if ((c & 0xE0) == 0xC0) {
+            // 2字节字符 (110xxxxx)
+            charBytes = 2;
+        } else if ((c & 0xF0) == 0xE0) {
+            // 3字节字符 (1110xxxx) - 大部分中文
+            charBytes = 3;
+        } else if ((c & 0xF8) == 0xF0) {
+            // 4字节字符 (11110xxx)
+            charBytes = 4;
+        }
+        
+        // 确保不会超出字符串范围
+        if (i + charBytes > text.length()) break;
+        
+        // 添加完整字符
+        textToDraw.append(text.substr(i, charBytes));
+        i += charBytes;
+        charCount++;
+    }
 
     //绘制辉光文本
     DrawTextGlow(

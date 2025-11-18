@@ -38,9 +38,20 @@ void CleanupMap(GameContext& map) {
  * @param map 地图指针
  */
 void DrawMap(const GameContext& map) {
-    for(int y = 0;y < map.height;y++){
-        for(int x = 0;x < map.width;x++){
-            DrawSingleTile(map,x,y);
+    // 安全检查
+    if (map.width <= 0 || map.height <= 0) {
+        TraceLog(LOG_WARNING, "[Map] 地图尺寸无效: %dx%d", map.width, map.height);
+        return;
+    }
+    
+    if (map.tiles.empty() || map.tileGIDs.empty()) {
+        TraceLog(LOG_WARNING, "[Map] 地图数据为空");
+        return;
+    }
+    
+    for(int y = 0; y < map.height && y < (int)map.tiles.size(); y++){
+        for(int x = 0; x < map.width && x < (int)map.tiles[y].size(); x++){
+            DrawSingleTile(map, x, y);
         }
     }
 }
@@ -54,40 +65,52 @@ void DrawMap(const GameContext& map) {
  * @param type 地图块类型
  */
 void DrawSingleTile(const GameContext& map, int tileX, int tileY) {
-    // 获取 tile type
-    TileType type = map.tiles[tileY][tileX];
-    // 如果没有纹理映射，直接返回
-    if (map.mapTextures.count(type) == 0) return;
-
-    Texture2D tileset = map.mapTextures.at(type);
-
-    // 计算在 tileset 中的位置（以 tileSize 为单位）
-    int tileSetX = 0;
-    int tileSetY = 0;
-
-    //需要什么类型就在这里添加 然后对素材图进行行列匹配
-    switch (type) {
-    case TileType::EMPTY: tileSetX = 0; tileSetY = 0; break;
-    case TileType::GRASS: tileSetX = 1; tileSetY = 0; break;
-    case TileType::WALL:  tileSetX = 2; tileSetY = 0; break;
-    default: break;
+    // 获取该位置的 GID
+    if (tileY >= map.tileGIDs.size() || tileX >= map.tileGIDs[tileY].size()) return;
+    
+    unsigned int gid = map.tileGIDs[tileY][tileX];
+    if (gid == 0) return; // GID 为 0 表示空白图块
+    
+    // 找到对应的 tileset
+    int tilesetIndex = -1;
+    int localID = gid;
+    
+    for (int i = map.tilesetFirstGIDs.size() - 1; i >= 0; i--) {
+        if (gid >= map.tilesetFirstGIDs[i]) {
+            tilesetIndex = i;
+            localID = gid - map.tilesetFirstGIDs[i];
+            break;
+        }
     }
-
-    //计算在素材图中的位置（以 tileSize 为单位）
+    
+    if (tilesetIndex < 0 || tilesetIndex >= map.tilesetTextures.size()) return;
+    
+    Texture2D tileset = map.tilesetTextures[tilesetIndex];
+    if (tileset.id == 0) return;
+    
+    // 计算 tileset 中的列数
+    int columns = tileset.width / map.tileSize;
+    if (columns <= 0) return;
+    
+    // 根据 localID 计算在 tileset 中的位置
+    int tilesetX = localID % columns;
+    int tilesetY = localID / columns;
+    
+    // 源矩形（从 tileset 中切割）
     Rectangle sourceRect = {
-        static_cast<float>(tileSetX * map.tileSize),
-        static_cast<float>(tileSetY * map.tileSize),
+        static_cast<float>(tilesetX * map.tileSize),
+        static_cast<float>(tilesetY * map.tileSize),
         static_cast<float>(map.tileSize),
         static_cast<float>(map.tileSize)
     };
-
-    //计算在屏幕中的位置（以像素为单位）
+    
+    // 目标位置（屏幕坐标）
     Vector2 destPos = {
         static_cast<float>(tileX * map.tileSize),
         static_cast<float>(tileY * map.tileSize)
     };
-
-    // 只绘制切割出来的小块
+    
+    // 绘制图块
     DrawTextureRec(tileset, sourceRect, destPos, WHITE);
 }
 
@@ -102,10 +125,10 @@ void DrawSingleTile(const GameContext& map, int tileX, int tileY) {
 void LoadMapTextures(GameContext& map) {
     map.mapTextures.clear();
     
-    // 尝试多个可能的路径加载纹理
+    // 从 build 目录运行，优先使用 ../ 路径
     const char* texturePaths[] = {
-        "res/graphics/tilesets/Godot_Autotiles_32x32.png",
         "../res/graphics/tilesets/Godot_Autotiles_32x32.png",
+        "res/graphics/tilesets/Godot_Autotiles_32x32.png",
         "../../res/graphics/tilesets/Godot_Autotiles_32x32.png"
     };
     
@@ -138,16 +161,34 @@ void LoadMapTextures(GameContext& map) {
  * @return false 
  */
 bool LoadLevelFromTiled(GameContext& ctx, const char* filepath){
+    TraceLog(LOG_INFO, "[Map] 尝试加载地图文件: %s", filepath);
+    
     //清理旧的关卡数据
     ctx.tiles.clear();
+    ctx.tileGIDs.clear();
     ctx.enemies.clear();
+    ctx.mapTextures.clear();
+    ctx.tilesetTextures.clear();
+    ctx.tilesetFirstGIDs.clear();
 
     //实现从 Tiled 文件加载地图和敌人数据
     tmx::Map tiledMap;
-    if(!tiledMap.load(filepath)){
-        TraceLog(LOG_ERROR, "[Map] Tiled 地图加载失败: %s", filepath);
+    
+    try {
+        if(!tiledMap.load(filepath)){
+            TraceLog(LOG_ERROR, "[Map] Tiled 地图加载失败: %s", filepath);
+            TraceLog(LOG_ERROR, "[Map] 请检查文件是否存在，是否为 .tmx 格式");
+            return false;
+        }
+    } catch (const std::exception& e) {
+        TraceLog(LOG_ERROR, "[Map] Tiled 加载异常: %s", e.what());
+        return false;
+    } catch (...) {
+        TraceLog(LOG_ERROR, "[Map] Tiled 加载发生未知异常");
         return false;
     }
+    
+    TraceLog(LOG_INFO, "[Map] Tiled 文件解析成功");
 
     // 读取地图尺寸和图块大小
     ctx.width = tiledMap.getTileCount().x;
@@ -156,8 +197,57 @@ bool LoadLevelFromTiled(GameContext& ctx, const char* filepath){
     
     TraceLog(LOG_INFO, "[Map] 地图尺寸: %dx%d, 瓦片大小: %d", ctx.width, ctx.height, ctx.tileSize);
     
+    // 从 Tiled 地图加载 tileset 纹理
+    const auto& tilesets = tiledMap.getTilesets();
+    TraceLog(LOG_INFO, "[Map] 地图包含 %zu 个 tileset", tilesets.size());
+    
+    for(const auto& tileset : tilesets) {
+        // 记录该 tileset 的起始 GID
+        ctx.tilesetFirstGIDs.push_back(tileset.getFirstGID());
+        
+        string imagePath = tileset.getImagePath();
+        if(imagePath.empty()) {
+            TraceLog(LOG_WARNING, "[Map] Tileset '%s' 没有图片路径", tileset.getName().c_str());
+            ctx.tilesetTextures.push_back(Texture2D{0});
+            continue;
+        }
+        
+        // 提取文件名（去掉路径中的 graphics/tilesets/ 或其他前缀）
+        size_t lastSlash = imagePath.find_last_of("/\\");
+        string filename = (lastSlash != string::npos) ? imagePath.substr(lastSlash + 1) : imagePath;
+        
+        // 尝试多个可能的路径
+        const char* possiblePaths[] = {
+            (string("res/graphics/tilesets/") + filename).c_str(),
+            (string("../res/graphics/tilesets/") + filename).c_str(),
+            imagePath.c_str()  // 尝试原始路径
+        };
+        
+        Texture2D texture = {0};
+        bool loaded = false;
+        for (int i = 0; i < 3; i++) {
+            texture = LoadTexture(possiblePaths[i]);
+            if (texture.id != 0) {
+                TraceLog(LOG_INFO, "[Map] 成功加载 tileset '%s': %s (FirstGID: %d, 尺寸: %dx%d)", 
+                         tileset.getName().c_str(), possiblePaths[i], 
+                         tileset.getFirstGID(), texture.width, texture.height);
+                loaded = true;
+                break;
+            }
+        }
+        
+        if (loaded) {
+            ctx.tilesetTextures.push_back(texture);
+        } else {
+            TraceLog(LOG_ERROR, "[Map] 无法加载 tileset 纹理: %s (尝试的文件名: %s)", 
+                     imagePath.c_str(), filename.c_str());
+            ctx.tilesetTextures.push_back(Texture2D{0});
+        }
+    }
+    
     // 初始化地图数据结构
     ctx.tiles.resize(ctx.height, vector<TileType>(ctx.width, TileType::EMPTY));
+    ctx.tileGIDs.resize(ctx.height, vector<unsigned int>(ctx.width, 0));
 
     // 读取图层数据
     const auto& layers = tiledMap.getLayers();
@@ -167,17 +257,24 @@ bool LoadLevelFromTiled(GameContext& ctx, const char* filepath){
             const auto& tileLayer = layer->getLayerAs<tmx::TileLayer>();
             const auto& tiles = tileLayer.getTiles();
 
+            TraceLog(LOG_INFO, "[Map] 处理图块图层: %s", layer->getName().c_str());
+
             // 遍历所有地块
             for(int y = 0; y < ctx.height; y++){
                 for(int x = 0; x < ctx.width; x++){
                     unsigned int gid = tiles[y * ctx.width + x].ID;
+                    
+                    // 保存原始 GID（用于绘制）
+                    if (gid != 0) {
+                        ctx.tileGIDs[y][x] = gid;
+                    }
+                    
+                    // 根据图层名称设置逻辑类型（用于碰撞检测）
                     if(gid != 0){
-                        // 在这里添加地块分类，对能否通行进行判断
-                        if(layer->getName() == "Collision"){
+                        if(layer->getName() == "Collision" || layer->getName() == "collision"){
                             ctx.tiles[y][x] = TileType::WALL;
                         }
                         else if(layer->getName() == "Tree"){
-                            // 装饰图层暂时不影响地图数据
                             ctx.tiles[y][x] = TileType::WALL;
                         }
                         else if(layer->getName() == "Enemy"){
@@ -186,9 +283,14 @@ bool LoadLevelFromTiled(GameContext& ctx, const char* filepath){
                         else if(layer->getName() == "NPC"){
                             ctx.tiles[y][x] = TileType::WALL;
                         }
-                        else if(layer->getName() == "Ground"){
+                        else if(layer->getName() == "Ground" || layer->getName() == "ground"){
                             ctx.tiles[y][x] = TileType::GRASS;
                         }
+                        else {
+                            // 默认可通行
+                            ctx.tiles[y][x] = TileType::GRASS;
+                        }
+                    }
                 }
             }
         }
@@ -199,44 +301,49 @@ bool LoadLevelFromTiled(GameContext& ctx, const char* filepath){
         if(layer->getType() == tmx::Layer::Type::Object && layer->getName() == "Enemies"){
             const auto& objectlayer = layer->getLayerAs<tmx::ObjectGroup>();
 
-                for(const auto& object : objectlayer.getObjects()){
-                    Enemy enemy = {};//声明敌人主结构体
+            for(const auto& object : objectlayer.getObjects()){
+                Enemy enemy = {};//声明敌人主结构体
 
-                    //读取敌人位置
-                    float objX = object.getPosition().x;
-                    float objY = object.getPosition().y;
-                    float objHeight = object.getAABB().height;
+                //读取敌人位置
+                float objX = object.getPosition().x;
+                float objY = object.getPosition().y;
+                float objHeight = object.getAABB().height;
 
-                    //计算实际位置
-                    enemy.gridX = static_cast<int>(objX / ctx.tileSize);
-                    enemy.gridY = static_cast<int>((objY + objHeight - 1) / ctx.tileSize);
-                    enemy.visualPosition = { (float)enemy.gridX * ctx.tileSize, (float)enemy.gridY * ctx.tileSize };
-                    enemy.moveTarget = enemy.visualPosition;
-                    enemy.patrolCenter = enemy.visualPosition;
+                //计算实际位置
+                enemy.gridX = static_cast<int>(objX / ctx.tileSize);
+                enemy.gridY = static_cast<int>((objY + objHeight - 1) / ctx.tileSize);
+                enemy.visualPosition = { (float)enemy.gridX * ctx.tileSize, (float)enemy.gridY * ctx.tileSize };
+                enemy.moveTarget = enemy.visualPosition;
+                enemy.patrolCenter = enemy.visualPosition;
 
-                    //从tilesMap中获取敌人数据
-                    //严肃声明，在tilesmap里面自定义敌人数据的时候，不要修改变量名，将对象层的敌人模块复制粘贴并且仅修改属性值
-                    for(const auto& prop : object.getProperties()){
-                        if (prop.getName() == "hp") enemy.stats.hp = prop.getIntValue();
-                        if (prop.getName() == "maxHp") enemy.stats.maxHp = prop.getIntValue();
-                        if (prop.getName() == "attack") enemy.stats.attack = prop.getIntValue();
-                        if (prop.getName() == "defense") enemy.stats.defense = prop.getIntValue();
-                        if (prop.getName() == "moveSpeed") enemy.moveSpeed = prop.getFloatValue();
-                    }
-
-                    //设置其他默认属性
-                    enemy.isActive = true;
-                    enemy.isMoving = true;
-                    enemy.aiState = AI_STATE_PATROL;
-                    enemy.currentDirection = ENEMY_DIR_DOWN;
-
-                    //添加到世界中
-                    ctx.enemies.push_back(enemy);
+                //从tilesMap中获取敌人数据
+                //严肃声明，在tilesmap里面自定义敌人数据的时候，不要修改变量名，将对象层的敌人模块复制粘贴并且仅修改属性值
+                for(const auto& prop : object.getProperties()){
+                    if (prop.getName() == "hp") enemy.stats.hp = prop.getIntValue();
+                    if (prop.getName() == "maxHp") enemy.stats.maxHp = prop.getIntValue();
+                    if (prop.getName() == "attack") enemy.stats.attack = prop.getIntValue();
+                    if (prop.getName() == "defense") enemy.stats.defense = prop.getIntValue();
+                    if (prop.getName() == "moveSpeed") enemy.moveSpeed = prop.getFloatValue();
                 }
-                
+
+                //设置其他默认属性
+                enemy.isActive = true;
+                enemy.isMoving = true;
+                enemy.aiState = AI_STATE_PATROL;
+                enemy.currentDirection = ENEMY_DIR_DOWN;
+
+                //添加到世界中
+                ctx.enemies.push_back(enemy);
             }
         }
     }
+
+    TraceLog(LOG_INFO, "[Map] 地图加载完成");
+    TraceLog(LOG_INFO, "[Map] - 地图尺寸: %dx%d", ctx.width, ctx.height);
+    TraceLog(LOG_INFO, "[Map] - Tileset 数量: %zu", ctx.tilesetTextures.size());
+    TraceLog(LOG_INFO, "[Map] - 敌人数量: %zu", ctx.enemies.size());
+    TraceLog(LOG_INFO, "[Map] - tiles 数组大小: %zu", ctx.tiles.size());
+    TraceLog(LOG_INFO, "[Map] - tileGIDs 数组大小: %zu", ctx.tileGIDs.size());
 
     return true;
 }

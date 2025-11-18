@@ -22,10 +22,23 @@
     const DialogueLine& firstLine = data->script[0];
     
     if (firstLine.portraitPath != "nullptr" && !firstLine.portraitPath.empty()) {
-        // 如果路径不是"nullptr"且不为空
-        data->currentPortrait = LoadTexture(firstLine.portraitPath.c_str());
+        // 尝试多个路径加载头像
+        std::string paths[] = {
+            "../" + firstLine.portraitPath,
+            firstLine.portraitPath,
+            "../../" + firstLine.portraitPath
+        };
+        
+        data->currentPortrait.id = 0;
+        for (const auto& path : paths) {
+            data->currentPortrait = LoadTexture(path.c_str());
+            if (data->currentPortrait.id != 0) {
+                TraceLog(LOG_INFO, "[Dialogue] 成功加载头像: %s", path.c_str());
+                break;
+            }
+        }
+        
         if (data->currentPortrait.id == 0) {
-            // 如果加载失败，打印一条警告
             TraceLog(LOG_WARNING, "[Dialogue] 加载第一个头像失败，路径: %s", firstLine.portraitPath.c_str());
         }
     } else {
@@ -76,8 +89,15 @@ void dialogue_update(GameContext* ctx, void* state_data) {
             data->currentLineIndex++;
             
             if (data->currentLineIndex >= data->script.size()) {
-                // 对话结束，标记状态机需要退出对话
-                ctx->isRunning = false; // TODO: 改为切换到探索状态
+                // 对话结束，切换回探索状态
+                TraceLog(LOG_INFO, "[Dialogue] 对话结束，准备返回探索状态");
+                GameState* explorationState = createExplorationState();
+                if (explorationState) {
+                    GameStateMachine_change(&ctx->state_machine, ctx, explorationState);
+                } else {
+                    TraceLog(LOG_ERROR, "[Dialogue] 创建探索状态失败，退出游戏");
+                    ctx->isRunning = false;
+                }
                 return;
             }
             
@@ -94,9 +114,22 @@ void dialogue_update(GameContext* ctx, void* state_data) {
                     data->currentPortrait.id = 0;
                 }
                 
-                // 加载新头像
+                // 加载新头像（尝试多个路径）
                 if (nextLine.portraitPath != "nullptr" && !nextLine.portraitPath.empty()) {
-                    data->currentPortrait = LoadTexture(nextLine.portraitPath.c_str());
+                    std::string paths[] = {
+                        "../" + nextLine.portraitPath,
+                        nextLine.portraitPath,
+                        "../../" + nextLine.portraitPath
+                    };
+                    
+                    for (const auto& path : paths) {
+                        data->currentPortrait = LoadTexture(path.c_str());
+                        if (data->currentPortrait.id != 0) {
+                            TraceLog(LOG_INFO, "[Dialogue] 切换头像成功: %s", path.c_str());
+                            break;
+                        }
+                    }
+                    
                     if (data->currentPortrait.id == 0) {
                         TraceLog(LOG_WARNING, "[Dialogue] 加载新头像失败，路径: %s", nextLine.portraitPath.c_str());
                     }
@@ -121,6 +154,12 @@ void dialogue_update(GameContext* ctx, void* state_data) {
 // 在 Dialogue.cpp 中
 
 void dialogue_render(GameContext* ctx, void* state_data) {
+    static int renderCount = 0;
+    renderCount++;
+    if (renderCount % 60 == 0) {
+        TraceLog(LOG_INFO, "[Dialogue] 渲染帧 %d", renderCount);
+    }
+    
     // 1. 获取数据包并进行安全检查
     DialogueData* data = static_cast<DialogueData*>(state_data);
 
@@ -200,10 +239,39 @@ GameState* createDialogueState(const vector<DialogueLine>& script){
 
 vector<DialogueLine> LoadDialogueScript(const char* filepath) {
     vector<DialogueLine> script;
-    ifstream file(filepath);
+    
+    // 从 build 目录运行，优先尝试带 ../ 的路径
+    const char* possiblePaths[] = {
+        filepath,
+        nullptr,
+        nullptr
+    };
+    
+    // 构建备用路径
+    string path1 = string("../") + filepath;
+    string path2 = string("../../") + filepath;
+    possiblePaths[1] = path1.c_str();
+    possiblePaths[2] = path2.c_str();
+    
+    ifstream file;
+    const char* actualPath = nullptr;
+    
+    for (int i = 0; i < 3; i++) {
+        file.open(possiblePaths[i]);
+        if (file.is_open()) {
+            actualPath = possiblePaths[i];
+            TraceLog(LOG_INFO, "[DialogueLoader] 成功打开剧本文件: %s", actualPath);
+            break;
+        }
+        file.clear();
+    }
 
     if (!file.is_open()) {
-        TraceLog(LOG_ERROR, "[DialogueLoader] 无法打开剧本文件: %s", filepath);
+        TraceLog(LOG_ERROR, "[DialogueLoader] 无法打开剧本文件，尝试了以下路径:");
+        TraceLog(LOG_ERROR, "  - %s", filepath);
+        TraceLog(LOG_ERROR, "  - %s", path1.c_str());
+        TraceLog(LOG_ERROR, "  - %s", path2.c_str());
+        TraceLog(LOG_ERROR, "[DialogueLoader] 当前工作目录: %s", GetWorkingDirectory());
         return script;
     }
 

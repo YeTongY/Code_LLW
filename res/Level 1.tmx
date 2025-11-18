@@ -4,22 +4,22 @@
   <export format="json"/>
  </editorsettings>
  <tileset firstgid="1" name="地图素材" tilewidth="32" tileheight="32" tilecount="1248" columns="16">
-  <image source="data/maps/1_Generic_32x32.png" width="512" height="2496"/>
+  <image source="graphics/tilesets/1_Generic_32x32.png" width="512" height="2496"/>
  </tileset>
  <tileset firstgid="1249" name="Game_Maker_Studio_Autotiles_32x32" tilewidth="32" tileheight="32" tilecount="1248" columns="12">
-  <image source="data/maps/Game_Maker_Studio_Autotiles_32x32.png" width="384" height="3328"/>
+  <image source="graphics/tilesets/Game_Maker_Studio_Autotiles_32x32.png" width="384" height="3328"/>
  </tileset>
  <tileset firstgid="2497" name="Characters_MV" tilewidth="32" tileheight="32" tilecount="432" columns="18">
-  <image source="data/maps/Characters_MV.png" width="576" height="768"/>
+  <image source="graphics/tilesets/Characters_MV.png" width="576" height="768"/>
  </tileset>
  <tileset firstgid="2929" name="Adam_16x16" tilewidth="32" tileheight="32" tilecount="84" columns="12">
-  <image source="../../地图素材/Modern_Interiors_Free_v2.2/Modern tiles_Free/Characters_free/Adam_16x16.png" width="384" height="224"/>
+  <image source="graphics/tilesets/Adam_16x16.png" width="384" height="224"/>
  </tileset>
  <tileset firstgid="3013" name="Modern_Exteriors_Characters_Swimmers_32x32" tilewidth="32" tileheight="32" tilecount="192" columns="24">
-  <image source="data/maps/Modern_Exteriors_Characters_Swimmers_32x32.png" width="768" height="256"/>
+  <image source="graphics/tilesets/Modern_Exteriors_Characters_Swimmers_32x32.png" width="768" height="256"/>
  </tileset>
  <tileset firstgid="3205" name="24_Additional_Houses_32x32" tilewidth="32" tileheight="32" tilecount="8992" columns="32">
-  <image source="data/maps/24_Additional_Houses_32x32.png" width="1024" height="8992"/>
+  <image source="graphics/tilesets/24_Additional_Houses_32x32.png" width="1024" height="8992"/>
  </tileset>
  <layer id="1" name="Ground" width="38" height="30">
   <data encoding="csv">

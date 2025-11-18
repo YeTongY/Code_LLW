@@ -12,10 +12,10 @@ const char* playerSpriteAddress = "res/graphics/player/Pixel_Taffy/Pixel_Taffy_S
  * @param ctx 
  */
 void LoadPlayerAssets(GameContext& ctx){
-    // 尝试多个可能的路径（支持从build目录或项目根目录运行）
+    // 从 build 目录运行，优先使用 ../ 访问项目根目录
     const char* possiblePaths[] = {
-        "res/graphics/player/Pixel_Taffy/Pixel_Taffy_Sprite_v3_XIXI.png",
         "../res/graphics/player/Pixel_Taffy/Pixel_Taffy_Sprite_v3_XIXI.png",
+        "res/graphics/player/Pixel_Taffy/Pixel_Taffy_Sprite_v3_XIXI.png",
         "../../res/graphics/player/Pixel_Taffy/Pixel_Taffy_Sprite_v3_XIXI.png"
     };
     
@@ -66,13 +66,13 @@ void LoadPlayerAssets(GameContext& ctx){
         TraceLog(LOG_ERROR, "[Shader] 渲染纹理创建失败！");
     }
 
-    // 2. 加载"着色器" (Shader) - 尝试多个路径
+    // 2. 加载"着色器" (Shader) - 从 build 目录访问
     const char* shaderPaths[] = {
-        "res/graphics/shaders/cyberpunk.fs",        // 从项目根目录运行
-        "../res/graphics/shaders/cyberpunk.fs",     // 从 build 目录运行
-        "../../res/graphics/shaders/cyberpunk.fs",  // 从更深的子目录运行
-        "Code_LLW_Project/res/graphics/shaders/cyberpunk.fs",  // 从父目录运行
-        "./res/graphics/shaders/cyberpunk.fs"       // 当前目录
+        "../res/graphics/shaders/cyberpunk.fs",
+        "res/graphics/shaders/cyberpunk.fs",
+        "../../res/graphics/shaders/cyberpunk.fs",
+        "Code_LLW_Project/res/graphics/shaders/cyberpunk.fs",
+        "./res/graphics/shaders/cyberpunk.fs"
     };
     
     bool shaderLoaded = false;
