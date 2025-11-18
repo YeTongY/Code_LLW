@@ -44,14 +44,13 @@ void InitEnemy(GameContext& enemy, int x, int y,const Stats& stats,Texture2D tex
     enemy1.isActive = true;                     //存活
     enemy1.isMoving = false;                    //移动
 
-    enemy1.patrolPoints = { (float)enemy1.gridX * TILE_SIZE, (float)enemy1.gridY * TILE_SIZE};               //巡逻点
+    enemy1.patrolCenter = { (float)enemy1.gridX * TILE_SIZE, (float)enemy1.gridY * TILE_SIZE};               //巡逻点
     enemy1.visualPosition = { (float)enemy1.gridX * TILE_SIZE, (float)enemy1.gridY * TILE_SIZE};            //渲染位置
     enemy1.moveTarget = enemy1.visualPosition;      //目标位置
     enemy1.moveSpeed = 2.0f;                    //敌人移动速度
     enemy1.stats = {50,50,10,5};                //属性
     enemy1.aiState = AI_STATE_PATROL;           //设置AI状态：是否巡逻
 
-    enemy1.Enemytexture = texture;              //贴图
     enemy1.currentDirection = ENEMY_DIR_DOWN;   //敌人朝向
 
     enemy.enemies.push_back(enemy1);
@@ -149,8 +148,8 @@ void UpdateEnemies(GameContext& ctx){
                     enemy.aiState = AI_STATE_CHASING;       //如果进入索敌范围，自动切换为追击模式
                 }else if(!enemy.isMoving){
                     Vector2 randomPoint = {
-                        randomPoint.x = enemy.patrolPoints.x + GetRandomValue(-enemy.patrolRange, enemy.patrolRange),
-                        randomPoint.y = enemy.patrolPoints.y + GetRandomValue(-enemy.patrolRange, enemy.patrolRange)
+                        randomPoint.x = enemy.patrolCenter.x + GetRandomValue(-enemy.patrolRange, enemy.patrolRange),
+                        randomPoint.y = enemy.patrolCenter.y + GetRandomValue(-enemy.patrolRange, enemy.patrolRange)
                     };      // 随机巡逻点
 
                     enemy.moveTarget = (randomPoint);

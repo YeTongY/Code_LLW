@@ -1,5 +1,11 @@
 #include "GameState.h"
 #include "Map.h"
+
+#include "tmxlite/Map.hpp"
+#include "tmxlite/Layer.hpp"
+#include "tmxlite/TileLayer.hpp"
+#include "tmxlite/ObjectGroup.hpp"
+
 #include <iostream>
 #include <fstream>  // 文件操作核心库
 #include <vector>   // 用vector存储地图的行（动态数组，比普通数组灵活）
@@ -194,6 +200,24 @@ void LoadMapTextures(GameContext& map) {
     map.mapTextures[TileType::GRASS] = tileset;
     map.mapTextures[TileType::WALL] = tileset;
 }                                   
+
+/**
+ * @brief 加载Tiled地图
+ * 
+ * @param ctx 
+ * @param filepath 
+ * @return true 
+ * @return false 
+ */
+bool LoadLevelFromTiled(GameContext& ctx, const char* filepath){
+    //清理旧的关卡数据
+    ctx.tiles.clear();
+    ctx.enemies.clear();
+
+    //使用tmxlite加载地图数据
+
+    return true;
+}
 
 /**
  * @brief 更新地图状态

@@ -29,7 +29,7 @@ struct Enemy {//声明敌人主结构体
     Vector2 visualPosition;//敌人渲染位置
     Vector2 moveTarget;//敌人目标移动位置
 
-    Vector2 patrolPoints; // 巡逻点
+    Vector2 patrolCenter; // 巡逻点
     AIState aiState; // 敌人AI状态
     float aggroRange; // 敌人的索敌范围
     float patrolRange; // 敌人的巡逻范围
@@ -38,7 +38,6 @@ struct Enemy {//声明敌人主结构体
 
     Stats stats; // 敌人的属性
 
-    Texture2D Enemytexture; // 敌人的精灵图贴图
     EnemyDirection currentDirection; // 敌人"当前"的方向
 };
 
