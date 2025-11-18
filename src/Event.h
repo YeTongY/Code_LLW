@@ -1,3 +1,6 @@
+#ifndef EVENT_H
+#define EVENT_H
+
 #include <string>
 #include <vector>
 
@@ -8,4 +11,6 @@ struct GameEvent{
     string triggerValue;
     string scriptPath;
 };
+
+#endif // EVENT_H
 
