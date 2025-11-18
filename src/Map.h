@@ -26,9 +26,7 @@ typedef enum {
 //} Map;
 
 // C风格函数声明（第一个参数是结构体指针）
-void InitMap(GameContext& map, int width, int height, int tileSize);        //初始化地图
 void CleanupMap(GameContext& map);                                          //清理地图资源
-bool LoadMap(GameContext& map, const char* filepath);                       //加载地图
 void LoadMapTextures(GameContext& map);                                     //加载图块集
 void DrawMap(const GameContext& map);                                       //绘图
 void DrawSingleTile(const GameContext& map, int tileX, int tileY);          //绘制单个块

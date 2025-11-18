@@ -15,28 +15,6 @@
 using namespace std;
 
 /**
- * @brief 初始化地图
- * 
- * @param map 地图指针
- * @param w 宽
- * @param h 高
- * @param size 单位块的像素个数
- */
-void InitMap(GameContext& map, int width, int height, int tileSize) {
-    //对地图块进行初始化
-    map.width = (width < 0) ? 0 : width;
-    map.height = (height < 0) ? 0 : height;
-    map.tileSize = (tileSize < 0) ? 0 : tileSize;
-
-    //初始化vector容器，将位置全部改成EMPTY
-    map.tiles.resize(map.height);
-
-    for(auto& row : map.tiles){
-        row.resize(map.width, TileType::EMPTY);
-    }
-}
-
-/**
  * @brief 清理地图资源，卸载地图纹理，防止内存溢出
  * 
  * @param map 地图指针
@@ -52,56 +30,6 @@ void CleanupMap(GameContext& map) {
     }
     map.tiles.clear();
     map.mapTextures.clear();
-}
-
-/**
- * @brief TODO: 从文件加载地图数据
- * 
- * @param map 地图指针
- * @param filepath 文件路径
- */
-bool LoadMap(GameContext& map, const char* filepath) {
-    // 打开文件流
-    ifstream file(filepath);
-    if (!file.is_open()) {
-        cout << "错误: 无法打开文件 " << filepath << endl;
-        return false;
-    }
-
-    // 清空原有地图数据
-    map.tiles.clear();
-    string line;
-
-    //逐行读取数据
-    while(getline(file, line)){
-        vector<TileType> currentRow;
-        for(char c : line){
-            //后期会对不同地块进行分类
-            switch(c)
-            {
-            case '0':
-                currentRow.push_back(TileType::EMPTY);
-                break;
-            case '1':
-                currentRow.push_back(TileType::GRASS);
-                break;
-            case '2':
-                currentRow.push_back(TileType::WALL);
-                break;
-            default:
-                break;
-            }
-        }
-        map.tiles.push_back(currentRow);
-    }
-
-    //关闭文件
-    file.close();
-    // 设置 map 的宽高（以读取到的数据为准）
-    map.height = static_cast<int>(map.tiles.size());
-    map.width = (map.height > 0) ? static_cast<int>(map.tiles[0].size()) : 0;
-
-    return true;
 }
 
 /**
@@ -214,47 +142,98 @@ bool LoadLevelFromTiled(GameContext& ctx, const char* filepath){
     ctx.tiles.clear();
     ctx.enemies.clear();
 
-    tmx::Map tmxMap;
-    if(!tmxMap.load(filepath)){
+    //实现从 Tiled 文件加载地图和敌人数据
+    tmx::Map tiledMap;
+    if(!tiledMap.load(filepath)){
         TraceLog(LOG_ERROR, "[Map] Tiled 地图加载失败: %s", filepath);
         return false;
     }
 
-    // 基本尺寸信息
-    auto tileCount = tmxMap.getTileCount();      // tmx::Vector2u (地图宽高，单位：tile)
-    auto tileSize = tmxMap.getTileSize();        // tmx::Vector2u (单个图块像素尺寸)
+    // 读取地图尺寸和图块大小
+    ctx.width = tiledMap.getTileCount().x;
+    ctx.height = tiledMap.getTileCount().y;
+    // 初始化地图数据结构
+    ctx.tiles.resize(ctx.height, vector<TileType>(ctx.width, TileType::EMPTY));
 
-    ctx.width = (int)tileCount.x;
-    ctx.height = (int)tileCount.y;
-    ctx.tileSize = (int)tileSize.x; // 假设方形图块
-
-    // 先全部初始化为 EMPTY
-    ctx.tiles.resize(ctx.height);
-    for(int y=0; y<ctx.height; ++y){
-        ctx.tiles[y].resize(ctx.width, TileType::EMPTY);
-    }
-
-    // 读取第一个 TileLayer，简单映射到内部 TileType（演示用）
-    for(const auto& layer : tmxMap.getLayers()){
+    // 读取图层数据
+    const auto& layers = tiledMap.getLayers();
+    for(const auto& layer : layers){
         if(layer->getType() == tmx::Layer::Type::Tile){
+            // 处理图块图层
             const auto& tileLayer = layer->getLayerAs<tmx::TileLayer>();
             const auto& tiles = tileLayer.getTiles();
-            if(tiles.empty()) break;
 
-            for(int y=0; y<ctx.height; ++y){
-                for(int x=0; x<ctx.width; ++x){
-                    std::size_t idx = (std::size_t)y * ctx.width + x;
-                    unsigned gid = tiles[idx].ID; // 全局 ID
-                    // 简单示例映射：0=EMPTY，非0=GRASS（可根据 tileset 进一步细分）
-                    if(gid == 0) ctx.tiles[y][x] = TileType::EMPTY;
-                    else ctx.tiles[y][x] = TileType::GRASS;
+            // 遍历所有地块
+            for(int y = 0; y < ctx.height; y++){
+                for(int x = 0; x < ctx.width; x++){
+                    unsigned int gid = tiles[y * ctx.width + x].ID;
+                    if(gid != 0){
+                        // 在这里添加地块分类，对能否通行进行判断
+                        if(layer->getName() == "Collision"){
+                            ctx.tiles[y][x] = TileType::WALL;
+                        }
+                        else if(layer->getName() == "Tree"){
+                            // 装饰图层暂时不影响地图数据
+                            ctx.tiles[y][x] = TileType::WALL;
+                        }
+                        else if(layer->getName() == "Enemy"){
+                            ctx.tiles[y][x] = TileType::WALL;
+                        }
+                        else if(layer->getName() == "NPC"){
+                            ctx.tiles[y][x] = TileType::WALL;
+                        }
+                        else if(layer->getName() == "Ground"){
+                            ctx.tiles[y][x] = TileType::GRASS;
+                        }
                 }
             }
-            break; // 只处理第一个图层
         }
     }
 
-    TraceLog(LOG_INFO, "[Map] 已加载 Tiled 地图: %s (尺寸: %dx%d, TileSize: %d)", filepath, ctx.width, ctx.height, ctx.tileSize);
+    // 解析对象层来创建敌人
+    for(const auto& layer: layers){
+        if(layer->getType() == tmx::Layer::Type::Object && layer->getName() == "Enemies"){
+            const auto& objectlayer = layer->getLayerAs<tmx::ObjectGroup>();{
+
+                for(const auto& object : objectlayer.getObjects()){
+                    Enemy enemy = {};//声明敌人主结构体
+
+                    //读取敌人位置
+                    float objX = object.getPosition().x;
+                    float objY = object.getPosition().y;
+                    float objHeight = object.getAABB().height;
+
+                    //计算实际位置
+                    enemy.gridX = static_cast<int>(objX / ctx.tileSize);
+                    enemy.gridY = static_cast<int>((objY + objHeight - 1) / ctx.tileSize);
+                    enemy.visualPosition = { (float)enemy.gridX * ctx.tileSize, (float)enemy.gridY * ctx.tileSize };
+                    enemy.moveTarget = enemy.visualPosition;
+                    enemy.patrolCenter = enemy.visualPosition;
+
+                    //从tilesMap中获取敌人数据
+                    //严肃声明，在tilesmap里面自定义敌人数据的时候，不要修改变量名，将对象层的敌人模块复制粘贴并且仅修改属性值
+                    for(const auto& prop : object.getProperties()){
+                        if (prop.getName() == "hp") enemy.stats.hp = prop.getIntValue();
+                        if (prop.getName() == "maxHp") enemy.stats.maxHp = prop.getIntValue();
+                        if (prop.getName() == "attack") enemy.stats.attack = prop.getIntValue();
+                        if (prop.getName() == "defense") enemy.stats.defense = prop.getIntValue();
+                        if (prop.getName() == "moveSpeed") enemy.moveSpeed = prop.getFloatValue();
+                    }
+
+                    //设置其他默认属性
+                    enemy.isActive = true;
+                    enemy.isMoving = true;
+                    enemy.aiState = AI_STATE_PATROL;
+                    enemy.currentDirection = ENEMY_DIR_DOWN;
+
+                    //添加到世界中
+                    ctx.enemies.push_back(enemy);
+                }
+                
+            }
+        }
+    }
+
     return true;
 }
 
