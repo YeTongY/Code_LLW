@@ -3,8 +3,9 @@
 #include "GameState.h"
 #include "raygui.h"
 
-new typedef struct{
-    
-}
+struct dialogueData{
+    float visibleChars;//可见字符数
+    bool skipToEnd;//是否跳过逐字打字效果
+};
 
-void createDialogueState(char* potrait_address, char* lines,)
+void createDialogueState(const char* portrait_address, const char* lines);

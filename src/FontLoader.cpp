@@ -116,7 +116,7 @@ void unloadGameFont (GameContext &ctx){
 }
 
 /**
- * @brief (P1) 绘制“辉光”字体 (GDD v3.9d - 已修复 Fade())
+ * @brief 绘制“辉光”字体
  */
 void DrawTextGlow(
     Font font, 
@@ -128,7 +128,7 @@ void DrawTextGlow(
     Color glowColor  // (e.g., CYAN)
 )
 {
-    // 【【【P1 施工：Task 1 - “辉光层” (Pass 1)】】】
+    // “辉光层”
     
     // 1. 计算“辉光”的位置
     Vector2 glowPos = { position.x + 2.0f, position.y + 2.0f };
