@@ -70,7 +70,6 @@ void DrawEnemy(const GameContext& ctx){
 
             //绘制角色
             Rectangle source = {0,0,32,64};
-            Rectangle source;//声明绘制源
             source.width = 32.0f;
             source.height = 64.0f;
             source.y = 0.0f;
@@ -104,9 +103,7 @@ void DrawEnemy(const GameContext& ctx){
         
             }
 
-            Vector2 drawPos = { enemy.visualPosition.x, enemy.visualPosition.y - TILE_SIZE};
-
-            //  让角色精灵图绘制在平滑的“视觉位置”上
+            //  让角色精灵图绘制在平滑的"视觉位置"上
             Vector2 drawDestPosition = {
                 enemy.visualPosition.x,
                 enemy.visualPosition.y - TILE_SIZE // 向上偏移一个瓦片高度，使脚踩在格子上

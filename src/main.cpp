@@ -22,6 +22,7 @@
 #include "Map.h"
 #include "Enemy.h"          //未完成敌人模块
 #include "FontLoader.h"     //字体加载
+#include "UI.h"             //UI加载
 #include <cstdio>
 #include <cstring>
 
@@ -57,6 +58,9 @@ int main(void)
     
     TraceLog(LOG_INFO, "[Main] 赋值后，屏幕尺寸: %.0fx%.0f", ctx.screenWidth, ctx.screenHeight);
     
+    //==========加载UI资产==========
+    LoadUIAssets(ctx);
+
     //==========初始化玩家==========
     ctx.player.gridX = 2;  // 修改为安全位置（草地区域）
     ctx.player.gridY = 2;  // 修改为安全位置（草地区域）
@@ -232,7 +236,9 @@ int main(void)
     
     CloseWindow();
     TraceLog(LOG_INFO, "[Main] 窗口已关闭");
-    
+
+    UnloadUIAssets(ctx);
+    TraceLog(LOG_INFO, "[Main] UI资源已释放");
     //==========输出测试总结==========
     TraceLog(LOG_INFO, "========================================");
     TraceLog(LOG_INFO, "      测试结束");
