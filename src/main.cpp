@@ -75,31 +75,31 @@ int main(void)
              ctx.player.gridX, ctx.player.gridY, 
              ctx.player.stats.hp, ctx.player.stats.maxHp);
    
-    //===========================从文件加载地图
+    //===========================从 Tiled 文件加载地图
     // 尝试多个可能的路径（支持从build目录或项目根目录运行）
     const char* possiblePaths[] = {
-        "res/data/maps/home.txt",
-        "../res/data/maps/home.txt",
-        "../../res/data/maps/home.txt"
+        "res/Level 1.tmj",
+        "../res/Level 1.tmj",
+        "../../res/Level 1.tmj"
     };
     
     bool mapLoaded = false;
     for (int i = 0; i < 3; i++) {
-        if (LoadMap(ctx, possiblePaths[i])) {
-            TraceLog(LOG_INFO, "[Main] 地图加载成功，路径: %s", possiblePaths[i]);
+        if (LoadLevelFromTiled(ctx, possiblePaths[i])) {
+            TraceLog(LOG_INFO, "[Main] Tiled 地图加载成功，路径: %s", possiblePaths[i]);
             mapLoaded = true;
             break;
         }
     }
     
     if (!mapLoaded) {
-        TraceLog(LOG_ERROR, "[Main] 地图加载失败! 请确保从项目根目录运行程序");
+        TraceLog(LOG_ERROR, "[Main] Tiled 地图加载失败! 请确保从项目根目录运行程序");
         TraceLog(LOG_ERROR, "[Main] 当前工作目录: %s", GetWorkingDirectory());
         
         BeginDrawing();
         ClearBackground(BLACK);
-        DrawText("ERROR: 地图文件加载失败!", 50, 50, 30, RED);
-        DrawText("请从项目根目录运行程序，或检查 res/data/maps/home.txt 是否存在", 50, 100, 20, RED);
+        DrawText("ERROR: Tiled 地图文件加载失败!", 50, 50, 30, RED);
+        DrawText("请从项目根目录运行程序，或检查 res/Level 1.tmj 是否存在", 50, 100, 20, RED);
         DrawText("5秒后自动退出...", 50, 150, 20, YELLOW);
         EndDrawing();
         
@@ -130,10 +130,8 @@ int main(void)
         }
     }
 
-    // 设置地图的宽度、高度和瓦片大小
-    ctx.height = static_cast<int>(ctx.tiles.size());
-    ctx.width = (ctx.height > 0) ? static_cast<int>(ctx.tiles[0].size()) : 0;
-    ctx.tileSize = 32; // 与 Player.cpp 中的 TILE_SIZE 保持一致
+    // LoadLevelFromTiled 已经设置了 ctx.width, ctx.height, ctx.tileSize
+    // 不需要再手动设置
     
     TraceLog(LOG_INFO, "[Main] 地图初始化完成 - 大小: %dx%d, 瓦片大小: %d", 
              ctx.width, ctx.height, ctx.tileSize);

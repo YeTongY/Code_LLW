@@ -152,6 +152,10 @@ bool LoadLevelFromTiled(GameContext& ctx, const char* filepath){
     // 读取地图尺寸和图块大小
     ctx.width = tiledMap.getTileCount().x;
     ctx.height = tiledMap.getTileCount().y;
+    ctx.tileSize = tiledMap.getTileSize().x; // 设置瓦片大小
+    
+    TraceLog(LOG_INFO, "[Map] 地图尺寸: %dx%d, 瓦片大小: %d", ctx.width, ctx.height, ctx.tileSize);
+    
     // 初始化地图数据结构
     ctx.tiles.resize(ctx.height, vector<TileType>(ctx.width, TileType::EMPTY));
 
