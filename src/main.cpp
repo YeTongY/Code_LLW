@@ -78,9 +78,9 @@ int main(void)
     //===========================从 Tiled 文件加载地图
     // 尝试多个可能的路径（支持从build目录或项目根目录运行）
     const char* possiblePaths[] = {
-        "res/Level 1.tmj",
-        "../res/Level 1.tmj",
-        "../../res/Level 1.tmj"
+        "res/Level 1.tmx",
+        "../res/Level 1.tmx",
+        "../../res/Level 1.tmx"
     };
     
     bool mapLoaded = false;
@@ -99,7 +99,7 @@ int main(void)
         BeginDrawing();
         ClearBackground(BLACK);
         DrawText("ERROR: Tiled 地图文件加载失败!", 50, 50, 30, RED);
-        DrawText("请从项目根目录运行程序，或检查 res/Level 1.tmj 是否存在", 50, 100, 20, RED);
+        DrawText("请从项目根目录运行程序，或检查 res/Level 1.tmx 是否存在", 50, 100, 20, RED);
         DrawText("5秒后自动退出...", 50, 150, 20, YELLOW);
         EndDrawing();
         
