@@ -24,7 +24,7 @@ struct DialogueBoxTemplate_Normal{//创建一般对话框模板
     //textColor 直接用Gamestate.h宏定义的UI_TEXT
     //glowColor 直接用CYBER_CYAN
     Vector2 textOffset = {330.0f, 50.0f};
-    Font font = nullptr;
+    Font* font = nullptr; // 使用指针，可以指向 GameContext.mainFont 等
 
 
 

@@ -214,8 +214,47 @@ bool LoadLevelFromTiled(GameContext& ctx, const char* filepath){
     ctx.tiles.clear();
     ctx.enemies.clear();
 
-    //使用tmxlite加载地图数据
+    tmx::Map tmxMap;
+    if(!tmxMap.load(filepath)){
+        TraceLog(LOG_ERROR, "[Map] Tiled 地图加载失败: %s", filepath);
+        return false;
+    }
 
+    // 基本尺寸信息
+    auto tileCount = tmxMap.getTileCount();      // tmx::Vector2u (地图宽高，单位：tile)
+    auto tileSize = tmxMap.getTileSize();        // tmx::Vector2u (单个图块像素尺寸)
+
+    ctx.width = (int)tileCount.x;
+    ctx.height = (int)tileCount.y;
+    ctx.tileSize = (int)tileSize.x; // 假设方形图块
+
+    // 先全部初始化为 EMPTY
+    ctx.tiles.resize(ctx.height);
+    for(int y=0; y<ctx.height; ++y){
+        ctx.tiles[y].resize(ctx.width, TileType::EMPTY);
+    }
+
+    // 读取第一个 TileLayer，简单映射到内部 TileType（演示用）
+    for(const auto& layer : tmxMap.getLayers()){
+        if(layer->getType() == tmx::Layer::Type::Tile){
+            const auto& tileLayer = layer->getLayerAs<tmx::TileLayer>();
+            const auto& tiles = tileLayer.getTiles();
+            if(tiles.empty()) break;
+
+            for(int y=0; y<ctx.height; ++y){
+                for(int x=0; x<ctx.width; ++x){
+                    std::size_t idx = (std::size_t)y * ctx.width + x;
+                    unsigned gid = tiles[idx].ID; // 全局 ID
+                    // 简单示例映射：0=EMPTY，非0=GRASS（可根据 tileset 进一步细分）
+                    if(gid == 0) ctx.tiles[y][x] = TileType::EMPTY;
+                    else ctx.tiles[y][x] = TileType::GRASS;
+                }
+            }
+            break; // 只处理第一个图层
+        }
+    }
+
+    TraceLog(LOG_INFO, "[Map] 已加载 Tiled 地图: %s (尺寸: %dx%d, TileSize: %d)", filepath, ctx.width, ctx.height, ctx.tileSize);
     return true;
 }
 

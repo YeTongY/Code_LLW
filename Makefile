@@ -47,17 +47,17 @@ BUILD_DIR = build
 # 存放 Raylib 库的文件夹
 LIB_DIR = lib/raylib
 
-# 3. Raylib 相关的路径和库
+# 3. 外部库 (Raylib + tmxlite + 头文件单文件库)
 # ------------------------------------------------------------------------------
-# 告诉编译器去哪里找 raylib.h 等头文件
-INCLUDES = -I$(LIB_DIR)/include
+# 头文件搜索路径：raylib 自带 + tmxlite + 其它单文件库(json.hpp 已放入 raylib/include)
+INCLUDES = -I$(LIB_DIR)/include -Ilib/tmxlite/include
 # 告诉链接器去哪里找 libraylib.a 等库文件
 LDFLAGS = -L$(LIB_DIR)/lib
 # 需要链接的库列表
 # 在 Windows 上使用 Raylib，这些都是必需的
 LIBS = -lraylib -lopengl32 -lgdi32 -lwinmm
 
-# 4. 文件和最终目标
+# 4. 文件和最终目标 + 外部库源文件编译（tmxlite）
 # ------------------------------------------------------------------------------
 # 你最终想要生成的可执行文件的名字
 TARGET = $(BUILD_DIR)/LLW.exe
@@ -66,6 +66,21 @@ SRCS = $(wildcard $(SRC_DIR)/*.cpp)
 # 根据找到的 .cpp 文件列表，生成一个对应的 .o (目标文件) 列表
 # 例如，src/main.cpp 会被转换成 build/main.o
 OBJS = $(patsubst $(SRC_DIR)/%.cpp, $(BUILD_DIR)/%.o, $(SRCS))
+
+# tmxlite 源文件（直接静态编入，不再单独生成 .a）
+TML_DIR = lib/tmxlite
+TML_SRC_DIR = $(TML_DIR)/src
+# 仅匹配顶层 .cpp，miniz.c 作为 C 源一并加入
+TML_SRCS_CPP = $(wildcard $(TML_SRC_DIR)/*.cpp)
+TML_MINIZ_SRC = $(TML_SRC_DIR)/miniz.c
+TML_PUGIXML_SRC = $(TML_SRC_DIR)/detail/pugixml.cpp
+TML_OBJS_CPP = $(patsubst $(TML_SRC_DIR)/%.cpp, $(BUILD_DIR)/tmxlite_%.o, $(TML_SRCS_CPP))
+TML_MINIZ_OBJ = $(BUILD_DIR)/tmxlite_miniz.o
+TML_PUGIXML_OBJ = $(BUILD_DIR)/tmxlite_pugixml.o
+TML_OBJS = $(TML_OBJS_CPP) $(TML_MINIZ_OBJ) $(TML_PUGIXML_OBJ)
+
+# 将 tmxlite 对象加入最终链接对象列表
+OBJS += $(TML_OBJS)
 
 # ==============================================================================
 # 编译规则 (告诉 make 如何一步步构建项目)
@@ -92,6 +107,24 @@ $(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp
 	@echo "正在编译: $<"
 	@mkdir -p $(BUILD_DIR)
 	$(CC) $(CFLAGS) $(CPPFLAGS) $(INCLUDES) -c $< -o $@
+
+# tmxlite .cpp 源编译规则
+$(BUILD_DIR)/tmxlite_%.o: $(TML_SRC_DIR)/%.cpp
+	@echo "编译 tmxlite 源: $<"
+	@mkdir -p $(BUILD_DIR)
+	$(CC) $(CFLAGS) $(CPPFLAGS) -DTMXLITE_STATIC -I$(TML_DIR)/include -c $< -o $@
+
+# tmxlite miniz.c 编译规则
+$(BUILD_DIR)/tmxlite_miniz.o: $(TML_SRC_DIR)/miniz.c
+	@echo "编译 tmxlite 源: $<"
+	@mkdir -p $(BUILD_DIR)
+	$(CC) $(CFLAGS) -DTMXLITE_STATIC -I$(TML_DIR)/include -c $< -o $@
+
+# tmxlite pugixml.cpp 编译规则
+$(BUILD_DIR)/tmxlite_pugixml.o: $(TML_SRC_DIR)/detail/pugixml.cpp
+	@echo "编译 tmxlite 依赖: $<"
+	@mkdir -p $(BUILD_DIR)
+	$(CC) $(CFLAGS) $(CPPFLAGS) -DTMXLITE_STATIC -I$(TML_DIR)/include -c $< -o $@
 
 # 清理规则：用于删除所有编译产物
 # 当你运行 "make clean" 时，会执行这里的命令
