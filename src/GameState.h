@@ -17,6 +17,7 @@
 #include "Player.h"
 #include "Map.h"
 #include "Enemy.h"
+#include "Event.h"
 
 //颜色定义
 // 1. “主要”的“赛博朋克”辉光色 (明亮的青色)
@@ -124,6 +125,9 @@ struct GameContext
     Texture2D dialogueBoxTexture;
     Texture2D portraitFrameTexture;
 
+
+    //事件
+    vector <GameEvent> gameEvents;
 };
 
 #endif // GAMESTATE_H

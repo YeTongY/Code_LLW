@@ -3,6 +3,7 @@
 #define EXPLORATIONSTATE_H
 
 #include "GameState.h"
+#include "Event.h"
 
 //探索状态数据
 struct ExplorationData 

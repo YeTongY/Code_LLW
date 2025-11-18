@@ -32,6 +32,9 @@ struct DialogueBoxTemplate_Normal{//创建一般对话框模板
 
     float charsPerSecond = 25.0f;//每秒显示多少个字符
 
+    //姓名样式设置
+    Vector2 speakerNameOffset = {100.0f, 595.0f}; 
+    float speakerNameFontSize = 32.0f; 
 
 };
 

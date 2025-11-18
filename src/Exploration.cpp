@@ -5,6 +5,11 @@
 #include "GameState.h"
 #include <cstdlib>
 #include <cstdio>
+//================================
+#include "Event.h"
+#include "DialogueState.h"
+
+
 
 const int TILE_SIZE = 32; // 与 Player.cpp 保持一致
 
@@ -58,9 +63,30 @@ void exploration_update(GameContext* ctx, void* state_data)
 
     //处理状态切换
     if (IsKeyPressed(KEY_E)) {
-        TraceLog(LOG_INFO, "[Exploration] 按下E键 - 触发交互");
-        // 未来可以切换到战斗状态：
-        // GameStateMachine_change(&ctx->state_machine, ctx, createCombatState());
+        TraceLog(LOG_INFO, "[Exploration] 按下 E 键，开始检查交互事件...");
+        // 遍历当前关卡的所有事件
+        for (const auto& event : ctx->gameEvents) { 
+            
+            // 检查这个事件是不是我们关心的“按E交互”类型
+            if (event.triggerType == "npc_interaction") {
+                
+                // TODO (进阶): 检查玩家是否真的在NPC旁边
+                // bool playerIsNearTarget = (abs(ctx->player.gridX - targetX) <= 1 && abs(ctx->player.gridY - targetY) <= 1);
+                // if (playerIsNearTarget) { ... }
+
+                // 暂时，我们只要按E就触发第一个找到的交互事件
+                TraceLog(LOG_INFO, "触发事件！加载剧本: %s", event.scriptPath.c_str());
+
+                // 从事件中获取剧本路径并加载
+                vector<DialogueLine> script = LoadDialogueScript(event.scriptPath.c_str());
+
+                if (!script.empty()) {
+                    // 切换到对话状态
+                    GameStateMachine_change(&ctx->state_machine, ctx, createDialogueState(script));
+                    return; // 触发了一个事件后，立刻结束本帧的update，防止一帧内触发多个事件
+                }
+            }
+        }
     }
 
     //退出游戏

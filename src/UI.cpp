@@ -57,9 +57,23 @@ void FillTemplateWithAssets(DialogueBoxTemplate_Normal& tpl, GameContext& ctx){
 
 
 
-void DrawDialogueWithTemplate(const DialogueBoxTemplate_Normal& tpl, const string& text,Texture2D portrait,int charsToShow){
+void DrawDialogueWithTemplate(const DialogueBoxTemplate_Normal& tpl, const string& text,const string& speakerName,Texture2D portrait,int charsToShow){
+    //准备一些矩形
     Rectangle portrait_source = {0.0f, 0.0f, (float)portrait.width, (float)portrait.height};//不裁剪
     Rectangle portrait_dest = {tpl.portraitPosition.x, tpl.portraitPosition.y, tpl.portraitWidth, tpl.portraitHeight};
+    Rectangle boxRect = { 
+        tpl.dialogueBoxPosition.x, 
+        tpl.dialogueBoxPosition.y, 
+        tpl.dialogueBoxWidth, 
+        tpl.dialogueBoxHeight 
+    };
+    
+    Rectangle portraitFrameRect = { 
+        tpl.portraitFramePosition.x, 
+        tpl.portraitFramePosition.y, 
+        tpl.portraitFrameWidth, 
+        tpl.portraitFrameHeight 
+    };
 
 
     //准备文本的位置
@@ -68,7 +82,26 @@ void DrawDialogueWithTemplate(const DialogueBoxTemplate_Normal& tpl, const strin
     //绘制对话框背景
     DrawTexture(tpl.dialogueBoxTexture,tpl.dialogueBoxPosition.x,tpl.dialogueBoxPosition.y,WHITE);
 
-    if(portrait.id != 0){
+    if (!speakerName.empty()) {//绘制名字
+        // 计算名字的绝对屏幕位置
+        Vector2 namePosition = { 
+            tpl.speakerNameOffset.x, // 直接使用模板里定义的绝对坐标
+            tpl.speakerNameOffset.y 
+        };
+
+        // 用不同的样式来绘制名字，以作区分
+        DrawTextGlow(
+            *tpl.font,
+            speakerName.c_str(),
+            namePosition,
+            tpl.speakerNameFontSize, // 使用为名字专门定义的字号
+            1,
+            WHITE,
+            CYBER_MAGENTA // 使用不同的辉光色，比如品红
+        );
+    }
+
+    if(portrait.id != 0){//绘制头像
         
         //绘制头像框
         DrawTexture(tpl.portraitFrameTexture,tpl.portraitFramePosition.x,tpl.portraitFramePosition.y,WHITE);
