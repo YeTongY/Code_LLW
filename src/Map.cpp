@@ -193,7 +193,7 @@ bool LoadLevelFromTiled(GameContext& ctx, const char* filepath){
     // 解析对象层来创建敌人
     for(const auto& layer: layers){
         if(layer->getType() == tmx::Layer::Type::Object && layer->getName() == "Enemies"){
-            const auto& objectlayer = layer->getLayerAs<tmx::ObjectGroup>();{
+            const auto& objectlayer = layer->getLayerAs<tmx::ObjectGroup>();
 
                 for(const auto& object : objectlayer.getObjects()){
                     Enemy enemy = {};//声明敌人主结构体
@@ -236,6 +236,7 @@ bool LoadLevelFromTiled(GameContext& ctx, const char* filepath){
 
     return true;
 }
+
 
 /**
  * @brief 更新地图状态
