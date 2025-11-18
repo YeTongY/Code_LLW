@@ -58,7 +58,7 @@ void GameStateMachine_shutdown(GameStateMachine* sm, GameContext* ctx)
     }
 }
 
-//=============================状态创建（C++ 风格）
+//=============================状态创建
 GameState* Gamestate_create(
     StateEnterFunc enter,
     StateExitFunc exit,

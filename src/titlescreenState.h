@@ -5,16 +5,16 @@
 
 #include "GameState.h"
 
-struct titlescreendata
+struct TitleScreenData
 {
-    int titlescreenOption; // 0：开始游戏 1：退出游戏
+    int TitleScreenOption; // 0：开始游戏 1：退出游戏
 };
 
 //========状态生命周期函数
-void titlescreen_enter(GameContext* ctx, void* data);
-void titlescreen_exit(GameContext* ctx, void* data);
-void titlescreen_update(GameContext* ctx, void* data);
-void titlescreen_render(GameContext* ctx, void* data);
+void TitleScreen_enter(GameContext* ctx, void* data);
+void TitleScreen_exit(GameContext* ctx, void* data);
+void TitleScreen_update(GameContext* ctx, void* data);
+void TitleScreen_render(GameContext* ctx, void* data);
 
 GameState* CreateTitleScreenState();
 

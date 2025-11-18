@@ -109,7 +109,7 @@ void exploration_render(GameContext* ctx, void* state_data)
 //探索状态创建函数
 GameState* createExplorationState()
 {
-    //使用 new 分配探索状态数据（C++ 风格）
+    //使用 new 分配探索状态数据
     ExplorationData* expd = new ExplorationData();
     if (!expd) {
         TraceLog(LOG_ERROR, "[Exploration] 创建失败：内存分配失败");
