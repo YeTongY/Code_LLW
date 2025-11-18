@@ -72,7 +72,7 @@ void dialogue_update(GameContext* ctx, void* state_data) {
             data->skipToEnd = true;
         } else {
             // 意图是“下一句”
-            std::string oldPath = currentLine.portraitPath;
+            string oldPath = currentLine.portraitPath;
             data->currentLineIndex++;
             
             if (data->currentLineIndex >= data->script.size()) {
@@ -138,8 +138,8 @@ void dialogue_render(GameContext* ctx, void* state_data) {
 
     // 4. 从 DialogueData 中准备好要绘制的所有“材料”
     const DialogueLine& currentLine = data->script[data->currentLineIndex];
-    const std::string& textToDisplay = currentLine.text;
-    const std::string& speakerToShow = currentLine.speaker;
+    const string& textToDisplay = currentLine.text;
+    const string& speakerToShow = currentLine.speaker;
     const Texture2D& portraitToShow = data->currentPortrait;
     const int charsToShow = (int)data->visibleChars;
 
@@ -198,3 +198,42 @@ GameState* createDialogueState(const vector<DialogueLine>& script){
 }
 
 
+vector<DialogueLine> LoadDialogueScript(const char* filepath) {
+    vector<DialogueLine> script;
+    ifstream file(filepath);
+
+    if (!file.is_open()) {
+        TraceLog(LOG_ERROR, "[DialogueLoader] 无法打开剧本文件: %s", filepath);
+        return script;
+    }
+
+    string line;
+    while (getline(file, line)) {
+        // 跳过空行或注释行 
+        if (line.empty() || line[0] == '#') {
+            continue;
+        }
+
+        stringstream ss(line);
+        string speaker;
+        string path;
+        string text;
+
+        getline(ss, speaker, ',');
+        getline(ss, path, ',');
+        getline(ss, text);
+
+        if (!text.empty() && text.front() == '"') {
+            text.erase(0, 1);
+        }
+        if (!text.empty() && text.back() == '"') {
+            text.pop_back();
+        }
+
+        script.push_back({speaker, path, text}); // 使用C++11的列表初始化，更简洁
+    }
+
+    file.close();
+    TraceLog(LOG_INFO, "[DialogueLoader] 成功加载剧本 '%s'，共 %d 行对话。", filepath, script.size());
+    return script;
+}
