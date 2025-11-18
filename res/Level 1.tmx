@@ -12,13 +12,10 @@
  <tileset firstgid="2497" name="Characters_MV" tilewidth="32" tileheight="32" tilecount="432" columns="18">
   <image source="graphics/tilesets/Characters_MV.png" width="576" height="768"/>
  </tileset>
- <tileset firstgid="2929" name="Adam_16x16" tilewidth="32" tileheight="32" tilecount="84" columns="12">
-  <image source="graphics/tilesets/Adam_16x16.png" width="384" height="224"/>
- </tileset>
- <tileset firstgid="3013" name="Modern_Exteriors_Characters_Swimmers_32x32" tilewidth="32" tileheight="32" tilecount="192" columns="24">
+ <tileset firstgid="2929" name="Modern_Exteriors_Characters_Swimmers_32x32" tilewidth="32" tileheight="32" tilecount="192" columns="24">
   <image source="graphics/tilesets/Modern_Exteriors_Characters_Swimmers_32x32.png" width="768" height="256"/>
  </tileset>
- <tileset firstgid="3205" name="24_Additional_Houses_32x32" tilewidth="32" tileheight="32" tilecount="8992" columns="32">
+ <tileset firstgid="3121" name="24_Additional_Houses_32x32" tilewidth="32" tileheight="32" tilecount="8992" columns="32">
   <image source="graphics/tilesets/24_Additional_Houses_32x32.png" width="1024" height="8992"/>
  </tileset>
  <layer id="1" name="Ground" width="38" height="30">

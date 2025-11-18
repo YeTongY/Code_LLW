@@ -217,19 +217,20 @@ bool LoadLevelFromTiled(GameContext& ctx, const char* filepath){
         string filename = (lastSlash != string::npos) ? imagePath.substr(lastSlash + 1) : imagePath;
         
         // 尝试多个可能的路径
-        const char* possiblePaths[] = {
-            (string("res/graphics/tilesets/") + filename).c_str(),
-            (string("../res/graphics/tilesets/") + filename).c_str(),
-            imagePath.c_str()  // 尝试原始路径
+        vector<string> possiblePaths = {
+            string("../res/graphics/tilesets/") + filename,  // 从 build/ 运行
+            string("res/graphics/tilesets/") + filename,     // 从项目根运行
+            string("../res/") + imagePath,                   // .tmx 中的相对路径 (从 build/)
+            string("res/") + imagePath,                      // .tmx 中的相对路径 (从根目录)
         };
         
         Texture2D texture = {0};
         bool loaded = false;
-        for (int i = 0; i < 3; i++) {
-            texture = LoadTexture(possiblePaths[i]);
+        for (const auto& path : possiblePaths) {
+            texture = LoadTexture(path.c_str());
             if (texture.id != 0) {
                 TraceLog(LOG_INFO, "[Map] 成功加载 tileset '%s': %s (FirstGID: %d, 尺寸: %dx%d)", 
-                         tileset.getName().c_str(), possiblePaths[i], 
+                         tileset.getName().c_str(), path.c_str(), 
                          tileset.getFirstGID(), texture.width, texture.height);
                 loaded = true;
                 break;
