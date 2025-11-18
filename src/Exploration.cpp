@@ -3,6 +3,7 @@
 #include "Map.h"
 #include "raylib.h"
 #include "GameState.h"
+#include "Dialogue.h"
 #include <cstdlib>
 #include <cstdio>
 //================================
@@ -75,16 +76,18 @@ void exploration_update(GameContext* ctx, void* state_data)
                 // if (playerIsNearTarget) { ... }
 
                 // 暂时，我们只要按E就触发第一个找到的交互事件
-                TraceLog(LOG_INFO, "触发事件！加载剧本: %s", event.scriptPath.c_str());
+                TraceLog(LOG_INFO, "触发事件！剧本路径: %s", event.scriptPath.c_str());
 
-                // 从事件中获取剧本路径并加载
-                vector<DialogueLine> script = LoadDialogueScript(event.scriptPath.c_str());
-
-                if (!script.empty()) {
-                    // 切换到对话状态
-                    GameStateMachine_change(&ctx->state_machine, ctx, createDialogueState(script));
-                    return; // 触发了一个事件后，立刻结束本帧的update，防止一帧内触发多个事件
-                }
+                // TODO: 实现对话系统
+                // createDialogueState 函数还未实现，暂时注释掉
+                /*
+                const char* testPortrait = "res/graphics/portraits/default.png";
+                const char* testLines = "测试对话内容";
+                createDialogueState(testPortrait, testLines);
+                */
+                TraceLog(LOG_WARNING, "[Exploration] 对话系统尚未实现");
+                
+                return; // 触发了一个事件后，立刻结束本帧的update
             }
         }
     }

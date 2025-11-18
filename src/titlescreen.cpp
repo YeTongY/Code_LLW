@@ -28,7 +28,7 @@ void TitleScreen_render(GameContext* ctx, void* data)
 
     //=============绘制游戏标题
 
-    const char* Title = "代号：LLW";
+    const char* Title = "代号:LLW";
 
     Vector2 titlesize = MeasureTextEx(ctx->mainFont, Title, 80, 2);//测量标题大小
     DrawTextEx(ctx->mainFont, Title, {(ctx->screenWidth - titlesize.x) / 2.0f, ctx->screenHeight * 0.25f}, 80, 2, RAYWHITE);
@@ -56,7 +56,7 @@ void TitleScreen_render(GameContext* ctx, void* data)
 
 }
 
-void TitleScreen_updata(GameContext* ctx, void* data)
+void TitleScreen_update(GameContext* ctx, void* data)
 {
     TitleScreenData* state_data = static_cast<TitleScreenData*>(data);
     
@@ -102,7 +102,7 @@ void TitleScreen_updata(GameContext* ctx, void* data)
 }
 
 //=================状态创建
-GameState* creatTitleScreenState()
+GameState* CreateTitleScreenState()
 {
 
     TitleScreenData* data = new TitleScreenData();
