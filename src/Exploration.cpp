@@ -8,6 +8,7 @@
 #include <cstdio>
 //================================
 #include "Event.h"
+#include "Dialogue.h"
 
 
 

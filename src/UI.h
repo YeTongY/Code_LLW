@@ -51,9 +51,11 @@ void FillTemplateWithAssets(DialogueBoxTemplate_Normal& tpl, GameContext& ctx);
  * 
  * @param tpl 对话框模板
  * @param text 对话文本
- * @param portrait_address 头像地址 
+ * @param speakerName 说话者名字
+ * @param portrait 头像纹理
+ * @param charsToShow 要显示的字符数量
  */
-void DrawDialogueWithTemplate(const DialogueBoxTemplate_Normal& tpl, const string& text, const char* portrait_address);
+void DrawDialogueWithTemplate(const DialogueBoxTemplate_Normal& tpl, const string& text, const string& speakerName, Texture2D portrait, int charsToShow);
 
 /**
  * @brief 加载UI资产
