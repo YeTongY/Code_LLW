@@ -1,10 +1,12 @@
-#pragma once
 #include "Event.h"
+#include "GameState.h"
+#include "Dialogue.h"
+#include "Map.h"
 
 void CheckAndExecuteEvents(GameContext &ctx){
     for(const auto&event : ctx.gameEvents){
         if(!event.isTrigged){
-            switch(event.EventType){
+            switch(event.eventType){
                 case(DIALOGUE):{
                     LoadDialogueScript(event.dialogue.scriptPath.c_str());
                     break;

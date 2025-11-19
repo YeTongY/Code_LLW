@@ -134,92 +134,124 @@ void UnloadPlayerAssets(GameContext& ctx){
 
 
 
- /**
-  * @brief 用于读取键盘输入来更新玩家位置
-  * 
-  * @param ctx Gamestate里的GameContext核心数据文件
-  */
+/**
+ * @brief 用于读取键盘输入来更新玩家位置 (后按键优先逻辑)
+ * 
+ * @param ctx Gamestate里的GameContext核心数据文件
+ */
 void updatePlayer(GameContext& ctx){
 
-
-    //------开始移动状态更新------
-
+    //------ 1. 实时处理输入栈 (无论是否正在移动都要处理) ------
     
-    Vector2 input = { 0.0f, 0.0f }; // (0, 0) = 不动
+    // 我们关心的四个方向键
+    int directionKeys[] = { KEY_W, KEY_S, KEY_A, KEY_D };
 
-    float dt = GetFrameTime(); // 获取帧间时间
-    float moveSpeed = ctx.player.moveSpeed; // 移动速度像素/秒
-    Vector2 desiredMove = Vector2Scale(input, moveSpeed * dt);// (速度 * 时间 = 这一帧应该移动的“距离”)
+    for (int key : directionKeys) {
+        // 如果刚刚按下了某个键
+        if (IsKeyPressed(key)) {
+            // 先尝试从栈中移除它（防止重复），确保它被放到最末尾
+            for (size_t i = 0; i < ctx.player.inputStack.size(); ) {
+                if (ctx.player.inputStack[i] == key) {
+                    ctx.player.inputStack.erase(ctx.player.inputStack.begin() + i);
+                } else {
+                    i++;
+                }
+            }
+            // 把新按下的键推入栈顶（优先级最高）
+            ctx.player.inputStack.push_back(key);
+        }
 
-    if (ctx.player.isMoving == false)
-    {
-        // 初始化移动意图
-        int nextX = ctx.player.gridX;
-        int nextY = ctx.player.gridY;
-        
-        // 检测输入
-        if (IsKeyDown(KEY_W)) { nextY--; ctx.player.currentDirection = PLAYER_DIR_UP; }
-        else if (IsKeyDown(KEY_S)) { nextY++; ctx.player.currentDirection = PLAYER_DIR_DOWN; }
-        else if (IsKeyDown(KEY_A)) { nextX--; ctx.player.currentDirection = PLAYER_DIR_LEFT; }
-        else if (IsKeyDown(KEY_D)) { nextX++; ctx.player.currentDirection = PLAYER_DIR_RIGHT; }
-        
-        // 碰撞检测
-        if ((nextX != ctx.player.gridX || nextY != ctx.player.gridY) && // (玩家“真的”按键了)
-            (nextY >= 0 && nextY < ctx.tiles.size()) && // (Y 边界)
-            (nextX >= 0 && nextX < ctx.tiles[nextY].size()) && // (X 边界)
-            (ctx.tiles[nextY][nextX] == EMPTY || ctx.tiles[nextY][nextX] == GRASS)) // (障碍)
-        {
-            //开始移动，修改渲染位置
-            
-            // 1. “设置”动画“状态”
-            ctx.player.isMoving = true;
-            
-            // 2. “设置”动画“目标” (像素)
-            ctx.player.moveTarget = { (float)nextX * TILE_SIZE, (float)nextY * TILE_SIZE };
+        // 如果松开了某个键
+        if (IsKeyReleased(key)) {
+            // 从栈中移除
+            for (size_t i = 0; i < ctx.player.inputStack.size(); ) {
+                if (ctx.player.inputStack[i] == key) {
+                    ctx.player.inputStack.erase(ctx.player.inputStack.begin() + i);
+                } else {
+                    i++;
+                }
+            }
         }
     }
-    //  【【如果“正在动” -> “执行”动画】】
-    else // (if isMoving == true)
+
+    // 【安全检查】清理那些实际上没有被按住的键
+    // (防止因窗口切换等原因导致的“卡键”现象)
+    for (size_t i = 0; i < ctx.player.inputStack.size(); ) {
+        if (!IsKeyDown(ctx.player.inputStack[i])) {
+            ctx.player.inputStack.erase(ctx.player.inputStack.begin() + i);
+        } else {
+            i++;
+        }
+    }
+
+    //------ 2. 开始移动状态更新 ------
+
+    float dt = GetFrameTime(); 
+    float moveSpeed = ctx.player.moveSpeed;
+    
+    // 处理平滑移动动画
+    if (ctx.player.isMoving)
     {
-        
-        
-        // 1. “执行”一小步移动
+        // “平滑”地“追”向“目标”
         ctx.player.visualPosition = Vector2MoveTowards(
-            ctx.player.visualPosition, // (当前“视觉”位置)
-            ctx.player.moveTarget,     // (目标“像素”位置)
-            ctx.player.moveSpeed * dt  // (“追”的速度)
+            ctx.player.visualPosition, // 当前视觉位置
+            ctx.player.moveTarget,     // 目标像素位置
+            ctx.player.moveSpeed * dt  // 这一帧移动距离
         );
 
-        // 2. “检查”是否到达终点
-        if (Vector2Distance(ctx.player.visualPosition, ctx.player.moveTarget) < 1.0f) // (如果“足够近”)
+        // 检查是否到达
+        if (Vector2Distance(ctx.player.visualPosition, ctx.player.moveTarget) < 1.0f)
         {
-            // 停止移动
-            
-            // “重置”动画“状态”
             ctx.player.isMoving = false;
-            
-            // “校准”视觉位置 (防止 0.001 的误差)
-            ctx.player.visualPosition = ctx.player.moveTarget;
-            
-            // 更新逻辑位置
+            ctx.player.visualPosition = ctx.player.moveTarget; // 校准
             ctx.player.gridX = (int)(ctx.player.moveTarget.x / TILE_SIZE);
             ctx.player.gridY = (int)(ctx.player.moveTarget.y / TILE_SIZE);
         }
     }
-    
+    // 如果静止，检查输入栈来决定下一步动作
+    else 
+    {
+        // 只有当输入栈不为空时才处理移动
+        if (!ctx.player.inputStack.empty()) {
+            
+            // 取出栈顶的键（最后按下的那个键）
+            int activeKey = ctx.player.inputStack.back();
 
-    //------移动状态更新结束------
+            int nextX = ctx.player.gridX;
+            int nextY = ctx.player.gridY;
 
+            // 根据这个“最高优先级”的键来决定方向
+            if (activeKey == KEY_W) { 
+                nextY--; 
+                ctx.player.currentDirection = PLAYER_DIR_UP; 
+            }
+            else if (activeKey == KEY_S) { 
+                nextY++; 
+                ctx.player.currentDirection = PLAYER_DIR_DOWN; 
+            }
+            else if (activeKey == KEY_A) { 
+                nextX--; 
+                ctx.player.currentDirection = PLAYER_DIR_LEFT; 
+            }
+            else if (activeKey == KEY_D) { 
+                nextX++; 
+                ctx.player.currentDirection = PLAYER_DIR_RIGHT; 
+            }
 
-    //------开始战斗状态更新------
-    //? 战斗状态进入应该写在这吗？
-
-    if(IsKeyPressed(KEY_E)){
-        //TODO 在这里进入战斗状态
+            // 碰撞检测
+            if ((nextX != ctx.player.gridX || nextY != ctx.player.gridY) &&
+                (nextY >= 0 && nextY < ctx.tiles.size()) &&
+                (nextX >= 0 && nextX < ctx.tiles[nextY].size()) &&
+                (ctx.tiles[nextY][nextX] == EMPTY || ctx.tiles[nextY][nextX] == GRASS))
+            {
+                // 开始移动
+                ctx.player.isMoving = true;
+                ctx.player.moveTarget = { (float)nextX * TILE_SIZE, (float)nextY * TILE_SIZE };
+            }
+        }
     }
-
-    //------结束战斗状态更新------
 }
+
 
 
 /**
