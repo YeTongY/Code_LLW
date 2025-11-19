@@ -49,9 +49,14 @@ void DrawMap(const GameContext& map) {
         return;
     }
     
-    for(int y = 0; y < map.height && y < (int)map.tiles.size(); y++){
-        for(int x = 0; x < map.width && x < (int)map.tiles[y].size(); x++){
-            DrawSingleTile(map, x, y);
+    for(const auto& layerGIDs : map.tileGIDs){  //遍历所有层
+        for(int y = 0;y < map.height;y++){
+            for(int x = 0;x < map.width;x++){
+                unsigned int gid = layerGIDs[y][x];
+                if(gid != 0){
+                    DrawSingleTile(map, x, y, gid);
+                }
+            }
         }
     }
 }
@@ -64,56 +69,43 @@ void DrawMap(const GameContext& map) {
  * @param tileY y坐标
  * @param type 地图块类型
  */
-void DrawSingleTile(const GameContext& map, int tileX, int tileY) {
+void DrawSingleTile(const GameContext& map, int tileX, int tileY,unsigned int gid) {
     // 获取该位置的 GID
-    if (tileY >= map.tileGIDs.size() || tileX >= map.tileGIDs[tileY].size()) return;
-    
-    unsigned int gid = map.tileGIDs[tileY][tileX];
-    if (gid == 0) return; // GID 为 0 表示空白图块
-    
-    // 找到对应的 tileset
     int tilesetIndex = -1;
-    int localID = gid;
-    
-    for (int i = map.tilesetFirstGIDs.size() - 1; i >= 0; i--) {
-        if (gid >= map.tilesetFirstGIDs[i]) {
+    for(int i = map.tilesetFirstGIDs.size() - 1;i >= 0 ;i--){
+        if(gid >= map.tilesetFirstGIDs[i]){
             tilesetIndex = i;
-            localID = gid - map.tilesetFirstGIDs[i];
             break;
         }
     }
-    
-    if (tilesetIndex < 0 || tilesetIndex >= map.tilesetTextures.size()) return;
-    
+    if(tilesetIndex == -1 || tilesetIndex >= map.tilesetTextures.size()) return;
+
+    // 收集本地纹理
     Texture2D tileset = map.tilesetTextures[tilesetIndex];
-    if (tileset.id == 0) return;
-    
-    // 计算 tileset 中的列数
+    unsigned int localID = gid - map.tilesetFirstGIDs[tilesetIndex];
     int columns = tileset.width / map.tileSize;
-    if (columns <= 0) return;
-    
-    // 根据 localID 计算在 tileset 中的位置
+    if(columns == 0) return;
+
+    // 计算图块在 tileset 中的位置
     int tilesetX = localID % columns;
     int tilesetY = localID / columns;
-    
-    // 源矩形（从 tileset 中切割）
-    Rectangle sourceRect = {
-        static_cast<float>(tilesetX * map.tileSize),
-        static_cast<float>(tilesetY * map.tileSize),
-        static_cast<float>(map.tileSize),
-        static_cast<float>(map.tileSize)
-    };
-    
-    // 目标位置（屏幕坐标）
-    Vector2 destPos = {
-        static_cast<float>(tileX * map.tileSize),
-        static_cast<float>(tileY * map.tileSize)
-    };
-    
-    // 绘制图块
-    DrawTextureRec(tileset, sourceRect, destPos, WHITE);
-}
 
+    // 定义源矩形和目标位置
+    Rectangle sourceRect = {
+        (float)(tilesetX * map.tileSize),
+        (float)(tilesetY * map.tileSize),
+        (float)map.tileSize,
+        (float)map.tileSize
+    };
+    Vector2 destPos = {
+        (float)(tileX * map.tileSize),
+        (float)(tileY * map.tileSize)
+    };
+
+    DrawTextureRec(tileset, sourceRect, destPos, WHITE);
+
+    if(tileset.id == 0) return;
+}
 /**
  * @brief 加载地图纹理
  * 将地图纹理放置在maps文件下，注意png格式
@@ -247,8 +239,7 @@ bool LoadLevelFromTiled(GameContext& ctx, const char* filepath){
     }
     
     // 初始化地图数据结构
-    ctx.tiles.resize(ctx.height, vector<TileType>(ctx.width, TileType::EMPTY));
-    ctx.tileGIDs.resize(ctx.height, vector<unsigned int>(ctx.width, 0));
+    ctx.tiles.assign(ctx.height, vector<TileType>(ctx.width, TileType::EMPTY));
 
     // 读取图层数据
     const auto& layers = tiledMap.getLayers();
@@ -258,6 +249,7 @@ bool LoadLevelFromTiled(GameContext& ctx, const char* filepath){
             const auto& tileLayer = layer->getLayerAs<tmx::TileLayer>();
             const auto& tiles = tileLayer.getTiles();
 
+            vector<vector<unsigned int>> currentLayerGIDs(ctx.height, vector<unsigned int>(ctx.width, 0));
             TraceLog(LOG_INFO, "[Map] 处理图块图层: %s", layer->getName().c_str());
 
             // 遍历所有地块
@@ -265,10 +257,7 @@ bool LoadLevelFromTiled(GameContext& ctx, const char* filepath){
                 for(int x = 0; x < ctx.width; x++){
                     unsigned int gid = tiles[y * ctx.width + x].ID;
                     
-                    // 保存原始 GID（用于绘制）
-                    if (gid != 0) {
-                        ctx.tileGIDs[y][x] = gid;
-                    }
+                    currentLayerGIDs[y][x] = gid;
                     
                     // 根据图层名称设置逻辑类型（用于碰撞检测）
                     if(gid != 0){
@@ -292,6 +281,8 @@ bool LoadLevelFromTiled(GameContext& ctx, const char* filepath){
                             ctx.tiles[y][x] = TileType::GRASS;
                         }
                     }
+
+                    ctx.tileGIDs.push_back(currentLayerGIDs);
                 }
             }
         }

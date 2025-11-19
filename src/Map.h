@@ -29,7 +29,7 @@ typedef enum {
 void CleanupMap(GameContext& map);                                          //清理地图资源
 void LoadMapTextures(GameContext& map);                                     //加载图块集
 void DrawMap(const GameContext& map);                                       //绘图
-void DrawSingleTile(const GameContext& map, int tileX, int tileY);          //绘制单个块
+void DrawSingleTile(const GameContext& map, int tileX, int tileY,unsigned int gid);          //绘制单个块
 bool UpdateMap(GameContext& map);                                           //更新地图
 
 bool LoadLevelFromTiled(GameContext& ctx, const char* filepath);            // 替换旧的 LoadMap
