@@ -10,6 +10,7 @@ struct GameEvent{
     string triggerType;
     string triggerValue;
     string scriptPath;
+    Rectangle area;
 };
 
 #endif // EVENT_H

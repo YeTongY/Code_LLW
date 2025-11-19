@@ -112,35 +112,15 @@ int main(void)
 
     TraceLog(LOG_INFO, "[Main] 地图加载成功 - 大小：%dx%d", ctx.width, ctx.height);
 
-    //==========初始化测试事件==========
-    GameEvent testEvent;
-    testEvent.triggerType = "npc_interaction";
-    testEvent.triggerValue = "test_npc";
-    testEvent.scriptPath = "../res/data/dialogues/test_script.csv";
-    ctx.gameEvents.push_back(testEvent);
-    
-    TraceLog(LOG_INFO, "[Main] 测试事件已添加 - 类型: %s, 脚本: %s", 
-             testEvent.triggerType.c_str(), testEvent.scriptPath.c_str());
+    //==========初始化事件==========
+    //创建事件
+    GameEvent npcEvent;
 
-    // 调试：检查玩家初始位置的地形
-    if (ctx.player.gridY < (int)ctx.tiles.size() && 
-        ctx.player.gridX < (int)ctx.tiles[ctx.player.gridY].size()) {
-        int tileValue = (int)ctx.tiles[ctx.player.gridY][ctx.player.gridX];
-        TraceLog(LOG_INFO, "[Main] 玩家位置 (%d,%d) 的地形类型: %d (0=EMPTY, 1=GRASS, 2=WALL)", 
-                 ctx.player.gridX, ctx.player.gridY, tileValue);
-        
-        // 调试：打印玩家周围的地形
-        TraceLog(LOG_INFO, "[Main] 调试 - 打印地图前3行前10列:");
-        for (int y = 0; y < 3 && y < (int)ctx.tiles.size(); y++) {
-            char rowStr[256] = "";
-            for (int x = 0; x < 10 && x < (int)ctx.tiles[y].size(); x++) {
-                char temp[8];
-                sprintf(temp, "%d ", (int)ctx.tiles[y][x]);
-                strcat(rowStr, temp);
-            }
-            TraceLog(LOG_INFO, "[Main]   行%d: %s", y, rowStr);
-        }
-    }
+    //初始化事件属性
+    
+
+
+    
 
     // LoadLevelFromTiled 已经加载了地图数据、tileset 纹理
     // 不需要再手动设置尺寸或加载纹理

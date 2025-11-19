@@ -129,8 +129,12 @@ struct GameContext
     Texture2D portraitFrameTexture;
 
 
-    //事件
+    //静态事件列表
     vector <GameEvent> gameEvents;
+
+    //记录敌人信息
+    Enemy* currentCombatant = nullptr;
+
 };
 
 #endif // GAMESTATE_H
