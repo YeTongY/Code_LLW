@@ -162,6 +162,7 @@ bool LoadLevelFromTiled(GameContext& ctx, const char* filepath){
     ctx.mapTextures.clear();
     ctx.tilesetTextures.clear();
     ctx.tilesetFirstGIDs.clear();
+    ctx.gameEvents.clear();
 
     //实现从 Tiled 文件加载地图和敌人数据
     tmx::Map tiledMap;
@@ -289,8 +290,10 @@ bool LoadLevelFromTiled(GameContext& ctx, const char* filepath){
 
     // 解析对象层来创建敌人
     for(const auto& layer: layers){
+        //解析敌人层
         if(layer->getType() == tmx::Layer::Type::Object && layer->getName() == "Enemies"){
             const auto& objectlayer = layer->getLayerAs<tmx::ObjectGroup>();
+            // 解析敌人对象
 
             for(const auto& object : objectlayer.getObjects()){
                 Enemy enemy = {};//声明敌人主结构体
@@ -327,6 +330,72 @@ bool LoadLevelFromTiled(GameContext& ctx, const char* filepath){
                 ctx.enemies.push_back(enemy);
             }
         }
+
+        //解析事件层
+        if(layer->getType() == tmx::Layer::Type::Object && layer->getName() == "Events"){
+            // 解析事件对象
+            const auto& objecLayer = layer->getLayerAs<tmx::ObjectGroup>();
+
+            for(const auto& object : objecLayer.getObjects()){
+                GameEvent event = {};
+                
+                float objX = object.getPosition().x;
+                float objY = object.getPosition().y;
+                float objHeight = object.getAABB().height;
+
+                for(const auto& prop : object.getProperties()){
+                    if (prop.getName() == "triggerType") event.triggerType = prop.getStringValue();
+                    if (prop.getName() == "triggerValue") event.triggerValue = prop.getStringValue();
+                    if (prop.getName() == "scriptPath") event.scriptPath = prop.getStringValue();
+                }
+
+                if(!event.triggerType.empty() && !event.scriptPath.empty()){
+                    ctx.gameEvents.push_back(event);
+                }
+            }
+        }
+        //解析NPC层
+        if(layer->getType() == tmx::Layer::Type::Object && layer->getName() == "NPC"){
+            // 解析NPC对象层
+            const auto& objectLayer = layer->getLayerAs<tmx::ObjectGroup>();
+
+            for(const auto& object : objectLayer.getObjects()){
+                // 可以在这里解析NPC对象的属性并创建NPC实体
+                // 目前仅作为占位符
+            }
+
+        }
+
+        //解析传送门层
+        if(layer->getType() == tmx::Layer::Type::Object && layer->getName() == "Portals"){
+            // 解析传送门对象层
+            const auto& objectLayer = layer->getLayerAs<tmx::ObjectGroup>();
+
+            for(const auto& object : objectLayer.getObjects()){
+                // 可以在这里解析传送门对象的属性并创建传送门实体
+                // 目前仅作为占位符
+                EventData_Portal protal = {};
+
+                protal.bounds = {
+                    object.getPosition().x,
+                    object.getPosition().y,
+                    object.getAABB().width,
+                    object.getAABB().height
+                };
+
+                for(const auto& prop : object.getProperties()){
+                    // 解析传送门属性
+                    if( prop.getName() == "targetMap") protal.targetMap = prop.getStringValue();
+                    if( prop.getName() == "targetSpawnPoint") protal.targetSpawnPoint = static_cast<float>(prop.getIntValue());
+                }
+
+                if(!protal.targetMap.empty() && !protal.targetSpawnPoint.empty()){
+                    ctx.gameEvents.push_back(protal);
+                }
+            }
+
+        }
+        //可以继续添加其他对象层的解析
     }
 
     TraceLog(LOG_INFO, "[Map] 地图加载完成");
