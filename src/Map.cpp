@@ -281,10 +281,9 @@ bool LoadLevelFromTiled(GameContext& ctx, const char* filepath){
                             ctx.tiles[y][x] = TileType::GRASS;
                         }
                     }
-
-                    ctx.tileGIDs.push_back(currentLayerGIDs);
                 }
             }
+            ctx.tileGIDs.push_back(currentLayerGIDs);
         }
     }
 
@@ -320,7 +319,7 @@ bool LoadLevelFromTiled(GameContext& ctx, const char* filepath){
 
                 //设置其他默认属性
                 enemy.isActive = true;
-                enemy.isMoving = true;
+                enemy.isMoving = false;
                 enemy.aiState = AI_STATE_PATROL;
                 enemy.currentDirection = ENEMY_DIR_DOWN;
 

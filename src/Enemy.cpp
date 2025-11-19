@@ -13,52 +13,6 @@ const char* enemySpriteAddress = "res/graphics/enemy/Enemy_Sprite.png";//敌人�
 using namespace std;
 
 /**
- * @brief 敌人是否存活并显示在地图上
- * 
- * @param enemy 
- * @return true 
- * @return false 
- */
-bool isActive(const GameContext& enemy){
-    for(const Enemy& enemyl : enemy.enemies){
-        if(enemyl.isActive){
-            return true;
-        }
-    }
-    return false;
-}
-
-/**
- * @brief // 初始化敌人
- * 
- * @param enemy 
- * @param x 
- * @param y 
- * @param stats 
- * @param texture 
- */
-void InitEnemy(GameContext& enemy, int x, int y,const Stats& stats,Texture2D texture){
-    Enemy enemy1 = {};
-    enemy1.gridX = 10;
-    enemy1.gridY = 10;
-    enemy1.isActive = true;                     //存活
-    enemy1.isMoving = false;                    //移动
-
-    enemy1.patrolCenter = { (float)enemy1.gridX * TILE_SIZE, (float)enemy1.gridY * TILE_SIZE};               //巡逻点
-    enemy1.visualPosition = { (float)enemy1.gridX * TILE_SIZE, (float)enemy1.gridY * TILE_SIZE};            //渲染位置
-    enemy1.moveTarget = enemy1.visualPosition;      //目标位置
-    enemy1.moveSpeed = 2.0f;                    //敌人移动速度
-    enemy1.stats = {50,50,10,5};                //属性
-    enemy1.aiState = AI_STATE_PATROL;           //设置AI状态：是否巡逻
-
-    enemy1.currentDirection = ENEMY_DIR_DOWN;   //敌人朝向
-
-    enemy.enemies.push_back(enemy1);
-
-    //可以在下面添加更多敌人
-}
-
-/**
  * @brief 在地图上绘制敌人
  * 
  * @param ctx 
@@ -135,7 +89,7 @@ void UpdateEnemies(GameContext& ctx){
     float dt = GetFrameTime(); // 帧时间增量
 
     for(Enemy& enemy : ctx.enemies){
-        if(enemy.isActive){
+        if(!enemy.isActive) continue; 
             float distanceToPlayer = Vector2Distance(enemy.visualPosition, ctx.player.visualPosition); // 计算敌人与玩家之间的距离
 
             switch (enemy.aiState)//切换敌人AI状态
@@ -144,18 +98,19 @@ void UpdateEnemies(GameContext& ctx){
                 if(distanceToPlayer < enemy.aggroRange){
                     enemy.aiState = AI_STATE_CHASING;       //如果进入索敌范围，自动切换为追击模式
                 }else if(!enemy.isMoving){
-                    Vector2 randomPoint = {
-                        randomPoint.x = enemy.patrolCenter.x + GetRandomValue(-enemy.patrolRange, enemy.patrolRange),
-                        randomPoint.y = enemy.patrolCenter.y + GetRandomValue(-enemy.patrolRange, enemy.patrolRange)
-                    };      // 随机巡逻点
-
-                    enemy.moveTarget = (randomPoint);
+                    float randomX = enemy.patrolCenter.x + GetRandomValue(-enemy.patrolRange, enemy.patrolRange);
+                    float randomY = enemy.patrolCenter.y + GetRandomValue(-enemy.patrolRange, enemy.patrolRange);
+                    // 正确计算随机移动位置
+                    enemy.moveTarget = {randomX, randomY};
                     enemy.isMoving = true;
                 }
                 break;
             case AI_STATE_CHASING://追击模式
-                if(distanceToPlayer > enemy.aggroRange){
+
+                if(distanceToPlayer > enemy.aggroRange * 1.5f){
                     enemy.aiState = AI_STATE_PATROL;       //如果玩家离开索敌范围，切换回巡逻模式
+                    enemy.moveTarget = enemy.patrolCenter; // 返回巡逻中心
+                    enemy.isMoving = true;
                 }else {
                     enemy.moveTarget = ctx.player.visualPosition;   //更新移动目标为玩家位置
                     enemy.isMoving = true;
@@ -182,7 +137,6 @@ void UpdateEnemies(GameContext& ctx){
                     }
                 }
             }
-        }
     }
 }
 

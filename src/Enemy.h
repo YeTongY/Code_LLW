@@ -41,8 +41,6 @@ struct Enemy {//声明敌人主结构体
     EnemyDirection currentDirection; // 敌人"当前"的方向
 };
 
-bool isActive(const GameContext& enemy);                                                // 敌人是否存活并显示在地图上
-void InitEnemy(GameContext enemy, int x, int y,const Stats& stats,Texture2D texture);   // 初始化敌人
 void DrawEnemy(const GameContext& ctx);                                                 // 在地图上绘制敌人
 void LoadEnemyAssets(GameContext& ctx);                                                 // 加载敌人贴图
 void UnloadEnemyAssets(GameContext& ctx);                                               // 卸载敌人贴图
