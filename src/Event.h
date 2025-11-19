@@ -33,7 +33,9 @@ struct EventData_Dialogue{
 struct EventData_Portal{
     string targetMap;//目标地图路径
     Vector2 targetPosition;//目标坐标
+    string targetSpawnPoint;//目标出生点
     int facingDir;//目标朝向：见player的枚举
+    Rectangle bounds;//触发区域
 
 };
 //TODO NPC 数据
@@ -42,6 +44,8 @@ struct EventData_Portal{
 
 struct GameEvent{
     string triggerType;//触发条件：npc/zone/auto
+    string triggerValue;//触发值
+    string scriptPath;//脚本路径
     Rectangle area;//触发区域
     bool isOneShot;//是否为一次性的
     bool isTrigged;//是否已被触发
