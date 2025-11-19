@@ -67,38 +67,8 @@ void exploration_update(GameContext* ctx, void* state_data)
     // --- 事件处理逻辑 ---
     if (IsKeyPressed(KEY_E)) {
         TraceLog(LOG_INFO, "[Exploration] 按下 E 键，开始检查交互事件...");
-
-        // 遍历存储在 GameContext 中的所有事件
-        for (const auto& event : ctx->gameEvents) { 
-            
-            // 检查这个事件是不是我们关心的“按E交互”类型
-            if (event.triggerType == "npc_interaction") {
-                
-                // 【进阶思考区】
-                // 在一个真正的游戏里，这里还应该有一个检查：
-                // 玩家是否正对着一个NPC？或者玩家是否在NPC的交互范围内？
-                // bool isPlayerNearTarget = ...;
-                // if (isPlayerNearTarget) { ... }
-                // 但对于现在的测试，我们先简化它：只要按E，就触发第一个找到的交互事件。
-
-                TraceLog(LOG_INFO, ">>> 发现并触发事件！加载剧本: %s", event.scriptPath.c_str());
-
-                // 【调用你的工具】从事件中获取剧本路径并加载
-                vector<DialogueLine> script = LoadDialogueScript(event.scriptPath.c_str());
-
-                // 安全检查：确保剧本加载成功且不为空
-                if (!script.empty()) {
-                    // 【切换状态】调用你已经完成的工厂函数，并让状态机切换
-                    GameStateMachine_change(&ctx->state_machine, ctx, createDialogueState(script));
-                    
-                    // 【关键】触发了一个事件后，立刻结束本帧的update，
-                    // 防止一帧内不小心触发了多个事件。
-                    return; 
-                } else {
-                    TraceLog(LOG_WARNING, "加载剧本失败或剧本为空: %s", event.scriptPath.c_str());
-                }
-            }
-        }
+         CheckAndExecuteEvents(*ctx); 
+        
     }
 
     //退出游戏

@@ -49,30 +49,12 @@ struct GameEvent{
 
     //各事件所需数据
     EventData_Dialogue dialogue;
-    EventData_Portal teleport;
+    EventData_Portal portal;
     //EventData_Combat;
     //EventData_NPC;
 };
 
+void CheckAndExecuteEvents(GameContext &ctx);
 
-GameContext CheckAndExecuteEvents(GameContext &ctx){
-    for(const auto&event : ctx.gameEvents){
-        if(!event.isTrigged){
-            switch(event.EventType){
-                case(DIALOGUE):{
-                    LoadDialogueScript(event.dialogue.scriptPath.c_str());
-                    break;
-                }
-                case(TELEPORT):{
-                    TraceLog(LOG_INFO,"[Event] 传送到地图 %s",event.teleport.targetMap.c_str());
-
-                    //1.切换地图
-                    LoadLevelFromTiled
-                }
-            }
-        }
-    }
-
-}
 #endif // EVENT_H
 
