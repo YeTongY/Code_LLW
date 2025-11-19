@@ -23,7 +23,7 @@
     
     if (firstLine.portraitPath != "nullptr" && !firstLine.portraitPath.empty()) {
         // 尝试多个路径加载头像
-        std::string paths[] = {
+        string paths[] = {
             "../" + firstLine.portraitPath,
             firstLine.portraitPath,
             "../../" + firstLine.portraitPath
