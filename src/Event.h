@@ -3,6 +3,9 @@
 
 #include <string>
 #include <vector>
+#include "GameState.h"
+#include "Dialogue.h"
+#include "Map.h"
 
 using namespace std;
 
@@ -50,16 +53,12 @@ struct GameEvent{
 
     //各事件所需数据
     EventData_Dialogue dialogue;
-    EventData_Portal teleport;
+    EventData_Portal portal;
     //EventData_Combat;
     //EventData_NPC;
 };
 
-
-GameContext CheckAndExecuteEvents(GameContext &ctx){
-    Rectangle playerHitBox = ;//玩家碰撞箱
-
-}
+void CheckAndExecuteEvents(GameContext &ctx);
 
 #endif // EVENT_H
 
