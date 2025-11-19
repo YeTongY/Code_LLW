@@ -3,6 +3,9 @@
 
 #include <string>
 #include <vector>
+#include "GameState.h"
+#include "Dialogue.h"
+#include "Map.h"
 
 using namespace std;
 
@@ -27,7 +30,7 @@ struct EventData_Dialogue{
 
 //2. 传送门专用数据
 struct EventData_Portal{
-    string targetMapPath;//目标地图路径
+    string targetMap;//目标地图路径
     Vector2 targetPosition;//目标坐标
     int facingDir;//目标朝向：见player的枚举
 
@@ -53,9 +56,23 @@ struct GameEvent{
 
 
 GameContext CheckAndExecuteEvents(GameContext &ctx){
-    Rectangle playerHitBox = ;//玩家碰撞箱
+    for(const auto&event : ctx.gameEvents){
+        if(!event.isTrigged){
+            switch(event.EventType){
+                case(DIALOGUE):{
+                    LoadDialogueScript(event.dialogue.scriptPath.c_str());
+                    break;
+                }
+                case(TELEPORT):{
+                    TraceLog(LOG_INFO,"[Event] 传送到地图 %s",event.teleport.targetMap.c_str());
+
+                    //1.切换地图
+                    LoadLevelFromTiled
+                }
+            }
+        }
+    }
 
 }
-
 #endif // EVENT_H
 
