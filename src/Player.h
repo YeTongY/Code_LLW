@@ -1,9 +1,13 @@
 #pragma once
 
 #include "raylib.h"  // 需要 Texture2D 类型定义
+#include <vector>
+using namespace std;
 
 // 前向声明（打破循环依赖）
 struct GameContext;
+
+
 
 typedef enum {//枚举玩家方向
     PLAYER_DIR_DOWN = 0, // 面向下方
@@ -28,6 +32,7 @@ struct Player {//声明玩家主结构体
     bool isMoving;//玩家移动状态
     Vector2 visualPosition;//玩家渲染位置
     Vector2 moveTarget;//玩家目标移动位置
+    vector<int> inputStack;//引入输入栈，以实现后覆盖
 
     Stats stats; // 玩家的属性
     

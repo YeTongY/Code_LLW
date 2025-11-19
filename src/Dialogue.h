@@ -1,9 +1,14 @@
 #pragma once
 #include "raylib.h"
-#include "GameState.h"
 #include "raygui.h"
 #include <fstream>   // 文件流 (ifstream)，用来读取文件
 #include <sstream>   // 字符串流 (stringstream)，用来在内存中处理字符串
+#include <vector>
+#include <string>
+using namespace std;
+
+// 前向声明
+struct GameState;
 
 struct DialogueLine{
     string speaker;

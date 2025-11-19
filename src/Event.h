@@ -3,11 +3,12 @@
 
 #include <string>
 #include <vector>
-#include "GameState.h"
-#include "Dialogue.h"
-#include "Map.h"
+#include "raylib.h"
 
 using namespace std;
+
+// 前向声明
+struct GameContext;
 
 typedef enum{
     NONE = 0,
@@ -44,7 +45,7 @@ struct GameEvent{
     Rectangle area;//触发区域
     bool isOneShot;//是否为一次性的
     bool isTrigged;//是否已被触发
-    int EventType;//见event上面的枚举
+    EventType eventType;//见event上面的枚举
 
 
     //各事件所需数据
