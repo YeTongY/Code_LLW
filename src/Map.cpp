@@ -281,10 +281,9 @@ bool LoadLevelFromTiled(GameContext& ctx, const char* filepath){
                             ctx.tiles[y][x] = TileType::GRASS;
                         }
                     }
-
-                    ctx.tileGIDs.push_back(currentLayerGIDs);
                 }
             }
+            ctx.tileGIDs.push_back(currentLayerGIDs);
         }
     }
 
