@@ -338,16 +338,17 @@ bool LoadLevelFromTiled(GameContext& ctx, const char* filepath){
 
             for(const auto& object : objecLayer.getObjects()){
                 GameEvent event = {};
-                
-                float objX = object.getPosition().x;
-                float objY = object.getPosition().y;
-                float objHeight = object.getAABB().height;
+                event.eventType = DIALOGUE; // 默认事件类型为对话
+
+                EventData_Dialogue dialogueData = {};
 
                 for(const auto& prop : object.getProperties()){
                     if (prop.getName() == "triggerType") event.triggerType = prop.getStringValue();
                     if (prop.getName() == "triggerValue") event.triggerValue = prop.getStringValue();
                     if (prop.getName() == "scriptPath") event.scriptPath = prop.getStringValue();
                 }
+
+                event.dialogue.push_back(dialogueData);
 
                 if(!event.triggerType.empty() && !event.scriptPath.empty()){
                     ctx.gameEvents.push_back(event);
@@ -374,9 +375,13 @@ bool LoadLevelFromTiled(GameContext& ctx, const char* filepath){
             for(const auto& object : objectLayer.getObjects()){
                 // 可以在这里解析传送门对象的属性并创建传送门实体
                 // 目前仅作为占位符
-                EventData_Portal protal = {};
+                GameEvent newPortalEvent = {};
+                newPortalEvent.eventType = TELEPORT; // 设置事件类型为传送
+                newPortalEvent.isTrigged = false;
 
-                protal.bounds = {
+                EventData_Portal portal = {};
+
+                portal.bounds = {
                     object.getPosition().x,
                     object.getPosition().y,
                     object.getAABB().width,
@@ -385,12 +390,14 @@ bool LoadLevelFromTiled(GameContext& ctx, const char* filepath){
 
                 for(const auto& prop : object.getProperties()){
                     // 解析传送门属性
-                    if( prop.getName() == "targetMap") protal.targetMap = prop.getStringValue();
-                    if( prop.getName() == "targetSpawnPoint") protal.targetSpawnPoint = static_cast<float>(prop.getIntValue());
+                    if( prop.getName() == "targetMap") portal.targetMap = prop.getStringValue();
+                    if( prop.getName() == "targetSpawnPoint") portal.targetSpawnPoint = static_cast<float>(prop.getIntValue());
                 }
 
-                if(!protal.targetMap.empty() && !protal.targetSpawnPoint.empty()){
-                    ctx.gameEvents.portal.push_back(protal);
+                newPortalEvent.portal.push_back(portal);
+
+                if(!portal.targetMap.empty() && !portal.targetSpawnPoint.empty()){
+                    ctx.gameEvents.push_back(newPortalEvent);
                 }
             }
 
