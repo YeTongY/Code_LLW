@@ -390,7 +390,7 @@ bool LoadLevelFromTiled(GameContext& ctx, const char* filepath){
                 }
 
                 if(!protal.targetMap.empty() && !protal.targetSpawnPoint.empty()){
-                    ctx.gameEvents.push_back(protal);
+                    ctx.gameEvents.portal.push_back(protal);
                 }
             }
 

@@ -52,8 +52,8 @@ struct GameEvent{
 
 
     //各事件所需数据
-    EventData_Dialogue dialogue;
-    EventData_Portal portal;
+    vector<EventData_Dialogue>  dialogue;
+    vector<EventData_Portal> portal;
     //EventData_Combat;
     //EventData_NPC;
 };
