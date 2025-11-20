@@ -154,7 +154,14 @@ void LoadMapTextures(GameContext& map) {
  */
 bool LoadLevelFromTiled(GameContext& ctx, const char* filepath){
     TraceLog(LOG_INFO, "[Map] 尝试加载地图文件: %s", filepath);
-    
+
+    //卸载旧的tileset纹理
+    for (Texture2D& tex : ctx.tilesetTextures) {
+        if (tex.id != 0) {
+            UnloadTexture(tex);
+        }
+    }
+
     //清理旧的关卡数据
     ctx.tiles.clear();
     ctx.tileGIDs.clear();
@@ -346,6 +353,18 @@ bool LoadLevelFromTiled(GameContext& ctx, const char* filepath){
                     if (prop.getName() == "triggerType") event.triggerType = prop.getStringValue();
                     if (prop.getName() == "triggerValue") event.triggerValue = prop.getStringValue();
                     if (prop.getName() == "scriptPath") event.scriptPath = prop.getStringValue();
+
+                    //解析事件类型
+                    if (prop.getName() == "eventType") {
+                        string typeStr = prop.getStringValue();
+                        if(typeStr == "DIALOGUE") event.eventType = DIALOGUE;
+                        else if(typeStr == "TELEPORT") event.eventType = TELEPORT;
+                        else if(typeStr == "COMBAT") event.eventType = COMBAT;
+                        else {
+                            TraceLog(LOG_WARNING, "[Map] 未知的事件类型: %s", typeStr.c_str());
+                            event.eventType = NONE;
+                        }
+                    }
                 }
 
                 event.dialogue.push_back(dialogueData);
