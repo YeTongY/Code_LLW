@@ -60,6 +60,8 @@ void exploration_update(GameContext* ctx, void* state_data)
     // 包含：键盘输入、碰撞检测、位置更新
     updatePlayer(*ctx);
 
+    //==========开始事件更新============
+    ExecuteEvents(*ctx);
 
 
     // 摄像机在 drawPlayer() 中设置，无需在此更新

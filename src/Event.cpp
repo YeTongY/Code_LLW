@@ -3,60 +3,58 @@
 #include "Dialogue.h"
 #include "Map.h"
 
-
-EventTriggerType CheckEvents(GameContext &ctx, Rectangle area, EventTriggerType type){
+EventTriggerType CheckEvents(GameContext &ctx, Rectangle area, EventTriggerType type)
+{
     Rectangle playerBounds = {
         ctx.player.visualPosition.x,
         ctx.player.visualPosition.y - 32,
         static_cast<float>(32),
-        static_cast<float>(32)
-    };
+        static_cast<float>(32)};
 
     switch (type)
     {
-    case ON_INTERACT:{
-        if(CheckCollisionRecs(playerBounds, area) && IsKeyPressed(KEY_E)){
+    case ON_INTERACT:
+    {
+        if (CheckCollisionRecs(playerBounds, area) && IsKeyPressed(KEY_E))
+        {
             return ON_INTERACT;
         }
         break;
     }
-    case ON_AUTO_START:{
+    case ON_AUTO_START:
+    {
         return ON_AUTO_START;
         break;
     }
-    case ON_ENTER_ZONE:{
-        if(CheckCollisionRecs(playerBounds, area)){
+    case ON_ENTER_ZONE:
+    {
+        if (CheckCollisionRecs(playerBounds, area))
+        {
             return ON_ENTER_ZONE;
         }
         break;
     }
     default:
-        TraceLog(LOG_WARNING,"[Event Checker] 传入的触发类型无效！");
+        TraceLog(LOG_WARNING, "[Event Checker] 传入的触发类型无效！");
         break;
     }
+    return ON_NONE;
 }
 
-
-
-
-
-
-
-
-
-
-
-void ExecuteEvents(GameContext& ctx)
+void ExecuteEvents(GameContext &ctx)
 {
-    for (auto& event : ctx.gameEvents)
+    for (auto &event : ctx.gameEvents)
     {
-        if (event.isTrigged)
+        if (event.isTrigged && event.isOneShot)
         {
             continue;
         }
 
-        switch (event.eventType)
+        if (event.triggerType == CheckEvents(ctx, event.area, event.triggerType))
         {
+
+            switch (event.eventType)
+            {
             case DIALOGUE:
             {
                 if (event.dialogue.empty())
@@ -65,7 +63,7 @@ void ExecuteEvents(GameContext& ctx)
                     break;
                 }
 
-                const std::string& scriptPath = event.dialogue.front().scriptPath;
+                const std::string &scriptPath = event.dialogue.front().scriptPath;
                 if (scriptPath.empty())
                 {
                     TraceLog(LOG_WARNING, "[Event] 对话事件缺少脚本路径，事件无法触发");
@@ -79,21 +77,13 @@ void ExecuteEvents(GameContext& ctx)
                     break;
                 }
 
-                GameState* dialogueState = createDialogueState(script);
+                GameState *dialogueState = createDialogueState(script);
                 if (!dialogueState)
                 {
                     TraceLog(LOG_ERROR, "[Event] 无法创建对话状态: %s", scriptPath.c_str());
                     break;
                 }
 
-                
-
-
-
-
-
-
-                
                 event.isTrigged = true;
                 break;
             }
@@ -106,7 +96,7 @@ void ExecuteEvents(GameContext& ctx)
                     break;
                 }
 
-                const EventData_Portal& portal = event.portal.front();
+                const EventData_Portal &portal = event.portal.front();
                 if (portal.targetMap.empty())
                 {
                     TraceLog(LOG_WARNING, "[Event] 传送事件缺少 targetMap 属性");
@@ -142,6 +132,7 @@ void ExecuteEvents(GameContext& ctx)
             default:
                 TraceLog(LOG_INFO, "[Event] 未实现的事件类型: %d", event.eventType);
                 break;
+            }
         }
     }
 }

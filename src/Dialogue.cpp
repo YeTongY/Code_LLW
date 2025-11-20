@@ -151,7 +151,6 @@ void dialogue_update(GameContext* ctx, void* state_data) {
     }
 }
 
-// 在 Dialogue.cpp 中
 
 void dialogue_render(GameContext* ctx, void* state_data) {
     static int renderCount = 0;

@@ -18,7 +18,8 @@ typedef enum{
 }EventType;
 
 typedef enum{
-    ON_INTERACT = 0, //按E
+    ON_NONE = 0,
+    ON_INTERACT,  //按E
     ON_ENTER_ZONE, //进入触发区域
     ON_AUTO_START //自动触发
 }EventTriggerType;
@@ -43,7 +44,7 @@ struct EventData_Portal{
 
 
 struct GameEvent{
-    string triggerType;//触发条件：npc/zone/auto
+    EventTriggerType triggerType;//触发条件：npc/zone/auto
     string triggerValue;//触发值
     string scriptPath;//脚本路径
     Rectangle area;//触发区域
