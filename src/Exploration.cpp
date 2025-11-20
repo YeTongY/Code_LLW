@@ -67,7 +67,7 @@ void exploration_update(GameContext* ctx, void* state_data)
     // --- 事件处理逻辑 ---
     if (IsKeyPressed(KEY_E)) {
         TraceLog(LOG_INFO, "[Exploration] 按下 E 键，开始检查交互事件...");
-         CheckAndExecuteEvents(*ctx); 
+        //CheckAndExecuteEvents(*ctx); 
         
     }
 

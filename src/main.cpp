@@ -52,13 +52,13 @@ int main(void)
     
     //==========创建游戏上下文==========
     GameContext ctx;
-    TraceLog(LOG_INFO, "[Main] GameContext 创建后，默认尺寸: %.0fx%.0f", ctx.screenWidth, ctx.screenHeight);
+    TraceLog(LOG_INFO, "[Main] GameContext 创建后，默认尺寸: %.0fx%.0f, isRunning=%d", ctx.screenWidth, ctx.screenHeight, ctx.isRunning);
     
     ctx.screenWidth = screenWidth;
     ctx.screenHeight = screenHeight;
     ctx.isRunning = true;
     
-    TraceLog(LOG_INFO, "[Main] 赋值后，屏幕尺寸: %.0fx%.0f", ctx.screenWidth, ctx.screenHeight);
+    TraceLog(LOG_INFO, "[Main] 赋值后，屏幕尺寸: %.0fx%.0f, isRunning=%d", ctx.screenWidth, ctx.screenHeight, ctx.isRunning);
     
     //==========初始化玩家==========
     ctx.player.gridX = 2;  // 修改为安全位置（草地区域）
@@ -73,9 +73,9 @@ int main(void)
     ctx.player.stats.attack = 15;
     ctx.player.stats.defense = 8;
     
-    TraceLog(LOG_INFO, "[Main] 玩家初始化完成 - 位置: (%d, %d), HP: %d/%d", 
+    TraceLog(LOG_INFO, "[Main] 玩家初始化完成 - 位置: (%d, %d), HP: %d/%d, isRunning=%d", 
              ctx.player.gridX, ctx.player.gridY, 
-             ctx.player.stats.hp, ctx.player.stats.maxHp);
+             ctx.player.stats.hp, ctx.player.stats.maxHp, ctx.isRunning);
    
     //===========================从 Tiled 文件加载地图
     // 注意：程序从项目根目录运行，直接使用 res/ 路径
@@ -110,7 +110,7 @@ int main(void)
         return -1;
     }
 
-    TraceLog(LOG_INFO, "[Main] 地图加载成功 - 大小：%dx%d", ctx.width, ctx.height);
+    TraceLog(LOG_INFO, "[Main] 地图加载成功 - 大小：%dx%d, isRunning=%d", ctx.width, ctx.height, ctx.isRunning);
 
     //==========初始化事件==========
     //创建事件
@@ -130,26 +130,28 @@ int main(void)
     
     //==========加载字体==========
     loadGameFont(ctx);
-    TraceLog(LOG_INFO, "[Main] 游戏字体加载完成");
+    TraceLog(LOG_INFO, "[Main] 游戏字体加载完成, isRunning=%d", ctx.isRunning);
     
     //==========加载玩家资源==========
     TraceLog(LOG_INFO, "[Main] 准备加载玩家资源，当前屏幕尺寸: %.0fx%.0f", ctx.screenWidth, ctx.screenHeight);
     LoadPlayerAssets(ctx);
-    TraceLog(LOG_INFO, "[Main] 玩家精灵图加载完成");
+    TraceLog(LOG_INFO, "[Main] 玩家精灵图加载完成, isRunning=%d", ctx.isRunning);
     
     //==========加载UI资源==========
     LoadUIAssets(ctx);
-    TraceLog(LOG_INFO, "[Main] UI资源加载完成");
+    TraceLog(LOG_INFO, "[Main] UI资源加载完成, isRunning=%d", ctx.isRunning);
     
     //==========初始化状态机==========
     GameStateMachine_init(&ctx.state_machine);
-    TraceLog(LOG_INFO, "[Main] 状态机初始化完成");
+    TraceLog(LOG_INFO, "[Main] 状态机初始化完成, isRunning=%d", ctx.isRunning);
     
     //==========创建并进入标题屏幕状态==========
     GameState* titleScreenState = CreateTitleScreenState();//11/18添加标题
     if (titleScreenState) {
+        TraceLog(LOG_INFO, "[Main] 切换状态前 isRunning = %d", ctx.isRunning);
         GameStateMachine_change(&ctx.state_machine, &ctx, titleScreenState);
         TraceLog(LOG_INFO, "[Main] 成功进入标题屏幕状态");
+        TraceLog(LOG_INFO, "[Main] 切换状态后 isRunning = %d", ctx.isRunning);
     } else {
         TraceLog(LOG_ERROR, "[Main] 创建标题屏幕状态失败！");
         CloseWindow();
@@ -177,6 +179,7 @@ int main(void)
     float elapsedTime = 0.0f;
     int frameCount = 0;
 
+    TraceLog(LOG_INFO, "[Main] 准备进入主循环，isRunning = %d, WindowShouldClose = %d", ctx.isRunning, WindowShouldClose());
     while (ctx.isRunning && !WindowShouldClose())
     {
         float deltaTime = GetFrameTime();
