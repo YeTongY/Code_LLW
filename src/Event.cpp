@@ -3,7 +3,50 @@
 #include "Dialogue.h"
 #include "Map.h"
 
-void CheckAndExecuteEvents(GameContext& ctx)
+
+EventTriggerType CheckEvents(GameContext &ctx, Rectangle area, EventTriggerType type){
+    Rectangle playerBounds = {
+        ctx.player.visualPosition.x,
+        ctx.player.visualPosition.y - 32,
+        static_cast<float>(32),
+        static_cast<float>(32)
+    };
+
+    switch (type)
+    {
+    case ON_INTERACT:{
+        if(CheckCollisionRecs(playerBounds, area) && IsKeyPressed(KEY_E)){
+            return ON_INTERACT;
+        }
+        break;
+    }
+    case ON_AUTO_START:{
+        return ON_AUTO_START;
+        break;
+    }
+    case ON_ENTER_ZONE:{
+        if(CheckCollisionRecs(playerBounds, area)){
+            return ON_ENTER_ZONE;
+        }
+        break;
+    }
+    default:
+        TraceLog(LOG_WARNING,"[Event Checker] 传入的触发类型无效！");
+        break;
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+void ExecuteEvents(GameContext& ctx)
 {
     for (auto& event : ctx.gameEvents)
     {
@@ -43,7 +86,14 @@ void CheckAndExecuteEvents(GameContext& ctx)
                     break;
                 }
 
-                GameStateMachine_change(&ctx.state_machine, &ctx, dialogueState);
+                
+
+
+
+
+
+
+                
                 event.isTrigged = true;
                 break;
             }

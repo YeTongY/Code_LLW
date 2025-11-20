@@ -59,7 +59,9 @@ struct GameEvent{
     //EventData_NPC;
 };
 
-void CheckAndExecuteEvents(GameContext &ctx);
+void ExecuteEvents(GameContext &ctx);
+
+EventTriggerType CheckEvents(GameContext &ctx);
 
 #endif // EVENT_H
 
