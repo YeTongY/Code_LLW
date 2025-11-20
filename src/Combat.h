@@ -1,14 +1,16 @@
+//2025/11/19 Warning开始编写战斗模块
 #pragma once
-#include "GameState.h" // 【合同】必须包含 GDD 核心
+#include "GameState.h" 
+#include <string>
 
-/**
- * @brief (P0) 战斗状态的“更新”逻辑
- * @param engine 游戏引擎的引用
- */
-void updateCombat(GameContext& ctx);
+enum CombatPhase
+{
 
-/**
- * @brief (P0) 战斗状态的“绘制”逻辑
- * @param engine 游戏引擎的引用 (const)
- */
-void drawCombat(const GameContext& ctx);
+};
+
+struct CombatData
+{
+
+};
+
+GameState* CreateCombatState();
