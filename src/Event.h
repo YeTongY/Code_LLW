@@ -46,7 +46,6 @@ struct EventData_Portal{
 struct GameEvent{
     EventTriggerType triggerType;//触发条件：npc/zone/auto
     string triggerValue;//触发值
-    string scriptPath;//脚本路径
     Rectangle area;//触发区域
     bool isOneShot;//是否为一次性的
     bool isTrigged;//是否已被触发
