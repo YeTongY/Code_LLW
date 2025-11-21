@@ -1,5 +1,3 @@
-#pragma once
-
 #include "raylib.h"
 #include "Player.h"
 #include "GameState.h"

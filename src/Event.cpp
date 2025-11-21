@@ -5,11 +5,13 @@
 
 EventTriggerType CheckEvents(GameContext &ctx, Rectangle area, EventTriggerType type)
 {
+    float tileSize = ctx.tileSize > 0 ? static_cast<float>(ctx.tileSize) : 32.0f;
+
     Rectangle playerBounds = {
         ctx.player.visualPosition.x,
-        ctx.player.visualPosition.y - 32,
-        static_cast<float>(32),
-        static_cast<float>(32)};
+        ctx.player.visualPosition.y - tileSize,
+        tileSize,
+        tileSize};
 
     switch (type)
     {
@@ -52,7 +54,6 @@ void ExecuteEvents(GameContext &ctx)
 
         if (event.triggerType == CheckEvents(ctx, event.area, event.triggerType))
         {
-
             switch (event.eventType)
             {
             case DIALOGUE:
@@ -60,32 +61,33 @@ void ExecuteEvents(GameContext &ctx)
                 if (event.dialogue.empty())
                 {
                     TraceLog(LOG_WARNING, "[Event] 对话事件未配置对话数据");
-                    break;
+                    continue;
                 }
 
                 const std::string &scriptPath = event.dialogue.front().scriptPath;
                 if (scriptPath.empty())
                 {
                     TraceLog(LOG_WARNING, "[Event] 对话事件缺少脚本路径，事件无法触发");
-                    break;
+                    continue;
                 }
 
                 auto script = LoadDialogueScript(scriptPath.c_str());
                 if (script.empty())
                 {
                     TraceLog(LOG_WARNING, "[Event] 对话脚本为空或加载失败: %s", scriptPath.c_str());
-                    break;
+                    continue;
                 }
 
                 GameState *dialogueState = createDialogueState(script);
                 if (!dialogueState)
                 {
                     TraceLog(LOG_ERROR, "[Event] 无法创建对话状态: %s", scriptPath.c_str());
-                    break;
+                    continue;
                 }
 
+                GameStateMachine_change(&ctx.state_machine, &ctx, dialogueState);
                 event.isTrigged = true;
-                break;
+                continue;
             }
 
             case TELEPORT:
@@ -93,14 +95,14 @@ void ExecuteEvents(GameContext &ctx)
                 if (event.portal.empty())
                 {
                     TraceLog(LOG_WARNING, "[Event] 传送事件缺少目的地数据");
-                    break;
+                    continue;
                 }
 
-                const EventData_Portal &portal = event.portal.front();
+                const EventData_Portal portal = event.portal.front();
                 if (portal.targetMap.empty())
                 {
                     TraceLog(LOG_WARNING, "[Event] 传送事件缺少 targetMap 属性");
-                    break;
+                    continue;
                 }
 
                 TraceLog(LOG_INFO, "[Event] 传送到地图 %s", portal.targetMap.c_str());
@@ -108,30 +110,32 @@ void ExecuteEvents(GameContext &ctx)
                 if (!LoadLevelFromTiled(ctx, portal.targetMap.c_str()))
                 {
                     TraceLog(LOG_ERROR, "[Event] 地图切换失败: %s", portal.targetMap.c_str());
-                    break;
+                    continue;
                 }
 
                 Vector2 teleportPos = portal.targetPosition;
                 if (teleportPos.x == 0.0f && teleportPos.y == 0.0f)
                 {
-                    TraceLog(LOG_WARNING, "[Event] 传送事件未指定 targetPosition，使用玩家当前位置作为兜底");
-                    teleportPos = ctx.player.visualPosition;
+                    teleportPos = {
+                        portal.bounds.x + portal.bounds.width * 0.5f,
+                        portal.bounds.y + portal.bounds.height * 0.5f
+                    };
                 }
 
-                int tileSize = ctx.tileSize > 0 ? ctx.tileSize : 32;
+                float tile = ctx.tileSize > 0 ? static_cast<float>(ctx.tileSize) : 32.0f;
                 ctx.player.visualPosition = teleportPos;
                 ctx.player.moveTarget = teleportPos;
-                ctx.player.gridX = static_cast<int>(teleportPos.x / tileSize);
-                ctx.player.gridY = static_cast<int>(teleportPos.y / tileSize);
+                ctx.player.gridX = static_cast<int>(teleportPos.x / tile);
+                ctx.player.gridY = static_cast<int>(teleportPos.y / tile);
                 ctx.camera.target = teleportPos;
 
-                event.isTrigged = true;
-                break;
+                return;
             }
 
             default:
                 TraceLog(LOG_INFO, "[Event] 未实现的事件类型: %d", event.eventType);
-                break;
+                event.isTrigged = true;
+                continue;
             }
         }
     }

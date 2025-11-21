@@ -5,6 +5,7 @@
 #include "tmxlite/Layer.hpp"
 #include "tmxlite/TileLayer.hpp"
 #include "tmxlite/ObjectGroup.hpp"
+#include "tmxlite/Property.hpp"
 
 #include <iostream>
 #include <fstream>  // 文件操作核心库
@@ -72,13 +73,13 @@ void DrawMap(const GameContext& map) {
 void DrawSingleTile(const GameContext& map, int tileX, int tileY,unsigned int gid) {
     // 获取该位置的 GID
     int tilesetIndex = -1;
-    for(int i = map.tilesetFirstGIDs.size() - 1;i >= 0 ;i--){
-        if(gid >= map.tilesetFirstGIDs[i]){
+    for(int i = static_cast<int>(map.tilesetFirstGIDs.size()) - 1;i >= 0 ;i--){
+        if(gid >= static_cast<unsigned int>(map.tilesetFirstGIDs[i])){
             tilesetIndex = i;
             break;
         }
     }
-    if(tilesetIndex == -1 || tilesetIndex >= map.tilesetTextures.size()) return;
+    if(tilesetIndex == -1 || static_cast<size_t>(tilesetIndex) >= map.tilesetTextures.size()) return;
 
     // 收集本地纹理
     Texture2D tileset = map.tilesetTextures[tilesetIndex];
@@ -346,30 +347,84 @@ bool LoadLevelFromTiled(GameContext& ctx, const char* filepath){
             for(const auto& object : objecLayer.getObjects()){
                 GameEvent event = {};
                 event.eventType = DIALOGUE; // 默认事件类型为对话
+                event.triggerType = ON_NONE;
+                event.isOneShot = false;
 
                 EventData_Dialogue dialogueData = {};
 
                 for(const auto& prop : object.getProperties()){
-                    if (prop.getName() == "triggerType") event.triggerType = prop.getStringValue();
-                    if (prop.getName() == "triggerValue") event.triggerValue = prop.getStringValue();
-                    if (prop.getName() == "scriptPath") event.scriptPath = prop.getStringValue();
+                    const auto propName = prop.getName();
+                    const auto propType = prop.getType();
+
+                    if (propName == "triggerType") {
+                        if (propType == tmx::Property::Type::String) {
+                            string triggerStr = prop.getStringValue();
+                            if (triggerStr == "ON_INTERACT") event.triggerType = ON_INTERACT;
+                            else if (triggerStr == "ON_ENTER_ZONE") event.triggerType = ON_ENTER_ZONE;
+                            else if (triggerStr == "ON_AUTO_START") event.triggerType = ON_AUTO_START;
+                            else {
+                                TraceLog(LOG_WARNING, "[Map] 未知的 triggerType: %s", triggerStr.c_str());
+                                event.triggerType = ON_NONE;
+                            }
+                        } else {
+                            TraceLog(LOG_WARNING, "[Map] triggerType 属性类型不是字符串");
+                        }
+                    }
+                    if (propName == "triggerValue") {
+                        if (propType == tmx::Property::Type::String) {
+                            event.triggerValue = prop.getStringValue();
+                        } else {
+                            TraceLog(LOG_WARNING, "[Map] triggerValue 属性类型不是字符串");
+                        }
+                    }
+                    if (propName == "scriptPath") {
+                        if (propType == tmx::Property::Type::String) {
+                            event.scriptPath = prop.getStringValue();
+                            dialogueData.scriptPath = event.scriptPath;
+                        } else {
+                            TraceLog(LOG_WARNING, "[Map] scriptPath 属性类型不是字符串");
+                        }
+                    }
+                    if (propName == "isOneShot") {
+                        if (propType == tmx::Property::Type::Boolean) {
+                            event.isOneShot = prop.getBoolValue();
+                        } else if (propType == tmx::Property::Type::Int || propType == tmx::Property::Type::Object) {
+                            event.isOneShot = (prop.getIntValue() != 0);
+                        } else if (propType == tmx::Property::Type::String) {
+                            string boolStr = prop.getStringValue();
+                            event.isOneShot = (boolStr == "true" || boolStr == "1");
+                        } else {
+                            TraceLog(LOG_WARNING, "[Map] isOneShot 属性类型不受支持");
+                        }
+                    }
 
                     //解析事件类型
-                    if (prop.getName() == "eventType") {
-                        string typeStr = prop.getStringValue();
-                        if(typeStr == "DIALOGUE") event.eventType = DIALOGUE;
-                        else if(typeStr == "TELEPORT") event.eventType = TELEPORT;
-                        else if(typeStr == "COMBAT") event.eventType = COMBAT;
-                        else {
-                            TraceLog(LOG_WARNING, "[Map] 未知的事件类型: %s", typeStr.c_str());
-                            event.eventType = NONE;
+                    if (propName == "eventType") {
+                        if (propType == tmx::Property::Type::String) {
+                            string typeStr = prop.getStringValue();
+                            if(typeStr == "DIALOGUE") event.eventType = DIALOGUE;
+                            else if(typeStr == "TELEPORT") event.eventType = TELEPORT;
+                            else if(typeStr == "COMBAT") event.eventType = COMBAT;
+                            else {
+                                TraceLog(LOG_WARNING, "[Map] 未知的事件类型: %s", typeStr.c_str());
+                                event.eventType = NONE;
+                            }
+                        } else {
+                            TraceLog(LOG_WARNING, "[Map] eventType 属性类型不是字符串");
                         }
                     }
                 }
 
+                event.area = {
+                    object.getPosition().x,
+                    object.getPosition().y,
+                    object.getAABB().width,
+                    object.getAABB().height
+                };
+
                 event.dialogue.push_back(dialogueData);
 
-                if(!event.triggerType.empty() && !event.scriptPath.empty()){
+                if(event.triggerType != ON_NONE && !event.scriptPath.empty()){
                     ctx.gameEvents.push_back(event);
                 }
             }
@@ -380,8 +435,7 @@ bool LoadLevelFromTiled(GameContext& ctx, const char* filepath){
             const auto& objectLayer = layer->getLayerAs<tmx::ObjectGroup>();
 
             for(const auto& object : objectLayer.getObjects()){
-                // 可以在这里解析NPC对象的属性并创建NPC实体
-                // 目前仅作为占位符
+                (void)object; // 占位，后续将根据需求解析 NPC
             }
 
         }
@@ -395,27 +449,86 @@ bool LoadLevelFromTiled(GameContext& ctx, const char* filepath){
                 // 可以在这里解析传送门对象的属性并创建传送门实体
                 // 目前仅作为占位符
                 GameEvent newPortalEvent = {};
-                newPortalEvent.eventType = TELEPORT; // 设置事件类型为传送
+                newPortalEvent.eventType = TELEPORT;
                 newPortalEvent.isTrigged = false;
+                newPortalEvent.triggerType = ON_ENTER_ZONE;
+                newPortalEvent.isOneShot = true;
 
-                EventData_Portal portal = {};
-
-                portal.bounds = {
+                newPortalEvent.area = {
                     object.getPosition().x,
                     object.getPosition().y,
                     object.getAABB().width,
                     object.getAABB().height
                 };
 
+                EventData_Portal portal = {};
+
+                portal.bounds = newPortalEvent.area;
+
                 for(const auto& prop : object.getProperties()){
-                    // 解析传送门属性
-                    if( prop.getName() == "targetMap") portal.targetMap = prop.getStringValue();
-                    if( prop.getName() == "targetSpawnPoint") portal.targetSpawnPoint = static_cast<float>(prop.getIntValue());
+                    const auto propName = prop.getName();
+                    const auto propType = prop.getType();
+
+                    if( propName == "targetMap" ) {
+                        if (propType == tmx::Property::Type::String) {
+                            portal.targetMap = prop.getStringValue();
+                        } else {
+                            TraceLog(LOG_WARNING, "[Map] targetMap 属性类型不是字符串");
+                        }
+                    }
+                    if( propName == "targetSpawnPoint") {
+                        if (propType == tmx::Property::Type::String) {
+                            portal.targetSpawnPoint = prop.getStringValue();
+                        } else {
+                            TraceLog(LOG_WARNING, "[Map] targetSpawnPoint 属性类型不是字符串");
+                        }
+                    }
+                    if( propName == "targetPosX") {
+                        if (propType == tmx::Property::Type::Float) {
+                            portal.targetPosition.x = prop.getFloatValue();
+                        } else if (propType == tmx::Property::Type::Int || propType == tmx::Property::Type::Object) {
+                            portal.targetPosition.x = static_cast<float>(prop.getIntValue());
+                        } else {
+                            TraceLog(LOG_WARNING, "[Map] targetPosX 属性类型不是数值");
+                        }
+                    }
+                    if( propName == "targetPosY") {
+                        if (propType == tmx::Property::Type::Float) {
+                            portal.targetPosition.y = prop.getFloatValue();
+                        } else if (propType == tmx::Property::Type::Int || propType == tmx::Property::Type::Object) {
+                            portal.targetPosition.y = static_cast<float>(prop.getIntValue());
+                        } else {
+                            TraceLog(LOG_WARNING, "[Map] targetPosY 属性类型不是数值");
+                        }
+                    }
+                    if( propName == "triggerType") {
+                        if (propType == tmx::Property::Type::String) {
+                            string triggerStr = prop.getStringValue();
+                            if (triggerStr == "ON_INTERACT") newPortalEvent.triggerType = ON_INTERACT;
+                            else if (triggerStr == "ON_AUTO_START") newPortalEvent.triggerType = ON_AUTO_START;
+                            else if (triggerStr == "ON_ENTER_ZONE") newPortalEvent.triggerType = ON_ENTER_ZONE;
+                            else TraceLog(LOG_WARNING, "[Map] 未知的传送 triggerType: %s", triggerStr.c_str());
+                        } else {
+                            TraceLog(LOG_WARNING, "[Map] 传送 triggerType 属性类型不是字符串");
+                        }
+                    }
+                    if (propName == "isOneShot") {
+                        if (propType == tmx::Property::Type::Boolean) {
+                            newPortalEvent.isOneShot = prop.getBoolValue();
+                        } else if (propType == tmx::Property::Type::Int || propType == tmx::Property::Type::Object) {
+                            newPortalEvent.isOneShot = (prop.getIntValue() != 0);
+                        } else if (propType == tmx::Property::Type::String) {
+                            string boolStr = prop.getStringValue();
+                            newPortalEvent.isOneShot = (boolStr == "true" || boolStr == "1");
+                        } else {
+                            TraceLog(LOG_WARNING, "[Map] 传送 isOneShot 属性类型不受支持");
+                        }
+                    }
                 }
 
                 newPortalEvent.portal.push_back(portal);
 
-                if(!portal.targetMap.empty() && !portal.targetSpawnPoint.empty()){
+                if(!portal.targetMap.empty()){
                     ctx.gameEvents.push_back(newPortalEvent);
                 }
             }

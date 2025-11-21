@@ -76,11 +76,11 @@ void dialogue_update(GameContext* ctx, void* state_data) {
 
     // 2. 准备当前行的数据
     const DialogueLine& currentLine = data->script[data->currentLineIndex];
-    const int currentLineLength = currentLine.text.length();
+    const size_t currentLineLength = currentLine.text.length();
 
     // 3. 处理用户输入
     if (IsKeyPressed(KEY_SPACE) || IsKeyPressed(KEY_ENTER) || IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
-        if ((int)data->visibleChars < currentLineLength) {
+        if (static_cast<size_t>(data->visibleChars) < currentLineLength) {
             // 意图是“跳过”
             data->skipToEnd = true;
         } else {
@@ -88,7 +88,7 @@ void dialogue_update(GameContext* ctx, void* state_data) {
             string oldPath = currentLine.portraitPath;
             data->currentLineIndex++;
             
-            if (data->currentLineIndex >= data->script.size()) {
+            if (static_cast<size_t>(data->currentLineIndex) >= data->script.size()) {
                 // 对话结束，切换回探索状态
                 TraceLog(LOG_INFO, "[Dialogue] 对话结束，准备返回探索状态");
                 GameState* explorationState = createExplorationState();
@@ -140,12 +140,12 @@ void dialogue_update(GameContext* ctx, void* state_data) {
 
     // 4. 更新打字机动画
     if (data->skipToEnd) {
-        data->visibleChars = currentLineLength;
+        data->visibleChars = static_cast<float>(currentLineLength);
     } else {
-        if (data->visibleChars < currentLineLength) {
+        if (static_cast<size_t>(data->visibleChars) < currentLineLength) {
             data->visibleChars += GetFrameTime() * data->charsPerSecond;
-            if (data->visibleChars > currentLineLength) {
-                data->visibleChars = currentLineLength;
+            if (static_cast<size_t>(data->visibleChars) > currentLineLength) {
+                data->visibleChars = static_cast<float>(currentLineLength);
             }
         }
     }
@@ -179,7 +179,7 @@ void dialogue_render(GameContext* ctx, void* state_data) {
     const string& textToDisplay = currentLine.text;
     const string& speakerToShow = currentLine.speaker;
     const Texture2D& portraitToShow = data->currentPortrait;
-    const int charsToShow = (int)data->visibleChars;
+    const int charsToShow = static_cast<int>(data->visibleChars);
 
     // 5. 调用你的"万能绘制工具"，完成所有UI的绘制
     DrawDialogueWithTemplate(
@@ -301,6 +301,6 @@ vector<DialogueLine> LoadDialogueScript(const char* filepath) {
     }
 
     file.close();
-    TraceLog(LOG_INFO, "[DialogueLoader] 成功加载剧本 '%s'，共 %d 行对话。", filepath, script.size());
+    TraceLog(LOG_INFO, "[DialogueLoader] 成功加载剧本 '%s'，共 %zu 行对话。", filepath, script.size());
     return script;
 }

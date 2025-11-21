@@ -61,8 +61,6 @@ struct GameEvent{
 };
 
 void ExecuteEvents(GameContext &ctx);
-
-EventTriggerType CheckEvents(GameContext &ctx);
-
+EventTriggerType CheckEvents(GameContext &ctx, Rectangle area, EventTriggerType type);
 #endif // EVENT_H
 
