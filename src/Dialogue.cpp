@@ -79,7 +79,7 @@ void dialogue_update(GameContext* ctx, void* state_data) {
     const size_t currentLineLength = currentLine.text.length();
 
     // 3. 处理用户输入
-    if (IsKeyPressed(KEY_SPACE) || IsKeyPressed(KEY_ENTER) || IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+    if (IsKeyPressed(KEY_SPACE) || IsKeyPressed(KEY_ENTER) || IsMouseButtonPressed(MOUSE_LEFT_BUTTON) || IsKeyPressed(KEY_E)) {
         if (static_cast<size_t>(data->visibleChars) < currentLineLength) {
             // 意图是“跳过”
             data->skipToEnd = true;
