@@ -37,8 +37,8 @@ EventTriggerType CheckEvents(GameContext &ctx, Rectangle area, EventTriggerType 
     float tileSize = ctx.tileSize > 0 ? static_cast<float>(ctx.tileSize) : 32.0f;
 
     Rectangle playerBounds = {
-        ctx.player.visualPosition.x,
-        ctx.player.visualPosition.y - tileSize,
+        ctx.player.gridX * tileSize,
+        ctx.player.gridY * tileSize,
         tileSize,
         tileSize};
 
