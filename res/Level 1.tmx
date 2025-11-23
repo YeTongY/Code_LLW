@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="38" height="30" tilewidth="32" tileheight="32" infinite="0" nextlayerid="11" nextobjectid="7">
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="38" height="30" tilewidth="32" tileheight="32" infinite="0" nextlayerid="11" nextobjectid="9">
  <editorsettings>
   <export format="json"/>
  </editorsettings>
@@ -72,8 +72,8 @@
 0,0,0,0,0,0,0,0,0,0,0,545,546,547,548,0,0,0,3345,3346,3347,3348,3349,3350,3351,3352,3353,3354,3355,3356,3357,3358,3359,3360,3361,3362,0,0,
 0,0,0,0,0,0,0,0,0,0,0,561,562,563,564,0,0,0,3377,3378,3379,3380,3381,3382,3383,3384,3385,3386,3387,3388,3389,3390,3391,3392,3393,3394,0,0,
 0,0,0,0,0,0,0,0,0,0,0,577,578,579,580,0,0,0,3409,3410,3411,3412,3413,3414,3415,3416,3417,3418,3419,3420,3421,3422,3423,3424,3425,3426,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3441,3442,3443,3444,3445,3446,3447,3448,3449,3450,3451,3452,3453,3454,3455,3456,3457,3458,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3473,3474,3475,3476,3477,3478,3479,3480,3481,3482,3483,3484,3485,3486,3487,3488,3489,3490,0,0,
+0,0,0,0,0,0,0,0,0,0,672,0,0,0,0,0,0,0,3441,3442,3443,3444,3445,3446,3447,3448,3449,3450,3451,3452,3453,3454,3455,3456,3457,3458,0,0,
+0,0,0,0,0,0,0,0,0,0,688,0,0,0,0,0,0,0,3473,3474,3475,3476,3477,3478,3479,3480,3481,3482,3483,3484,3485,3486,3487,3488,3489,3490,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3505,3506,3507,3508,3509,3510,3511,3512,3513,3514,3515,3516,3517,3518,3519,3520,3521,3522,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3537,3538,3539,3540,3541,3542,3543,3544,3545,3546,3547,3548,3549,3550,3551,3552,3553,3554,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3569,3570,3571,3572,3573,3574,3575,3576,3577,3578,3579,3580,3581,3582,3583,3584,3585,3586,0,0,
@@ -202,6 +202,14 @@
    <property name="triggerValue" value=""/>
   </properties>
   <object id="6" x="416" y="608" width="32" height="32"/>
+  <object id="7" x="320" y="480" width="64" height="64">
+   <properties>
+    <property name="eventType" value="DIALOGUE"/>
+    <property name="isOneShot" type="bool" value="false"/>
+    <property name="scriptPath" value="../res/data/dialogue/test.csv"/>
+    <property name="triggerType" value="ON_INTERACT"/>
+   </properties>
+  </object>
  </objectgroup>
  <objectgroup id="10" name="Portals">
   <properties>
@@ -209,6 +217,14 @@
    <property name="targetSpawnPoint" value=""/>
    <property name="triggerType" value="portal"/>
   </properties>
+  <object id="8" x="64" y="192" width="64" height="64">
+   <properties>
+    <property name="targetMap" value="../res/Level 2.tmx"/>
+    <property name="targetPosX" type="float" value="64"/>
+    <property name="targetPosY" type="float" value="64"/>
+    <property name="triggerType" value="ON_ENTER_ZONE"/>
+   </properties>
+  </object>
  </objectgroup>
  <objectgroup id="3" name="Enemies">
   <object id="5" x="128" y="352" width="32" height="64">

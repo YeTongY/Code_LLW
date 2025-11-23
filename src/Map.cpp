@@ -172,9 +172,43 @@ bool LoadLevelFromTiled(GameContext& ctx, const char* filepath){
     ctx.tilesetFirstGIDs.clear();
     ctx.gameEvents.clear();
 
-    //实现从 Tiled 文件加载地图和敌人数据
-    tmx::Map tiledMap;
+    //路径自动修正逻辑 
+    string originalPath = filepath;
+    vector<string> possiblePaths;
     
+    // 依次尝试：原始路径、上一级、上两级
+    possiblePaths.push_back(originalPath);
+    possiblePaths.push_back("../" + originalPath);
+    possiblePaths.push_back("../../" + originalPath);
+
+    bool loaded = false;
+    tmx::Map tiledMap;
+    string finalPath = "";
+
+    // 循环尝试所有可能的路径
+    for (const auto& path : possiblePaths) {
+        // 使用 raylib 的 FileExists 预检查，防止抛出异常干扰调试
+        if (FileExists(path.c_str())) {
+            try {
+                if(tiledMap.load(path)){
+                    TraceLog(LOG_INFO, "[Map] 成功加载地图: %s", path.c_str());
+                    loaded = true;
+                    finalPath = path;
+                    break;
+                }
+            } catch (...) { continue; }
+        }
+    }
+
+    if(!loaded){
+        TraceLog(LOG_ERROR, "[Map] Tiled 地图加载失败，尝试了以下路径:");
+        for(const auto& p : possiblePaths) TraceLog(LOG_ERROR, "  - %s", p.c_str());
+        TraceLog(LOG_ERROR, "[Map] 当前工作目录: %s", GetWorkingDirectory());
+        return false;
+    }
+    
+    TraceLog(LOG_INFO, "[Map] Tiled 文件解析成功");
+
     try {
         if(!tiledMap.load(filepath)){
             TraceLog(LOG_ERROR, "[Map] Tiled 地图加载失败: %s", filepath);
