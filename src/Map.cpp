@@ -319,6 +319,9 @@ bool LoadLevelFromTiled(GameContext& ctx, const char* filepath){
                         else if(layer->getName() == "Ground" || layer->getName() == "ground"){
                             ctx.tiles[y][x] = TileType::GRASS;
                         }
+                        else if(layer->getName() == "Empty" || layer->getName() == "empty"){
+                            ctx.tiles[y][x] = TileType::GRASS;
+                        }
                         else {
                             // 默认可通行
                             ctx.tiles[y][x] = TileType::GRASS;
