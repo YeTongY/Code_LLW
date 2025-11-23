@@ -96,8 +96,8 @@ void UpdateEnemies(GameContext& ctx){
                 if(distanceToPlayer < enemy.aggroRange){
                     enemy.aiState = AI_STATE_CHASING;       //如果进入索敌范围，自动切换为追击模式
                 }else if(!enemy.isMoving){
-                    float randomX = enemy.patrolCenter.x + GetRandomValue(-enemy.patrolRange, enemy.patrolRange);
-                    float randomY = enemy.patrolCenter.y + GetRandomValue(-enemy.patrolRange, enemy.patrolRange);
+                    float randomX = enemy.patrolCenter.x + GetRandomValue((int)-enemy.patrolRange, (int)enemy.patrolRange);
+                    float randomY = enemy.patrolCenter.y + GetRandomValue((int)-enemy.patrolRange, (int)enemy.patrolRange);
                     // 正确计算随机移动位置
                     enemy.moveTarget = {randomX, randomY};
                     enemy.isMoving = true;
@@ -119,12 +119,29 @@ void UpdateEnemies(GameContext& ctx){
             }
 
             if(enemy.isMoving){
+                Vector2 oldPosition = enemy.visualPosition;
                 //使用跟玩家移动相同的平滑移动逻辑
                 enemy.visualPosition = Vector2MoveTowards(
                     enemy.visualPosition,
                     enemy.moveTarget,
                     enemy.moveSpeed * dt
                 );
+
+                Vector2 movement = Vector2Subtract(enemy.visualPosition, oldPosition);
+
+                if(Vector2Length(movement) > 0.1f){
+                    //更新敌人朝向
+                    if(abs(movement.x) > abs(movement.y)){
+                        //水平移动
+                        enemy.currentDirection = (movement.x > 0) ? ENEMY_DIR_RIGHT : ENEMY_DIR_LEFT;
+                    }else{
+                        //垂直移动
+                        enemy.currentDirection = (movement.y > 0) ? ENEMY_DIR_DOWN : ENEMY_DIR_UP;
+                    }
+                }
+
+                enemy.gridX = (int)(enemy.visualPosition.x + TILE_SIZE/2) / TILE_SIZE;
+                enemy.gridY = (int)(enemy.visualPosition.y + TILE_SIZE/2) / TILE_SIZE;
 
                 //检查是否到达目标位置
                 if(Vector2Distance(enemy.visualPosition, enemy.moveTarget) < 2.0f){

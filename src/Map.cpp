@@ -350,10 +350,16 @@ bool LoadLevelFromTiled(GameContext& ctx, const char* filepath){
 
                 //计算实际位置
                 enemy.gridX = static_cast<int>(objX / ctx.tileSize);
-                enemy.gridY = static_cast<int>((objY + objHeight - 1) / ctx.tileSize);
-                enemy.visualPosition = { (float)enemy.gridX * ctx.tileSize, (float)enemy.gridY * ctx.tileSize };
-                enemy.moveTarget = enemy.visualPosition;
+                enemy.gridY = static_cast<int>(objY / ctx.tileSize);
+                enemy.visualPosition = { objX , objY};
+                enemy.moveTarget = enemy.patrolCenter;
                 enemy.patrolCenter = enemy.visualPosition;
+
+                //默认移动属性
+                enemy.moveSpeed = 60.0f; // 默认移动速度
+                enemy.patrolRange = 100.0f; // 默认巡逻范围
+                enemy.aggroRange = 150.0f; // 默认索敌范围
+                enemy.stats = {100, 100, 10, 5}; // 默认属性：hp, maxHp, attack, defense
 
                 //从tilesMap中获取敌人数据
                 //严肃声明，在tilesmap里面自定义敌人数据的时候，不要修改变量名，将对象层的敌人模块复制粘贴并且仅修改属性值
@@ -363,6 +369,9 @@ bool LoadLevelFromTiled(GameContext& ctx, const char* filepath){
                     if (prop.getName() == "attack") enemy.stats.attack = prop.getIntValue();
                     if (prop.getName() == "defense") enemy.stats.defense = prop.getIntValue();
                     if (prop.getName() == "moveSpeed") enemy.moveSpeed = prop.getFloatValue();
+                    //读取ai逻辑
+                    if (prop.getName() == "patrolRange") enemy.patrolRange = prop.getFloatValue();
+                    if (prop.getName() == "aggroRange") enemy.aggroRange = prop.getFloatValue();
                 }
 
                 //设置其他默认属性
