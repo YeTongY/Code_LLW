@@ -25,6 +25,7 @@ void TitleScreen_render(GameContext* ctx, void* data)
     TitleScreenData* state_data = static_cast<TitleScreenData*>(data);
 
     ClearBackground(BLACK);//=======黑色背景
+    
 
     //=============绘制游戏标题
 

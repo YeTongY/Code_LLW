@@ -128,6 +128,9 @@ struct GameContext
     Texture2D dialogueBoxTexture;
     Texture2D portraitFrameTexture;
 
+    //标题图片
+    Texture2D titleScreen;
+
 
     //静态事件列表
     vector <GameEvent> gameEvents;
