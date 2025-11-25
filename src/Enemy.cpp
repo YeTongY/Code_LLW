@@ -96,11 +96,33 @@ void UpdateEnemies(GameContext& ctx){
                 if(distanceToPlayer < enemy.aggroRange){
                     enemy.aiState = AI_STATE_CHASING;       //如果进入索敌范围，自动切换为追击模式
                 }else if(!enemy.isMoving){
-                    float randomX = enemy.patrolCenter.x + GetRandomValue((int)-enemy.patrolRange, (int)enemy.patrolRange);
-                    float randomY = enemy.patrolCenter.y + GetRandomValue((int)-enemy.patrolRange, (int)enemy.patrolRange);
-                    // 正确计算随机移动位置
-                    enemy.moveTarget = {randomX, randomY};
-                    enemy.isMoving = true;
+
+                    for(int attempt = 0; attempt < 10; ++attempt){
+                        float randomX = enemy.patrolCenter.x + GetRandomValue((int)-enemy.patrolRange, (int)enemy.patrolRange);
+                        float randomY = enemy.patrolCenter.y + GetRandomValue((int)-enemy.patrolRange, (int)enemy.patrolRange);
+
+                        if (randomX < 0 || randomX >= ctx.width * TILE_SIZE || 
+                            randomY < 0 || randomY >= ctx.height * TILE_SIZE){
+                                continue; // 超出地图边界，重新选择
+                        }
+
+                        int targetGridX = (int)(randomX / TILE_SIZE);
+                        int targetGridY = (int)(randomY / TILE_SIZE);
+
+                        if (targetGridY >= 0 && targetGridY < ctx.tiles.size() &&
+                            targetGridX >= 0 && targetGridX < ctx.tiles[targetGridY].size()) {
+                
+                            TileType type = ctx.tiles[targetGridY][targetGridX];
+                
+                            // 只有目标点是 空地(EMPTY) 或 草地(GRASS) 时才移动
+                            if (type != TileType::WALL) {
+                                enemy.moveTarget = {randomX, randomY};
+                                enemy.isMoving = true;
+                                break; // 找到合法点，退出尝试循环
+                            }
+                        }
+                        
+                    }
                 }
                 break;
             case AI_STATE_CHASING://追击模式
@@ -127,32 +149,32 @@ void UpdateEnemies(GameContext& ctx){
                     enemy.moveSpeed * dt
                 );
 
-                Vector2 movement = Vector2Subtract(enemy.visualPosition, oldPosition);
+            Vector2 movement = Vector2Subtract(enemy.visualPosition, oldPosition);
 
-                if(Vector2Length(movement) > 0.1f){
-                    //更新敌人朝向
-                    if(abs(movement.x) > abs(movement.y)){
-                        //水平移动
-                        enemy.currentDirection = (movement.x > 0) ? ENEMY_DIR_RIGHT : ENEMY_DIR_LEFT;
-                    }else{
-                        //垂直移动
-                        enemy.currentDirection = (movement.y > 0) ? ENEMY_DIR_DOWN : ENEMY_DIR_UP;
-                    }
+            if(Vector2Length(movement) > 0.1f){
+                //更新敌人朝向
+                if(abs(movement.x) > abs(movement.y)){
+                    //水平移动
+                    enemy.currentDirection = (movement.x > 0) ? ENEMY_DIR_RIGHT : ENEMY_DIR_LEFT;
+                }else{
+                    //垂直移动
+                    enemy.currentDirection = (movement.y > 0) ? ENEMY_DIR_DOWN : ENEMY_DIR_UP;
                 }
+            }
 
                 enemy.gridX = (int)(enemy.visualPosition.x + TILE_SIZE/2) / TILE_SIZE;
                 enemy.gridY = (int)(enemy.visualPosition.y + TILE_SIZE/2) / TILE_SIZE;
 
                 //检查是否到达目标位置
-                if(Vector2Distance(enemy.visualPosition, enemy.moveTarget) < 2.0f){
-                    //如果没有追击玩家，则停止移动
-                    if(enemy.aiState != AI_STATE_CHASING){
-                        enemy.isMoving = false;
-                        enemy.visualPosition = enemy.moveTarget; // 校准位置
-                    }
+            if(Vector2Distance(enemy.visualPosition, enemy.moveTarget) < 2.0f){
+                //如果没有追击玩家，则停止移动
+                if(enemy.aiState != AI_STATE_CHASING){
+                    enemy.isMoving = false;
+                    enemy.visualPosition = enemy.moveTarget; // 校准位置
                 }
             }
-    }
+        }
+    }    
 }
 
 /**
