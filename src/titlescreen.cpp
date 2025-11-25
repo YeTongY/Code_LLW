@@ -11,6 +11,16 @@ void TitleScreen_enter(GameContext* ctx, void* data)
     TitleScreenData* state_data = static_cast<TitleScreenData*>(data);
     state_data->TitleScreenOption = 0;
 
+    //===============加载标题背景图
+    ctx->titleScreen = LoadTexture(titleScreen_Address);
+    if(ctx->titleScreen.id == 0){
+        TraceLog(LOG_ERROR,"[Title] 加载标题背景图出错！");
+    }
+    else{
+        TraceLog(LOG_INFO,"[Title] 加载标题背景图成功");
+    }
+    //===============加载结束
+
     TraceLog(LOG_INFO,"[Title] 进入标题状态"); 
 }
 
@@ -18,13 +28,20 @@ void TitleScreen_exit(GameContext* ctx, void* data)
 {
     TraceLog(LOG_INFO,"[Title] 退出标题状态");
     //==========后续标题界面的资源在此处卸载
+    UnloadTexture(ctx->titleScreen);
 }
 
 void TitleScreen_render(GameContext* ctx, void* data)
 {
     TitleScreenData* state_data = static_cast<TitleScreenData*>(data);
 
-    ClearBackground(BLACK);//=======黑色背景
+    ClearBackground(BLACK);//=======黑色背景 
+
+    //=============绘制标题背景图
+    Rectangle titlescreen_source ={0,0,2731,1536};
+    Rectangle titlescreen_dest = {0,0,1920,1080};
+
+    DrawTexturePro(ctx->titleScreen,titlescreen_source,titlescreen_dest,{0,0},0.0f,WHITE);
     
 
     //=============绘制游戏标题
