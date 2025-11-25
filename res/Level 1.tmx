@@ -229,14 +229,14 @@
  <objectgroup id="3" name="Enemies">
   <object id="5" x="128" y="352" width="32" height="64">
    <properties>
-    <property name="aggroRange" type="float" value="180"/>
+    <property name="aggroRange" type="float" value="64"/>
     <property name="attack" type="int" value="10"/>
     <property name="defense" type="int" value="5"/>
     <property name="enemyType" value="Enemy_Sprite"/>
     <property name="hp" type="int" value="50"/>
     <property name="maxHp" type="int" value="50"/>
     <property name="moveSpeed" type="float" value="50"/>
-    <property name="patrolRange" type="float" value="100"/>
+    <property name="patrolRange" type="float" value="128"/>
    </properties>
   </object>
  </objectgroup>

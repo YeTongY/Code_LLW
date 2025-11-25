@@ -19,6 +19,6 @@ void TitleScreen_render(GameContext* ctx, void* data);
 GameState* CreateTitleScreenState();
 
 //=========定义标题图片路径
-const char* titleScreen_Address = "../res/graphics/titleScreen/titileScreen.png";
+extern const char* titleScreen_Address;
 
 #endif //TITLESCREENSTATE_H

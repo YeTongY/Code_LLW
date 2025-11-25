@@ -6,6 +6,8 @@
 #include "TitleScreenState.h"
 #include <string>
 
+const char* titleScreen_Address = "../res/graphics/titleScreen/titileScreen.png";
+
 void TitleScreen_enter(GameContext* ctx, void* data)
 {
     TitleScreenData* state_data = static_cast<TitleScreenData*>(data);
