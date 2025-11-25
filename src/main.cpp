@@ -52,6 +52,7 @@ int main(void)
     
     //==========创建游戏上下文==========
     GameContext ctx;
+    ctx.currentCombatant = nullptr;
     TraceLog(LOG_INFO, "[Main] GameContext 创建后，默认尺寸: %.0fx%.0f, isRunning=%d", ctx.screenWidth, ctx.screenHeight, ctx.isRunning);
     
     ctx.screenWidth = screenWidth;

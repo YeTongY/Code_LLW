@@ -43,6 +43,7 @@ void combat_exit(GameContext* ctx, void* state_data)
     
     if (data) {
         data->isActive = false;
+        ctx->currentCombatant = nullptr;
         delete data;
     }
     

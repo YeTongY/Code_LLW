@@ -22,3 +22,22 @@ Taffy,res/graphics/portraits/taffy.png,"你好喵，我是Taffy喵。"
 mmk,res/graphics/portraits/mmk.png,"我是mmk，很高兴见到你！"
 SYSTEM,nullptr,"（这是一个没有头像的旁白...）"
 Taffy,res/graphics/portraits/taffy.png,"看起来我们的剧本加载器要成功了。"
+
+
+攻击
+技能
+防御
+逃跑
+敌人出现了！
+选择你的行动
+回合
+按 ENTER 继续
+Taffy 对 敌人 造成了 %d 点伤害！
+技能系统尚未实现！
+Taffy 进入了防御姿态！
+成功逃脱了！
+逃跑失败了！
+敌人 对 Taffy 造成了 %d 点伤害！
+战斗胜利！
+战斗失败...
+选择你的行动

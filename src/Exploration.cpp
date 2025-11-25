@@ -2,7 +2,9 @@
 #include "Player.h" 
 #include "Map.h"
 #include "raylib.h"
+#include "raymath.h"
 #include "GameState.h"
+#include "Combat.h"
 #include "Dialogue.h"
 #include <cstdlib>
 #include <cstdio>
@@ -13,7 +15,38 @@
 
 
 const int TILE_SIZE = 32; // 与 Player.cpp 保持一致
+//===========================================2025/11/25新增配合combat模块的函数
+static void TryTriggerCombat(GameContext* ctx)
+{
+    if (!ctx) return;
 
+    const float triggerDistance = ctx->tileSize > 0 ? ctx->tileSize * 0.75f : TILE_SIZE * 0.75f;
+    const float triggerDistanceSq = triggerDistance * triggerDistance;
+    const Vector2 playerPos = ctx->player.visualPosition;
+
+    for (Enemy& enemy : ctx->enemies)
+    {
+        if (!enemy.isActive) continue;
+
+        const float distanceSq = Vector2DistanceSqr(playerPos, enemy.visualPosition);
+        if (distanceSq > triggerDistanceSq) continue;
+
+        ctx->currentCombatant = &enemy;
+        GameState* combatState = CreateCombatState(&enemy);
+        if (combatState)
+        {
+            TraceLog(LOG_INFO, "[Exploration] 触发与敌人(%d,%d)的战斗", enemy.gridX, enemy.gridY);
+            GameStateMachine_change(&ctx->state_machine, ctx, combatState);
+        }
+        else
+        {
+            TraceLog(LOG_ERROR, "[Exploration] 创建战斗状态失败，重置 currentCombatant");
+            ctx->currentCombatant = nullptr;
+        }
+        break;
+    }
+}
+//=============================================================================
 //==========================探索状态实现
 
 void exploration_enter(GameContext* ctx, void* state_data)
@@ -60,6 +93,7 @@ void exploration_update(GameContext* ctx, void* state_data)
     // 包含：键盘输入、碰撞检测、位置更新
     updatePlayer(*ctx);
     UpdateEnemies(*ctx);
+    TryTriggerCombat(ctx);
 
     //==========开始事件更新============
     ExecuteEvents(*ctx);
