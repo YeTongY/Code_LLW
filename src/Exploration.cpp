@@ -59,6 +59,7 @@ void exploration_update(GameContext* ctx, void* state_data)
     //======核心：直接调用 Player 模块的更新函数======
     // 包含：键盘输入、碰撞检测、位置更新
     updatePlayer(*ctx);
+    UpdateEnemies(*ctx);
 
     //==========开始事件更新============
     ExecuteEvents(*ctx);

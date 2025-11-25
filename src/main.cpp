@@ -136,6 +136,10 @@ int main(void)
     TraceLog(LOG_INFO, "[Main] 准备加载玩家资源，当前屏幕尺寸: %.0fx%.0f", ctx.screenWidth, ctx.screenHeight);
     LoadPlayerAssets(ctx);
     TraceLog(LOG_INFO, "[Main] 玩家精灵图加载完成, isRunning=%d", ctx.isRunning);
+
+    //==========加载敌人资源==========
+    LoadEnemyAssets(ctx);
+    TraceLog(LOG_INFO, "[Main] 敌人资源加载完成, isRunning=%d", ctx.isRunning);
     
     //==========加载UI资源==========
     LoadUIAssets(ctx);

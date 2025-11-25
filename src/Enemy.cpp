@@ -30,20 +30,20 @@ void DrawEnemy(const GameContext& ctx){
             switch (enemy.currentDirection)
             {
                 //第 1 帧 (x=0) 
-                case ENEMY_DIR_LEFT:
+                case ENEMY_DIR_RIGHT:
                     source.x = 0.0f;   // 0 * 32
                     break;
             
                 //第 2 帧 (x=32) 
-                case ENEMY_DIR_DOWN:
+                case ENEMY_DIR_UP:
                     source.x = 32.0f;  // 1 * 32
                     break;                
                 //第 3 帧 (x=64) 
-                case ENEMY_DIR_RIGHT:
+                case ENEMY_DIR_LEFT:
                     source.x = 64.0f;  // 2 * 32
                     break;
                 //第 4 帧 (x=96) 
-                case ENEMY_DIR_UP:
+                case ENEMY_DIR_DOWN:
                     source.x = 96.0f;  // 3 * 32
                     break;
         
