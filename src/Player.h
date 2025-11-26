@@ -2,11 +2,28 @@
 
 #include "raylib.h"  // 需要 Texture2D 类型定义
 #include <vector>
+#include <algorithm>
+
 using namespace std;
 
 // 前向声明（打破循环依赖）
 struct GameContext;
 
+
+// 定义实体类型
+typedef enum  {
+    ENTITY_PLAYER,
+    ENTITY_ENEMY,
+    ENTITY_NPC,
+    ENTITY_PROP // 比如树木、柱子等
+}EntityType;
+
+// 渲染命令结构体
+struct RenderEntity {
+    EntityType type;    // 类型：决定调用哪个绘制函数
+    void* data;         // 指针：指向原始数据（如 Player* 或 Enemy*）
+    float sortY;        // 排序依据：通常是物体脚底的 Y 坐标
+};
 
 
 typedef enum {//枚举玩家方向
