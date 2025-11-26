@@ -4,11 +4,135 @@
 #include "Enemy.h"
 #include "raymath.h"// 包含向量数学函数
 #include <vector>
+#include <cmath>
 
 const int TILE_SIZE = 32;//标准图块大小
 const char* enemySpriteAddress = "res/graphics/enemy/Enemy_Sprite.png";//敌人精灵位置
 
 using namespace std;
+
+namespace {
+
+Vector2 GridToWorld(int gridX, int gridY)
+{
+    return { gridX * (float)TILE_SIZE, gridY * (float)TILE_SIZE };
+}
+
+bool IsInsideMap(const GameContext& ctx, int gridX, int gridY)
+{
+    return gridY >= 0 && gridY < (int)ctx.tiles.size() &&
+           gridX >= 0 && !ctx.tiles.empty() && gridX < (int)ctx.tiles[gridY].size();
+}
+
+bool IsTileWalkable(const GameContext& ctx, int gridX, int gridY)
+{
+    if (!IsInsideMap(ctx, gridX, gridY)) {
+        return false;
+    }
+
+    TileType type = ctx.tiles[gridY][gridX];
+    return type == TileType::EMPTY || type == TileType::GRASS;
+}
+
+EnemyDirection DirectionFromDelta(int dx, int dy)
+{
+    if (dx > 0) return ENEMY_DIR_RIGHT;
+    if (dx < 0) return ENEMY_DIR_LEFT;
+    if (dy > 0) return ENEMY_DIR_DOWN;
+    return ENEMY_DIR_UP;
+}
+
+bool StartMoveToTile(Enemy& enemy, const GameContext& ctx, int nextGridX, int nextGridY)
+{
+    int diff = abs(nextGridX - enemy.gridX) + abs(nextGridY - enemy.gridY);
+    if (diff != 1 || !IsTileWalkable(ctx, nextGridX, nextGridY)) {
+        return false;
+    }
+
+    enemy.moveTarget = GridToWorld(nextGridX, nextGridY);
+    enemy.isMoving = true;
+    enemy.currentDirection = DirectionFromDelta(nextGridX - enemy.gridX, nextGridY - enemy.gridY);
+    return true;
+}
+
+bool TryStepToward(Enemy& enemy, const GameContext& ctx, int targetGridX, int targetGridY)
+{
+    int dx = targetGridX - enemy.gridX;
+    int dy = targetGridY - enemy.gridY;
+
+    if (dx == 0 && dy == 0) {
+        return false;
+    }
+
+    // 根据距离大小优先在差值更大的轴上移动
+    vector<Vector2> tryOrder;
+    if (abs(dx) >= abs(dy) && dx != 0) {
+        tryOrder.push_back({ (float)(dx > 0 ? 1 : -1), 0 });
+    }
+    if (dy != 0) {
+        tryOrder.push_back({ 0, (float)(dy > 0 ? 1 : -1) });
+    }
+    if (abs(dy) > abs(dx) && dx != 0) {
+        tryOrder.push_back({ (float)(dx > 0 ? 1 : -1), 0 });
+    }
+
+    for (const Vector2& dir : tryOrder) {
+        int nextX = enemy.gridX + (int)dir.x;
+        int nextY = enemy.gridY + (int)dir.y;
+        if (StartMoveToTile(enemy, ctx, nextX, nextY)) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+bool TryPatrolStep(Enemy& enemy, const GameContext& ctx)
+{
+    // 在四方向中随机挑选一个方向尝试移动
+    const Vector2 dirs[4] = { {0, -1}, {0, 1}, {-1, 0}, {1, 0} };
+    int startIndex = GetRandomValue(0, 3);
+    int centerGridX = (int)(enemy.patrolCenter.x / TILE_SIZE);
+    int centerGridY = (int)(enemy.patrolCenter.y / TILE_SIZE);
+    int patrolRadiusTiles = (int)(enemy.patrolRange / TILE_SIZE);
+
+    for (int attempt = 0; attempt < 4; ++attempt) {
+        int idx = (startIndex + attempt) % 4;
+        int nextX = enemy.gridX + (int)dirs[idx].x;
+        int nextY = enemy.gridY + (int)dirs[idx].y;
+
+        if (patrolRadiusTiles > 0) {
+            if (abs(nextX - centerGridX) > patrolRadiusTiles ||
+                abs(nextY - centerGridY) > patrolRadiusTiles) {
+                continue;
+            }
+        }
+
+        if (StartMoveToTile(enemy, ctx, nextX, nextY)) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+void UpdateEnemyMovement(Enemy& enemy, float dt)
+{
+    if (!enemy.isMoving) {
+        return;
+    }
+
+    enemy.visualPosition = Vector2MoveTowards(enemy.visualPosition, enemy.moveTarget, enemy.moveSpeed * dt);
+
+    if (Vector2Distance(enemy.visualPosition, enemy.moveTarget) < 1.0f) {
+        enemy.visualPosition = enemy.moveTarget;
+        enemy.isMoving = false;
+        enemy.gridX = (int)(enemy.moveTarget.x / TILE_SIZE);
+        enemy.gridY = (int)(enemy.moveTarget.y / TILE_SIZE);
+    }
+}
+
+}
 
 /**
  * @brief 在地图上绘制敌人
@@ -88,91 +212,36 @@ void UpdateEnemies(GameContext& ctx){
 
     for(Enemy& enemy : ctx.enemies){
         if(!enemy.isActive) continue; 
-            float distanceToPlayer = Vector2Distance(enemy.visualPosition, ctx.player.visualPosition); // 计算敌人与玩家之间的距离
 
-            switch (enemy.aiState)//切换敌人AI状态
-            {
-            case AI_STATE_PATROL://巡逻模式
-                if(distanceToPlayer < enemy.aggroRange){
-                    enemy.aiState = AI_STATE_CHASING;       //如果进入索敌范围，自动切换为追击模式
-                }else if(!enemy.isMoving){
+        float distanceToPlayer = Vector2Distance(enemy.visualPosition, ctx.player.visualPosition); // 计算敌人与玩家之间的距离
 
-                    for(int attempt = 0; attempt < 10; ++attempt){
-                        float randomX = enemy.patrolCenter.x + GetRandomValue((int)-enemy.patrolRange, (int)enemy.patrolRange);
-                        float randomY = enemy.patrolCenter.y + GetRandomValue((int)-enemy.patrolRange, (int)enemy.patrolRange);
+        if(enemy.aiState == AI_STATE_PATROL && distanceToPlayer < enemy.aggroRange){
+            enemy.aiState = AI_STATE_CHASING;
+        }else if(enemy.aiState == AI_STATE_CHASING && distanceToPlayer > enemy.aggroRange * 1.5f){
+            enemy.aiState = AI_STATE_PATROL;
+        }
 
-                        if (randomX < 0 || randomX >= ctx.width * TILE_SIZE || 
-                            randomY < 0 || randomY >= ctx.height * TILE_SIZE){
-                                continue; // 超出地图边界，重新选择
-                        }
+        UpdateEnemyMovement(enemy, dt);
+        if(enemy.isMoving){
+            continue; // 正在移动时不尝试新的目标
+        }
 
-                        int targetGridX = (int)(randomX / TILE_SIZE);
-                        int targetGridY = (int)(randomY / TILE_SIZE);
+        bool startedMove = false;
+        if(enemy.aiState == AI_STATE_CHASING){
+            startedMove = TryStepToward(enemy, ctx, ctx.player.gridX, ctx.player.gridY);
+        }else{
+            startedMove = TryPatrolStep(enemy, ctx);
 
-                        if (targetGridY >= 0 && targetGridY < ctx.tiles.size() &&
-                            targetGridX >= 0 && targetGridX < ctx.tiles[targetGridY].size()) {
-                
-                            TileType type = ctx.tiles[targetGridY][targetGridX];
-                
-                            // 只有目标点是 空地(EMPTY) 或 草地(GRASS) 时才移动
-                            if (type != TileType::WALL) {
-                                enemy.moveTarget = {randomX, randomY};
-                                enemy.isMoving = true;
-                                break; // 找到合法点，退出尝试循环
-                            }
-                        }
-                        
-                    }
-                }
-                break;
-            case AI_STATE_CHASING://追击模式
-
-                if(distanceToPlayer > enemy.aggroRange * 1.5f){
-                    enemy.aiState = AI_STATE_PATROL;       //如果玩家离开索敌范围，切换回巡逻模式
-                    enemy.moveTarget = enemy.patrolCenter; // 返回巡逻中心
-                    enemy.isMoving = true;
-                }else {
-                    enemy.moveTarget = ctx.player.visualPosition;   //更新移动目标为玩家位置
-                    enemy.isMoving = true;
-                }
-                break;
-            default:
-                break;
+            if(!startedMove){
+                //回中心点保证在巡逻范围内缓慢移动
+                int centerGridX = (int)(enemy.patrolCenter.x / TILE_SIZE);
+                int centerGridY = (int)(enemy.patrolCenter.y / TILE_SIZE);
+                startedMove = TryStepToward(enemy, ctx, centerGridX, centerGridY);
             }
+        }
 
-            if(enemy.isMoving){
-                Vector2 oldPosition = enemy.visualPosition;
-                //使用跟玩家移动相同的平滑移动逻辑
-                enemy.visualPosition = Vector2MoveTowards(
-                    enemy.visualPosition,
-                    enemy.moveTarget,
-                    enemy.moveSpeed * dt
-                );
-
-            Vector2 movement = Vector2Subtract(enemy.visualPosition, oldPosition);
-
-            if(Vector2Length(movement) > 0.1f){
-                //更新敌人朝向
-                if(abs(movement.x) > abs(movement.y)){
-                    //水平移动
-                    enemy.currentDirection = (movement.x > 0) ? ENEMY_DIR_RIGHT : ENEMY_DIR_LEFT;
-                }else{
-                    //垂直移动
-                    enemy.currentDirection = (movement.y > 0) ? ENEMY_DIR_DOWN : ENEMY_DIR_UP;
-                }
-            }
-
-                enemy.gridX = (int)(enemy.visualPosition.x + TILE_SIZE/2) / TILE_SIZE;
-                enemy.gridY = (int)(enemy.visualPosition.y + TILE_SIZE/2) / TILE_SIZE;
-
-                //检查是否到达目标位置
-            if(Vector2Distance(enemy.visualPosition, enemy.moveTarget) < 2.0f){
-                //如果没有追击玩家，则停止移动
-                if(enemy.aiState != AI_STATE_CHASING){
-                    enemy.isMoving = false;
-                    enemy.visualPosition = enemy.moveTarget; // 校准位置
-                }
-            }
+        if(!startedMove){
+            enemy.moveTarget = GridToWorld(enemy.gridX, enemy.gridY); // 保持对齐
         }
     }    
 }

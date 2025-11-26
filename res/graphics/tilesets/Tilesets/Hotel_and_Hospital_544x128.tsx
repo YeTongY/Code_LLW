@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tileset version="1.10" tiledversion="1.10.2" name="Hotel_and_Hospital_544x128" tilewidth="544" tileheight="128" tilecount="2" columns="2">
+  <image source="Hotel_and_Hospital_544x128_tilesheet.png" width="1088" height="128"/>
+</tileset>

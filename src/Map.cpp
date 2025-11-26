@@ -323,8 +323,11 @@ bool LoadLevelFromTiled(GameContext& ctx, const char* filepath){
                             ctx.tiles[y][x] = TileType::GRASS;
                         }
                         else {
-                            // 默认可通行
-                            ctx.tiles[y][x] = TileType::GRASS;
+                            // 如果是墙壁，则不修改为草地
+                            if(ctx.tiles[y][x] != TileType::WALL){
+                                ctx.tiles[y][x] = TileType::GRASS;
+                            }
+                            
                         }
                     }
                 }
@@ -352,8 +355,8 @@ bool LoadLevelFromTiled(GameContext& ctx, const char* filepath){
                 enemy.gridX = static_cast<int>(objX / ctx.tileSize);
                 enemy.gridY = static_cast<int>(objY / ctx.tileSize);
                 enemy.visualPosition = { objX , objY};
-                enemy.moveTarget = enemy.patrolCenter;
                 enemy.patrolCenter = enemy.visualPosition;
+                enemy.moveTarget = enemy.visualPosition;
 
                 //默认移动属性
                 enemy.moveSpeed = 60.0f; // 默认移动速度
