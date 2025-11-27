@@ -2,9 +2,32 @@
 #include "raylib.h"
 #include "Map.h"//TODO 需等待map完成
 #include "raymath.h"
+#include <algorithm>
 
 const int TILE_SIZE = 32;//标准图块大小
 const char* playerSpriteAddress = "res/graphics/player/Pixel_Taffy/Pixel_Taffy_Sprite.png";//玩家精灵位置
+
+
+//辅助函数，用于比较两个实体的y坐标
+bool CompareEntities(const RenderEntity& a, const RenderEntity& b){
+    return a.sortY < b.sortY;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 /**
  * @brief (P1) 加载玩家所需的美术资源 (贴图)
@@ -150,7 +173,7 @@ void updatePlayer(GameContext& ctx){
         // 如果刚刚按下了某个键
         if (IsKeyPressed(key)) {
             // 先尝试从栈中移除它（防止重复），确保它被放到最末尾
-            for (size_t i = 0; i < ctx.player.inputStack.size(); ) {
+            for (int i = 0; i < ctx.player.inputStack.size(); ) {
                 if (ctx.player.inputStack[i] == key) {
                     ctx.player.inputStack.erase(ctx.player.inputStack.begin() + i);
                 } else {
@@ -164,7 +187,7 @@ void updatePlayer(GameContext& ctx){
         // 如果松开了某个键
         if (IsKeyReleased(key)) {
             // 从栈中移除
-            for (size_t i = 0; i < ctx.player.inputStack.size(); ) {
+            for (int i = 0; i < ctx.player.inputStack.size(); ) {
                 if (ctx.player.inputStack[i] == key) {
                     ctx.player.inputStack.erase(ctx.player.inputStack.begin() + i);
                 } else {
@@ -176,7 +199,7 @@ void updatePlayer(GameContext& ctx){
 
     // 【安全检查】清理那些实际上没有被按住的键
     // (防止因窗口切换等原因导致的“卡键”现象)
-    for (size_t i = 0; i < ctx.player.inputStack.size(); ) {
+    for (int i = 0; i < ctx.player.inputStack.size(); ) {
         if (!IsKeyDown(ctx.player.inputStack[i])) {
             ctx.player.inputStack.erase(ctx.player.inputStack.begin() + i);
         } else {
@@ -301,7 +324,7 @@ void DrawPlayerSprite(const Player& player)
 
 
 /**
- * @brief 场景渲染总指挥（按 GDD v3.13 两步走方案）
+ * @brief 场景渲染总指挥
  * 
  * @param ctx Gamestate里的GameContext核心数据文件
  * 
@@ -343,12 +366,30 @@ void DrawMapScene(const GameContext& ctx){
         ClearBackground(RAYWHITE);
         BeginMode2D(camera); // 在纹理中应用相同的摄像机
     }
+    //=============开始地图渲染================
+
+
+
+
+
+
+
 
     // 按 2.5D 顺序绘制地图和实体
     DrawGroundLayers(ctx);
     DrawYSortLayer(ctx);
     DrawOverheadLayers(ctx);
 
+
+
+
+
+
+
+
+
+
+    //=============结束地图渲染================
     if(useShader) {
         EndMode2D(); // 结束纹理中的摄像机
         EndTextureMode(); // 结束渲染到纹理
@@ -374,9 +415,61 @@ void DrawMapScene(const GameContext& ctx){
         BeginMode2D(camera);
     }
 
-    // 实体已经在 DrawYSortLayer 中处理
+    // ============开始玩家和敌人绘制===============
+    
 
-    //结束角色渲染，恢复到正常尺寸以备之后绘制ui
+    //0.绘制地板
+    //TODO DrawMapLayer(Type_Ground);
+
+    //1.创建渲染列表
+    vector<RenderEntity> renderList;
+
+    //2.将玩家加入渲染列表
+    renderList.push_back({ENTITY_PLAYER, (void*)&ctx.player, ctx.player.visualPosition.y + 64.0f});
+
+    //3.将所有敌人加入渲染列表
+    for(const auto& enemy: ctx.enemies){
+        if(enemy.isActive){
+            renderList.push_back({ENTITY_ENEMY, (void*)&enemy, enemy.visualPosition.y +64.0f});
+        }
+    }
+    
+    //TODO 将墙壁等加入渲染列表
+
+    //4.开始排序
+
+    sort(renderList.begin(),renderList.end(),[](const RenderEntity& a, const RenderEntity& b){
+        return a.sortY < b.sortY;
+    });
+    
+    
+    //5.开始绘制
+    for(const auto& item: renderList){
+        if(item.type == ENTITY_PLAYER){
+            const Player* p = (const Player*)item.data;
+            DrawPlayerSprite(*p);
+        }
+        else if(item.type == ENTITY_ENEMY){
+            const Enemy* e = (const Enemy*)item.data;
+            DrawEnemySprite(ctx, *e);
+        }
+        //TODO 添加墙壁类型判断 else if
+
+    }
+    
+    // 6. 最后画屋顶 (Foreground层)，永远盖在头顶
+    //TODO DrawMapLayer(ctx, "Roof");
+    
+    
+    
+    
+
+
+    
+    
+    
+    
+    // ============结束玩家和敌人绘制===============
     EndMode2D();
     //------结束角色摄像机绘制------
 

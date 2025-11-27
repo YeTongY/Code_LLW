@@ -41,7 +41,7 @@ struct Enemy {//声明敌人主结构体
     EnemyDirection currentDirection; // 敌人"当前"的方向
 };
 
-void DrawEnemy(const GameContext& ctx);                                                 // 在地图上绘制敌人
+void DrawEnemySprite(const GameContext &ctx, const Enemy &enemy);                                                 // 在地图上绘制敌人
 void LoadEnemyAssets(GameContext& ctx);                                                 // 加载敌人贴图
 void UnloadEnemyAssets(GameContext& ctx);                                               // 卸载敌人贴图
 void UpdateEnemies(GameContext& ctx);                                                   // 更新敌人状态
