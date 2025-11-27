@@ -29,6 +29,9 @@ typedef enum {
 void CleanupMap(GameContext& map);                                          //清理地图资源
 void LoadMapTextures(GameContext& map);                                     //加载图块集
 void DrawMap(const GameContext& map);                                       //绘图
+void DrawGroundLayers(const GameContext& map);
+void DrawYSortLayer(const GameContext& map);
+void DrawOverheadLayers(const GameContext& map);
 void DrawSingleTile(const GameContext& map, int tileX, int tileY,unsigned int gid);          //绘制单个块
 bool UpdateMap(GameContext& map);                                           //更新地图
 

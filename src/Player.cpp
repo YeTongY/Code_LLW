@@ -344,8 +344,10 @@ void DrawMapScene(const GameContext& ctx){
         BeginMode2D(camera); // 在纹理中应用相同的摄像机
     }
 
-    //绘制地图（如果使用滤镜，会渲染到纹理；否则直接到屏幕）
-    DrawMap(ctx);
+    // 按 2.5D 顺序绘制地图和实体
+    DrawGroundLayers(ctx);
+    DrawYSortLayer(ctx);
+    DrawOverheadLayers(ctx);
 
     if(useShader) {
         EndMode2D(); // 结束纹理中的摄像机
@@ -372,11 +374,7 @@ void DrawMapScene(const GameContext& ctx){
         BeginMode2D(camera);
     }
 
-    // ====== P1 实体绘制区域（按 GDD v3.13 架构） ======
-    DrawPlayerSprite(ctx.player);
-    DrawEnemy(ctx);
-    
-    // TODO: 未来添加敌人绘制和 Y-Sorting
+    // 实体已经在 DrawYSortLayer 中处理
 
     //结束角色渲染，恢复到正常尺寸以备之后绘制ui
     EndMode2D();
