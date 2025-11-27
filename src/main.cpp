@@ -61,8 +61,8 @@ int main(void)
     TraceLog(LOG_INFO, "[Main] 赋值后，屏幕尺寸: %.0fx%.0f, isRunning=%d", ctx.screenWidth, ctx.screenHeight, ctx.isRunning);
     
     //==========初始化玩家==========
-    ctx.player.gridX = 2;  // 修改为安全位置（草地区域）
-    ctx.player.gridY = 2;  // 修改为安全位置（草地区域）
+    ctx.player.gridX = 1;  // 修改为安全位置（草地区域）
+    ctx.player.gridY = 26;  // 修改为安全位置（草地区域）
     ctx.player.currentDirection = PLAYER_DIR_DOWN; // 【P1 修复】默认朝下，防止未初始化导致的花屏 Bug
     ctx.player.moveSpeed = 200.0f; // 移动速度：200像素/秒
     ctx.player.isMoving = false;   // 初始状态：静止
@@ -80,9 +80,9 @@ int main(void)
     //===========================从 Tiled 文件加载地图
     // 注意：程序从项目根目录运行，直接使用 res/ 路径
     const char* possiblePaths[] = {
-        "res/Level 1.tmx",
-        "../res/Level 1.tmx",
-        "../../res/Level 1.tmx"
+        "res/Level 0.tmx",
+        "../res/Level 0.tmx",
+        "../../res/Level 0.tmx"
     };
     
     bool mapLoaded = false;

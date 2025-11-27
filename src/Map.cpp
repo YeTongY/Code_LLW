@@ -8,13 +8,12 @@
 #include "tmxlite/Property.hpp"
 
 #include <iostream>
-#include <fstream>  // 文件操作核心库
-#include <vector>   // 用vector存储地图的行（动态数组，比普通数组灵活）
-#include <string>   // 存储每行的字符串
-#include <set>
-#include <functional>
-#include <algorithm>
-
+#include <fstream>      // 文件操作核心库
+#include <vector>       // 用vector存储地图的行（动态数组，比普通数组灵活）
+#include <string>       // 存储每行的字符串
+#include <set>          // 用set避免重复卸载纹理
+#include <functional>   // 用于存储可调用对象
+#include <algorithm>    // 用于排序渲染项
 using namespace std;
 
 /**
@@ -47,27 +46,35 @@ enum class TiledLayerType {
     YSort,
     Overhead,
     Ignored
-};
+};//辅助函数，根据图层名称分类
 
+
+
+// 根据图层名称分类
 TiledLayerType ClassifyLayer(const std::string& name)
 {
     if(name == "Ground" || name == "ground" || name == "Background" || name == "background"){
         return TiledLayerType::Ground;
+        //地面层
     }
     if(name == "Overhead" || name == "overhead" || name == "Foreground" || name == "foreground"){
         return TiledLayerType::Overhead;
+        //天花板层
     }
     if(name == "Collision" || name == "collision" || name == "Tree" || name == "Enemy" || name == "NPC" || name == "Objects" || name == "Wall"){
         return TiledLayerType::YSort;
+        //墙壁层
     }
     return TiledLayerType::Ignored;
 }
 
+//  辅助结构体，用于存储可排序的渲染项
 struct SortedRenderable {
     float sortKey;
     std::function<void()> draw;
 };
 
+// 绘制图层列表的辅助函数
 void DrawLayerList(const GameContext& map, const vector<vector<vector<unsigned int>>>& layers)
 {
     for(const auto& layerGIDs : layers){
@@ -84,11 +91,13 @@ void DrawLayerList(const GameContext& map, const vector<vector<vector<unsigned i
 
 }
 
+//绘制地板层
 void DrawGroundLayers(const GameContext& map)
 {
     DrawLayerList(map, map.groundLayers);
 }
 
+//绘制Y排序层
 void DrawYSortLayer(const GameContext& map)
 {
     vector<SortedRenderable> sortedDrawables;
@@ -146,6 +155,7 @@ void DrawYSortLayer(const GameContext& map)
     }
 }
 
+//绘制前景层
 void DrawOverheadLayers(const GameContext& map)
 {
     DrawLayerList(map, map.overheadLayers);
