@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tileset version="1.10" tiledversion="1.10.2" name="Police_Station_160x160" tilewidth="160" tileheight="160" tilecount="1" columns="1">
+  <image source="Police_Station_160x160_tilesheet.png" width="160" height="160"/>
+</tileset>

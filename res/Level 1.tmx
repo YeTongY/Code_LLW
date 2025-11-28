@@ -18,6 +18,75 @@
  <tileset firstgid="3121" name="24_Additional_Houses_32x32" tilewidth="32" tileheight="32" tilecount="8992" columns="32">
   <image source="graphics/tilesets/24_Additional_Houses_32x32.png" width="1024" height="8992"/>
  </tileset>
+ <tileset firstgid="12113" name="Beach_32x32_tilesheet" tilewidth="32" tileheight="32" tilecount="132" columns="12">
+  <image source="graphics/tilesets/Tilesets/Beach_32x32_tilesheet.png" width="384" height="352"/>
+ </tileset>
+ <tileset firstgid="12245" name="Beach_32x64_tilesheet" tilewidth="32" tileheight="32" tilecount="50" columns="5">
+  <image source="graphics/tilesets/Tilesets/Beach_32x64_tilesheet.png" width="160" height="320"/>
+ </tileset>
+ <tileset firstgid="12295" name="Beach_32x96_tilesheet" tilewidth="32" tileheight="32" tilecount="18" columns="3">
+  <image source="graphics/tilesets/Tilesets/Beach_32x96_tilesheet.png" width="96" height="192"/>
+ </tileset>
+ <tileset firstgid="12313" name="Beach_32x128_tilesheet" tilewidth="32" tileheight="32" tilecount="36" columns="3">
+  <image source="graphics/tilesets/Tilesets/Beach_32x128_tilesheet.png" width="96" height="384"/>
+ </tileset>
+ <tileset firstgid="12349" name="Beach_32x288_tilesheet" tilewidth="32" tileheight="32" tilecount="9" columns="1">
+  <image source="graphics/tilesets/Tilesets/Beach_32x288_tilesheet.png" width="32" height="288"/>
+ </tileset>
+ <tileset firstgid="12358" name="Beach_64x32_tilesheet" tilewidth="32" tileheight="32" tilecount="24" columns="8">
+  <image source="graphics/tilesets/Tilesets/Beach_64x32_tilesheet.png" width="256" height="96"/>
+ </tileset>
+ <tileset firstgid="12382" name="Beach_64x64_tilesheet" tilewidth="32" tileheight="32" tilecount="224" columns="16">
+  <image source="graphics/tilesets/Tilesets/Beach_64x64_tilesheet.png" width="512" height="448"/>
+ </tileset>
+ <tileset firstgid="12606" name="Beach_64x96_tilesheet" tilewidth="32" tileheight="32" tilecount="72" columns="8">
+  <image source="graphics/tilesets/Tilesets/Beach_64x96_tilesheet.png" width="256" height="288"/>
+ </tileset>
+ <tileset firstgid="12678" name="Beach_96x96_tilesheet" tilewidth="32" tileheight="32" tilecount="81" columns="9">
+  <image source="graphics/tilesets/Tilesets/Beach_96x96_tilesheet.png" width="288" height="288"/>
+ </tileset>
+ <tileset firstgid="12759" name="Camping_32x32_tilesheet" tilewidth="32" tileheight="32" tilecount="121" columns="11">
+  <image source="graphics/tilesets/Tilesets/Camping_32x32_tilesheet.png" width="352" height="352"/>
+ </tileset>
+ <tileset firstgid="12880" name="City_Props_32x32_tilesheet" tilewidth="32" tileheight="32" tilecount="144" columns="12">
+  <image source="graphics/tilesets/Tilesets/City_Props_32x32_tilesheet.png" width="384" height="384"/>
+ </tileset>
+ <tileset firstgid="13024" name="City_Props_32x64_tilesheet" tilewidth="32" tileheight="32" tilecount="420" columns="15">
+  <image source="graphics/tilesets/Tilesets/City_Props_32x64_tilesheet.png" width="480" height="896"/>
+ </tileset>
+ <tileset firstgid="13444" name="City_Props_32x96_tilesheet" tilewidth="32" tileheight="32" tilecount="108" columns="6">
+  <image source="graphics/tilesets/Tilesets/City_Props_32x96_tilesheet.png" width="192" height="576"/>
+ </tileset>
+ <tileset firstgid="13552" name="City_Props_32x128_tilesheet" tilewidth="32" tileheight="32" tilecount="36" columns="3">
+  <image source="graphics/tilesets/Tilesets/City_Props_32x128_tilesheet.png" width="96" height="384"/>
+ </tileset>
+ <tileset firstgid="13588" name="City_Props_64x32_tilesheet" tilewidth="32" tileheight="32" tilecount="60" columns="12">
+  <image source="graphics/tilesets/Tilesets/City_Props_64x32_tilesheet.png" width="384" height="160"/>
+ </tileset>
+ <tileset firstgid="13648" name="city" tilewidth="1" tileheight="1" tilecount="0" columns="0"/>
+ <tileset firstgid="13648" source="graphics/tilesets/Tilesets/Collections/Beach_collection.tsx"/>
+ <tileset firstgid="13964" source="graphics/tilesets/Tilesets/Collections/Camping_collection.tsx"/>
+ <tileset firstgid="14657" source="graphics/tilesets/Tilesets/Collections/City_Props_collection.tsx"/>
+ <tileset firstgid="15372" source="graphics/tilesets/Tilesets/Collections/City_Terrains_collection.tsx"/>
+ <tileset firstgid="15723" source="graphics/tilesets/Tilesets/Collections/Fire_Station_collection.tsx"/>
+ <tileset firstgid="15765" source="graphics/tilesets/Tilesets/Collections/Floor_Modular_Building_collection.tsx"/>
+ <tileset firstgid="16108" source="graphics/tilesets/Tilesets/Collections/Garage_Sales_collection.tsx"/>
+ <tileset firstgid="16203" source="graphics/tilesets/Tilesets/Collections/Garden_collection.tsx"/>
+ <tileset firstgid="16773" source="graphics/tilesets/Tilesets/Collections/Generic_Building_collection.tsx"/>
+ <tileset firstgid="16953" source="graphics/tilesets/Tilesets/Collections/Graveyard_collection.tsx"/>
+ <tileset firstgid="17170" source="graphics/tilesets/Tilesets/Collections/Hotel_and_Hospital_collection.tsx"/>
+ <tileset firstgid="17211" source="graphics/tilesets/Tilesets/Collections/Military_Base_collection.tsx"/>
+ <tileset firstgid="17516" source="graphics/tilesets/Tilesets/Collections/Office_collection.tsx"/>
+ <tileset firstgid="17632" source="graphics/tilesets/Tilesets/Collections/Police_Station_collection.tsx"/>
+ <tileset firstgid="17669" source="graphics/tilesets/Tilesets/Collections/Post_Office_collection.tsx"/>
+ <tileset firstgid="17713" source="graphics/tilesets/Tilesets/Collections/School_collection.tsx"/>
+ <tileset firstgid="17838" source="graphics/tilesets/Tilesets/Collections/Shopping_Center_and_Markets_collection.tsx"/>
+ <tileset firstgid="17895" source="graphics/tilesets/Tilesets/Collections/Subway_and_Train_Station_collection.tsx"/>
+ <tileset firstgid="18476" source="graphics/tilesets/Tilesets/Collections/Swimming_Pool_collection.tsx"/>
+ <tileset firstgid="18655" source="graphics/tilesets/Tilesets/Collections/Terrains_and_Fences_collection.tsx"/>
+ <tileset firstgid="19117" source="graphics/tilesets/Tilesets/Collections/Vehicles_collection.tsx"/>
+ <tileset firstgid="19310" source="graphics/tilesets/Tilesets/Collections/Villas_collection.tsx"/>
+ <tileset firstgid="19504" source="graphics/tilesets/Tilesets/Collections/Worksite_collection.tsx"/>
  <layer id="1" name="Ground" width="38" height="30" visible="0">
   <data encoding="csv">
 1874,1874,1874,1874,1874,1874,1874,1874,1874,1874,1874,1874,1874,1874,1874,1874,1874,1874,1874,1874,1874,1874,1874,1874,1874,1874,1874,1874,1874,1874,1874,1874,1874,1874,1874,1874,1874,1874,

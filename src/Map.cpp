@@ -8,11 +8,12 @@
 #include "tmxlite/Property.hpp"
 
 #include <iostream>
-#include <fstream>  // 文件操作核心库
-#include <vector>   // 用vector存储地图的行（动态数组，比普通数组灵活）
-#include <string>   // 存储每行的字符串
-#include <set>
-
+#include <fstream>      // 文件操作核心库
+#include <vector>       // 用vector存储地图的行（动态数组，比普通数组灵活）
+#include <string>       // 存储每行的字符串
+#include <set>          // 用set避免重复卸载纹理
+#include <functional>   // 用于存储可调用对象
+#include <algorithm>    // 用于排序渲染项
 using namespace std;
 
 /**
@@ -38,19 +39,45 @@ void CleanupMap(GameContext& map) {
  * 
  * @param map 地图指针
  */
-void DrawMap(const GameContext& map) {
-    // 安全检查
-    if (map.width <= 0 || map.height <= 0) {
-        TraceLog(LOG_WARNING, "[Map] 地图尺寸无效: %dx%d", map.width, map.height);
-        return;
+namespace {
+
+enum class TiledLayerType {
+    Ground,
+    YSort,
+    Overhead,
+    Ignored
+};//辅助函数，根据图层名称分类
+
+
+
+// 根据图层名称分类
+TiledLayerType ClassifyLayer(const std::string& name)
+{
+    if(name == "Ground" || name == "ground" || name == "Background" || name == "background"){
+        return TiledLayerType::Ground;
+        //地面层
     }
-    
-    if (map.tiles.empty() || map.tileGIDs.empty()) {
-        TraceLog(LOG_WARNING, "[Map] 地图数据为空");
-        return;
+    if(name == "Overhead" || name == "overhead" || name == "Foreground" || name == "foreground"){
+        return TiledLayerType::Overhead;
+        //天花板层
     }
-    
-    for(const auto& layerGIDs : map.tileGIDs){  //遍历所有层
+    if(name == "Collision" || name == "collision" || name == "Tree" || name == "Enemy" || name == "NPC" || name == "Objects" || name == "Wall"){
+        return TiledLayerType::YSort;
+        //墙壁层
+    }
+    return TiledLayerType::Ignored;
+}
+
+//  辅助结构体，用于存储可排序的渲染项
+struct SortedRenderable {
+    float sortKey;
+    std::function<void()> draw;
+};
+
+// 绘制图层列表的辅助函数
+void DrawLayerList(const GameContext& map, const vector<vector<vector<unsigned int>>>& layers)
+{
+    for(const auto& layerGIDs : layers){
         for(int y = 0;y < map.height;y++){
             for(int x = 0;x < map.width;x++){
                 unsigned int gid = layerGIDs[y][x];
@@ -60,6 +87,93 @@ void DrawMap(const GameContext& map) {
             }
         }
     }
+}
+
+}
+
+//绘制地板层
+void DrawGroundLayers(const GameContext& map)
+{
+    DrawLayerList(map, map.groundLayers);
+}
+
+//绘制Y排序层
+void DrawYSortLayer(const GameContext& map)
+{
+    vector<SortedRenderable> sortedDrawables;
+
+    for(const auto& layerGIDs : map.tileGIDs){
+        for(int y = 0;y < map.height;y++){
+            for(int x = 0;x < map.width;x++){
+                unsigned int gid = layerGIDs[y][x];
+                if(gid == 0) continue;
+
+                float sortY = (float)((y + 1) * map.tileSize);
+                sortedDrawables.push_back({ sortY, [=, &map]() {
+                    DrawSingleTile(map, x, y, gid);
+                }});
+            }
+        }
+    }
+
+    const GameContext* ctxPtr = &map;
+    sortedDrawables.push_back({ map.player.visualPosition.y + map.tileSize, [ctxPtr]() {
+        DrawPlayerSprite(ctxPtr->player);
+    }});
+
+    for(const Enemy& enemy : map.enemies){
+        if(!enemy.isActive) continue;
+        const Enemy* enemyPtr = &enemy;
+        sortedDrawables.push_back({ enemy.visualPosition.y + map.tileSize, [ctxPtr, enemyPtr]() {
+            Rectangle source = {0,0,32,64};
+            source.height = 64.0f;
+            source.y = 0.0f;
+            switch (enemyPtr->currentDirection){
+                case ENEMY_DIR_RIGHT: source.x = 0.0f; break;
+                case ENEMY_DIR_UP: source.x = 32.0f; break;
+                case ENEMY_DIR_LEFT: source.x = 64.0f; break;
+                case ENEMY_DIR_DOWN: default: source.x = 96.0f; break;
+            }
+            Vector2 drawDestPosition = {
+                enemyPtr->visualPosition.x,
+                enemyPtr->visualPosition.y - ctxPtr->tileSize
+            };
+            if(ctxPtr->enemySpriteSheet.id != 0){
+                DrawTextureRec(ctxPtr->enemySpriteSheet, source, drawDestPosition, WHITE);
+            } else {
+                DrawRectangle((int)drawDestPosition.x, (int)drawDestPosition.y, 32, 64, BLUE);
+            }
+        }});
+    }
+
+    std::sort(sortedDrawables.begin(), sortedDrawables.end(), [](const SortedRenderable& a, const SortedRenderable& b){
+        return a.sortKey < b.sortKey;
+    });
+
+    for(const auto& renderable : sortedDrawables){
+        renderable.draw();
+    }
+}
+
+//绘制前景层
+void DrawOverheadLayers(const GameContext& map)
+{
+    DrawLayerList(map, map.overheadLayers);
+}
+
+void DrawMap(const GameContext& map) {
+    if (map.width <= 0 || map.height <= 0) {
+        TraceLog(LOG_WARNING, "[Map] 地图尺寸无效: %dx%d", map.width, map.height);
+        return;
+    }
+    if (map.tiles.empty()) {
+        TraceLog(LOG_WARNING, "[Map] 地图数据为空");
+        return;
+    }
+
+    DrawGroundLayers(map);
+    DrawYSortLayer(map);
+    DrawOverheadLayers(map);
 }
 
 /**
@@ -166,6 +280,8 @@ bool LoadLevelFromTiled(GameContext& ctx, const char* filepath){
     //清理旧的关卡数据
     ctx.tiles.clear();
     ctx.tileGIDs.clear();
+    ctx.groundLayers.clear();
+    ctx.overheadLayers.clear();
     ctx.enemies.clear();
     ctx.mapTextures.clear();
     ctx.tilesetTextures.clear();
@@ -288,48 +404,48 @@ bool LoadLevelFromTiled(GameContext& ctx, const char* filepath){
     const auto& layers = tiledMap.getLayers();
     for(const auto& layer : layers){
         if(layer->getType() == tmx::Layer::Type::Tile){
-            // 处理图块图层
             const auto& tileLayer = layer->getLayerAs<tmx::TileLayer>();
             const auto& tiles = tileLayer.getTiles();
 
             vector<vector<unsigned int>> currentLayerGIDs(ctx.height, vector<unsigned int>(ctx.width, 0));
             TraceLog(LOG_INFO, "[Map] 处理图块图层: %s", layer->getName().c_str());
 
-            // 遍历所有地块
             for(int y = 0; y < ctx.height; y++){
                 for(int x = 0; x < ctx.width; x++){
                     unsigned int gid = tiles[y * ctx.width + x].ID;
-                    
                     currentLayerGIDs[y][x] = gid;
-                    
-                    // 根据图层名称设置逻辑类型（用于碰撞检测）
-                    if(gid != 0){
-                        if(layer->getName() == "Collision" || layer->getName() == "collision"){
-                            ctx.tiles[y][x] = TileType::WALL;
-                        }
-                        else if(layer->getName() == "Tree"){
-                            ctx.tiles[y][x] = TileType::WALL;
-                        }
-                        else if(layer->getName() == "Enemy"){
-                            ctx.tiles[y][x] = TileType::WALL;
-                        }
-                        else if(layer->getName() == "NPC"){
-                            ctx.tiles[y][x] = TileType::WALL;
-                        }
-                        else if(layer->getName() == "Ground" || layer->getName() == "ground"){
-                            ctx.tiles[y][x] = TileType::GRASS;
-                        }
-                        else if(layer->getName() == "Empty" || layer->getName() == "empty"){
-                            ctx.tiles[y][x] = TileType::GRASS;
-                        }
-                        else {
-                            // 默认可通行
+
+                    if(gid == 0) continue;
+
+                    string name = layer->getName();
+                    if(name == "Collision" || name == "collision" || name == "Tree" || name == "Enemy" || name == "NPC" || name == "Wall"){
+                        ctx.tiles[y][x] = TileType::WALL;
+                    }
+                    else if(name == "Ground" || name == "ground" || name == "Empty" || name == "empty" || name == "Background"){
+                        ctx.tiles[y][x] = TileType::GRASS;
+                    }
+                    else {
+                        if(ctx.tiles[y][x] != TileType::WALL){
                             ctx.tiles[y][x] = TileType::GRASS;
                         }
                     }
                 }
             }
-            ctx.tileGIDs.push_back(currentLayerGIDs);
+
+            switch (ClassifyLayer(layer->getName())){
+                case TiledLayerType::Ground:
+                    ctx.groundLayers.push_back(currentLayerGIDs);
+                    break;
+                case TiledLayerType::Overhead:
+                    ctx.overheadLayers.push_back(currentLayerGIDs);
+                    break;
+                case TiledLayerType::YSort:
+                    ctx.tileGIDs.push_back(currentLayerGIDs);
+                    break;
+                default:
+                    TraceLog(LOG_INFO, "[Map] 忽略图块图层: %s", layer->getName().c_str());
+                    break;
+            }
         }
     }
 
@@ -352,8 +468,8 @@ bool LoadLevelFromTiled(GameContext& ctx, const char* filepath){
                 enemy.gridX = static_cast<int>(objX / ctx.tileSize);
                 enemy.gridY = static_cast<int>(objY / ctx.tileSize);
                 enemy.visualPosition = { objX , objY};
-                enemy.moveTarget = enemy.patrolCenter;
                 enemy.patrolCenter = enemy.visualPosition;
+                enemy.moveTarget = enemy.visualPosition;
 
                 //默认移动属性
                 enemy.moveSpeed = 60.0f; // 默认移动速度
@@ -588,7 +704,9 @@ bool LoadLevelFromTiled(GameContext& ctx, const char* filepath){
     TraceLog(LOG_INFO, "[Map] - Tileset 数量: %zu", ctx.tilesetTextures.size());
     TraceLog(LOG_INFO, "[Map] - 敌人数量: %zu", ctx.enemies.size());
     TraceLog(LOG_INFO, "[Map] - tiles 数组大小: %zu", ctx.tiles.size());
-    TraceLog(LOG_INFO, "[Map] - tileGIDs 数组大小: %zu", ctx.tileGIDs.size());
+    TraceLog(LOG_INFO, "[Map] - Ground 层: %zu", ctx.groundLayers.size());
+    TraceLog(LOG_INFO, "[Map] - Y-Sort 层: %zu", ctx.tileGIDs.size());
+    TraceLog(LOG_INFO, "[Map] - Overhead 层: %zu", ctx.overheadLayers.size());
 
     return true;
 }
