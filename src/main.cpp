@@ -144,6 +144,9 @@ int main(void)
     //==========加载UI资源==========
     LoadUIAssets(ctx);
     TraceLog(LOG_INFO, "[Main] UI资源加载完成, isRunning=%d", ctx.isRunning);
+
+    //==========初始化音频设备==========
+    InitAudioDevice(); // 初始化音频设备
     
     //==========初始化状态机==========
     GameStateMachine_init(&ctx.state_machine);
@@ -233,6 +236,9 @@ int main(void)
     
     CloseWindow();
     TraceLog(LOG_INFO, "[Main] 窗口已关闭");
+
+    CloseAudioDevice(); // 关闭音频设备
+    TraceLog(LOG_INFO, "[Main] 音频设备已关闭");
     
     //==========输出测试总结==========
     TraceLog(LOG_INFO, "========================================");

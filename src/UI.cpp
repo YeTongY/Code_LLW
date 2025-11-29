@@ -2,52 +2,68 @@
 #include "GameState.h"
 #include "FontLoader.h"
 
-
-
 void LoadUIAssets(GameContext& ctx){
-    const char* dialogue_box_address = "../res/graphics/ui/dialogue_box.png";
-    const char* portrait_frame_address = "../res/graphics/ui/portrait_frame.png";
+    // --- 1. 定义资源路径 ---
+    const char* dialogue_box_path = "../res/graphics/ui/dialogue_box.png";
+    const char* portrait_frame_path = "../res/graphics/ui/portrait_frame.png";
+    const char* player_portrait_path = "../res/graphics/portraits/Taffy.png";
+    const char* hp_bar_bg_path = "../res/graphics/ui/ProgressBar Background_Black.png";
+    const char* hp_bar_fill_path = "../res/graphics/ui/ProgressBarForeground_Black.png";
+
+    TraceLog(LOG_INFO, "================ [UI] 开始加载资源 ================");
+
+    // --- 2. 加载基础 UI 纹理 ---
     
-    //加载UI资产
-    ctx.portraitFrameTexture = LoadTexture(portrait_frame_address);
-    if(ctx.portraitFrameTexture.id == 0){
-        TraceLog(LOG_WARNING,"[UI Loader] 头像框UI加载失败！");
-    }
-    else{
-        TraceLog(LOG_INFO, "[UI Loader] 头像框UI加载成功");
-    }
+    // 对话框背景
+    ctx.dialogueBoxTexture = LoadTexture(dialogue_box_path);
+    if(ctx.dialogueBoxTexture.id == 0) TraceLog(LOG_WARNING, "[UI] 加载失败: %s", dialogue_box_path);
+    else TraceLog(LOG_INFO, "[UI] 加载成功: 对话框背景");
 
-    ctx.dialogueBoxTexture = LoadTexture(dialogue_box_address);
-    if(ctx.dialogueBoxTexture.id == 0){ 
-        TraceLog(LOG_WARNING,"[UI Loader] 头像框UI加载失败！");
-    }
-    else{
-        TraceLog(LOG_INFO, "[UI Loader] 头像框UI加载成功");
-    }
+    // 头像框 (通用)
+    ctx.portraitFrameTexture = LoadTexture(portrait_frame_path);
+    if(ctx.portraitFrameTexture.id == 0) TraceLog(LOG_WARNING, "[UI] 加载失败: %s", portrait_frame_path);
+    else TraceLog(LOG_INFO, "[UI] 加载成功: 头像框");
+
+    // 玩家头像
+    ctx.playerPortrait = LoadTexture(player_portrait_path);
+    if(ctx.playerPortrait.id == 0) TraceLog(LOG_WARNING, "[UI] 加载失败: %s", player_portrait_path);
+    else TraceLog(LOG_INFO, "[UI] 加载成功: 玩家头像");
+
+    // --- 3. 配置 HUD 模板 (复用 + 新加载) ---
+    
+    // 复用已加载的头像框
+    ctx.hudTemplate.avatarFrame = ctx.portraitFrameTexture; 
+    
+    // 加载血条资源直接到模板中
+    ctx.hudTemplate.hpBarEmpty = LoadTexture(hp_bar_bg_path);
+    if(ctx.hudTemplate.hpBarEmpty.id == 0) TraceLog(LOG_WARNING, "[UI] 加载失败: %s", hp_bar_bg_path);
+    else TraceLog(LOG_INFO, "[UI] 加载成功: 血条背景");
+
+    ctx.hudTemplate.hpBarFill = LoadTexture(hp_bar_fill_path);
+    if(ctx.hudTemplate.hpBarFill.id == 0) TraceLog(LOG_WARNING, "[UI] 加载失败: %s", hp_bar_fill_path);
+    else TraceLog(LOG_INFO, "[UI] 加载成功: 血条填充");
+
+    // --- 4. 其他兼容性设置 ---
+    ctx.playerPortraitFrame = ctx.portraitFrameTexture; // 保持兼容
+
+    TraceLog(LOG_INFO, "================ [UI] 资源加载结束 ================");
 }
-
-
-
 
 void UnloadUIAssets(GameContext& ctx){
-    
-    if(ctx.dialogueBoxTexture.id != 0){
-        UnloadTexture(ctx.dialogueBoxTexture);
-        TraceLog(LOG_INFO,"[UI Loader] 卸载对话框UI成功");
-    }
-    else{
-        TraceLog(LOG_ERROR,"[UI Loader] 尝试卸载一个空的UI纹理!");
-    }
-    if(ctx.portraitFrameTexture.id != 0){
-        UnloadTexture(ctx.portraitFrameTexture);
-        TraceLog(LOG_INFO,"[UI Loader] 卸载头像框UI成功");
-    }
-    else{
-        TraceLog(LOG_ERROR,"[UI Loader] 尝试卸载一个空的UI纹理!");
-    }
+    TraceLog(LOG_INFO, "================ [UI] 开始卸载资源 ================");
+
+    // 卸载基础纹理
+    if(ctx.dialogueBoxTexture.id != 0) UnloadTexture(ctx.dialogueBoxTexture);
+    if(ctx.portraitFrameTexture.id != 0) UnloadTexture(ctx.portraitFrameTexture);
+    if(ctx.playerPortrait.id != 0) UnloadTexture(ctx.playerPortrait);
+
+    // 卸载 HUD 独有纹理
+    // 注意：avatarFrame 是复用的 portraitFrameTexture，不要重复卸载！
+    if(ctx.hudTemplate.hpBarEmpty.id != 0) UnloadTexture(ctx.hudTemplate.hpBarEmpty);
+    if(ctx.hudTemplate.hpBarFill.id != 0) UnloadTexture(ctx.hudTemplate.hpBarFill);
+
+    TraceLog(LOG_INFO, "================ [UI] 资源卸载结束 ================");
 }
-
-
 
 void FillTemplateWithAssets(DialogueBoxTemplate_Normal& tpl, GameContext& ctx){
     tpl.font = &ctx.mainFont;//填充主字体
@@ -55,9 +71,90 @@ void FillTemplateWithAssets(DialogueBoxTemplate_Normal& tpl, GameContext& ctx){
     tpl.portraitFrameTexture = ctx.portraitFrameTexture;//填充头像框图片
 }
 
+// ====== HUD 绘制函数 ======
+void DrawHUD(const GameContext& ctx) {
+    const HUDTemplate& tpl = ctx.hudTemplate;
+    
+    // 1. 获取玩家当前 HP 比例
+    float hp = (float)ctx.player.stats.hp;
+    float maxHp = (float)ctx.player.stats.maxHp;
+    float hpRatio = (maxHp > 0) ? (hp / maxHp) : 0.0f;
+    
+    // 安全限制比例在 [0, 1] 范围内
+    if (hpRatio < 0.0f) hpRatio = 0.0f;
+    if (hpRatio > 1.0f) hpRatio = 1.0f;
 
+    // 2. 绘制头像（底层）
+    if (ctx.playerPortrait.id != 0) {
+        Rectangle portraitSource = {0, 0, (float)ctx.playerPortrait.width, (float)ctx.playerPortrait.height};
+        Rectangle portraitDest = {
+            tpl.position.x + tpl.avatarOffset.x,
+            tpl.position.y + tpl.avatarOffset.y,
+            80.0f, // 头像尺寸
+            80.0f
+        };
+        DrawTexturePro(ctx.playerPortrait, portraitSource, portraitDest, {0, 0}, 0.0f, WHITE);
+    }
 
-void DrawDialogueWithTemplate(const DialogueBoxTemplate_Normal& tpl, const string& text,const string& speakerName,Texture2D portrait,int charsToShow){
+    // 3. 绘制头像框（覆盖在头像上）
+    if (tpl.avatarFrame.id != 0) {
+        Rectangle frameSource = {0, 0, (float)tpl.avatarFrame.width, (float)tpl.avatarFrame.height};
+        Rectangle frameDest = {
+            tpl.position.x,
+            tpl.position.y,
+            100.0f, // 框的尺寸
+            100.0f
+        };
+        DrawTexturePro(tpl.avatarFrame, frameSource, frameDest, {0, 0}, 0.0f, WHITE);
+    }
+
+    // 4. 绘制血条背景（完整长度）
+    float barWidth = 200.0f;
+    float barHeight = 20.0f;
+    Vector2 barPos = {
+        tpl.position.x + tpl.hpBarOffset.x,
+        tpl.position.y + tpl.hpBarOffset.y
+    };
+
+    if (tpl.hpBarEmpty.id != 0) {
+        Rectangle bgSource = {0, 0, (float)tpl.hpBarEmpty.width, (float)tpl.hpBarEmpty.height};
+        Rectangle bgDest = {barPos.x, barPos.y, barWidth, barHeight};
+        DrawTexturePro(tpl.hpBarEmpty, bgSource, bgDest, {0, 0}, 0.0f, WHITE);
+    }
+
+    // 5. 绘制血条填充（按比例裁剪 + 染红色）
+    if (tpl.hpBarFill.id != 0 && hpRatio > 0) {
+        // 源矩形：裁剪图片的左侧部分（宽度 × 比例）
+        Rectangle fillSource = {
+            0, 0,
+            (float)tpl.hpBarFill.width * hpRatio,
+            (float)tpl.hpBarFill.height
+        };
+        
+        // 目标矩形：屏幕上显示的宽度也要对应缩放
+        Rectangle fillDest = {
+            barPos.x,
+            barPos.y,
+            barWidth * hpRatio,
+            barHeight
+        };
+        
+        DrawTexturePro(tpl.hpBarFill, fillSource, fillDest, {0, 0}, 0.0f, RED);
+    }
+
+    // 6. 绘制 HP 文字数值
+    char hpText[32];
+    std::sprintf(hpText, "%d/%d", ctx.player.stats.hp, ctx.player.stats.maxHp);
+    DrawTextEx(ctx.mainFont, hpText, 
+               {barPos.x + 5, barPos.y - 25}, 
+               20, 1, WHITE);
+    
+    DrawTextEx(ctx.mainFont, "HP", 
+               {barPos.x - 35, barPos.y}, 
+               20, 1, RED);
+}
+
+void DrawDialogueWithTemplate(const DialogueBoxTemplate_Normal& tpl, const std::string& text,const std::string& speakerName,Texture2D portrait,int charsToShow){ // 修改：参数改用 std::string
     //准备一些矩形
     Rectangle portrait_source = {0.0f, 0.0f, (float)portrait.width, (float)portrait.height};//不裁剪
     Rectangle portrait_dest = {tpl.portraitPosition.x, tpl.portraitPosition.y, tpl.portraitWidth, tpl.portraitHeight};
@@ -127,7 +224,7 @@ void DrawDialogueWithTemplate(const DialogueBoxTemplate_Normal& tpl, const strin
 
     //准备要绘制的文本,以实现流式文字绘制
     // 安全的 UTF-8 字符截断（避免截断多字节字符）
-    string textToDraw;
+    std::string textToDraw; // 修改：显式使用 std::string
     int charCount = 0;
     
     for (size_t i = 0; i < text.length() && charCount < charsToShow; ) {

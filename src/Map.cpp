@@ -270,14 +270,13 @@ void LoadMapTextures(GameContext& map) {
 bool LoadLevelFromTiled(GameContext& ctx, const char* filepath){
     TraceLog(LOG_INFO, "[Map] 尝试加载地图文件: %s", filepath);
 
-    //卸载旧的tileset纹理
+    // 新增：确保切换地图前完全释放旧纹理
     for (Texture2D& tex : ctx.tilesetTextures) {
         if (tex.id != 0) {
             UnloadTexture(tex);
         }
     }
 
-    //清理旧的关卡数据
     ctx.tiles.clear();
     ctx.tileGIDs.clear();
     ctx.groundLayers.clear();
@@ -288,58 +287,41 @@ bool LoadLevelFromTiled(GameContext& ctx, const char* filepath){
     ctx.tilesetFirstGIDs.clear();
     ctx.gameEvents.clear();
 
-    //路径自动修正逻辑 
-    string originalPath = filepath;
-    vector<string> possiblePaths;
-    
-    // 依次尝试：原始路径、上一级、上两级
-    possiblePaths.push_back(originalPath);
-    possiblePaths.push_back("../" + originalPath);
-    possiblePaths.push_back("../../" + originalPath);
+    // 新增：按优先级列出可能的相对路径，兼容不同工作目录
+    std::vector<std::string> pathCandidates = {
+        std::string(filepath),
+        std::string("../") + filepath,
+        std::string("../../") + filepath
+    };
 
-    bool loaded = false;
     tmx::Map tiledMap;
-    string finalPath = "";
+    bool loaded = false;
+    std::string resolvedPath;
 
-    // 循环尝试所有可能的路径
-    for (const auto& path : possiblePaths) {
-        // 使用 raylib 的 FileExists 预检查，防止抛出异常干扰调试
-        if (FileExists(path.c_str())) {
-            try {
-                if(tiledMap.load(path)){
-                    TraceLog(LOG_INFO, "[Map] 成功加载地图: %s", path.c_str());
-                    loaded = true;
-                    finalPath = path;
-                    break;
-                }
-            } catch (...) { continue; }
+    for (const auto& candidate : pathCandidates) {
+        if (!FileExists(candidate.c_str())) {
+            continue;
+        }
+        try {
+            if (tiledMap.load(candidate)) {
+                TraceLog(LOG_INFO, "[Map] 成功加载地图: %s", candidate.c_str());
+                loaded = true;
+                resolvedPath = candidate;
+                break;
+            }
+        } catch (const std::exception& e) {
+            TraceLog(LOG_WARNING, "[Map] 加载地图时发生异常 (%s): %s", candidate.c_str(), e.what());
         }
     }
 
-    if(!loaded){
-        TraceLog(LOG_ERROR, "[Map] Tiled 地图加载失败，尝试了以下路径:");
-        for(const auto& p : possiblePaths) TraceLog(LOG_ERROR, "  - %s", p.c_str());
+    if (!loaded) {
+        TraceLog(LOG_ERROR, "[Map] 无法在以下路径加载地图:");
+        for (const auto& candidate : pathCandidates) {
+            TraceLog(LOG_ERROR, "  - %s", candidate.c_str());
+        }
         TraceLog(LOG_ERROR, "[Map] 当前工作目录: %s", GetWorkingDirectory());
         return false;
     }
-    
-    TraceLog(LOG_INFO, "[Map] Tiled 文件解析成功");
-
-    try {
-        if(!tiledMap.load(filepath)){
-            TraceLog(LOG_ERROR, "[Map] Tiled 地图加载失败: %s", filepath);
-            TraceLog(LOG_ERROR, "[Map] 请检查文件是否存在，是否为 .tmx 格式");
-            return false;
-        }
-    } catch (const std::exception& e) {
-        TraceLog(LOG_ERROR, "[Map] Tiled 加载异常: %s", e.what());
-        return false;
-    } catch (...) {
-        TraceLog(LOG_ERROR, "[Map] Tiled 加载发生未知异常");
-        return false;
-    }
-    
-    TraceLog(LOG_INFO, "[Map] Tiled 文件解析成功");
 
     // 读取地图尺寸和图块大小
     ctx.width = tiledMap.getTileCount().x;
