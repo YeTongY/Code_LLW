@@ -1,7 +1,11 @@
 #pragma once
 
 #include "raylib.h"
-#include "GameState.h"
+#include <string>
+
+struct GameContext; // 新增：使用前向声明避免循环依赖
+
+
 struct DialogueBoxTemplate_Normal{//创建一般对话框模板
     //对话框样式设置
     Texture2D dialogueBoxTexture;
@@ -38,6 +42,28 @@ struct DialogueBoxTemplate_Normal{//创建一般对话框模板
 
 };
 
+struct HUDTemplate {
+    // --- 纹理 ---
+    Texture2D avatarFrame;  // 头像框图片
+    Texture2D hpBarEmpty;   // 血条底图（空的/黑底）
+    Texture2D hpBarFill;    // 血条填充图（红条）
+    // --- 位置与尺寸 (根据你的美术资源调整) ---
+    Vector2 position = { 20.0f, 20.0f }; // 整体起始位置 (左上角)
+    
+    // 头像偏移
+    Vector2 avatarOffset = { 10.0f, 10.0f }; 
+    
+    // 血条偏移
+    Vector2 hpBarOffset = { 120.0f, 20.0f }; 
+};
+
+
+// 声明绘制函数
+void DrawHUD(const GameContext& ctx);
+
+
+
+
 /**
  * @brief 将资产填入模板
  * 
@@ -55,7 +81,7 @@ void FillTemplateWithAssets(DialogueBoxTemplate_Normal& tpl, GameContext& ctx);
  * @param portrait 头像纹理
  * @param charsToShow 要显示的字符数量
  */
-void DrawDialogueWithTemplate(const DialogueBoxTemplate_Normal& tpl, const string& text, const string& speakerName, Texture2D portrait, int charsToShow);
+void DrawDialogueWithTemplate(const DialogueBoxTemplate_Normal& tpl, const std::string& text, const std::string& speakerName, Texture2D portrait, int charsToShow); // 修改：显式使用 std::string
 
 /**
  * @brief 加载UI资产

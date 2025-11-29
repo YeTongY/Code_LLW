@@ -18,6 +18,7 @@
 #include "Map.h"
 #include "Enemy.h"
 #include "Event.h"
+#include "UI.h" // 新增：需要 HUDTemplate 定义
 //================================================================================
 //颜色定义
 // 1. “主要”的“赛博朋克”辉光色 (明亮的青色)
@@ -129,6 +130,13 @@ struct GameContext
     //UI纹理
     Texture2D dialogueBoxTexture;
     Texture2D portraitFrameTexture;
+
+    //大地图玩家头像
+    Texture2D playerPortrait;
+    Texture2D playerPortraitFrame;
+
+    // UI 模板实例
+    HUDTemplate hudTemplate;
 
     //标题图片
     Texture2D titleScreen;
