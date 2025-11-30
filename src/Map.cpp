@@ -45,7 +45,8 @@ enum class TiledLayerType {
     Ground,
     YSort,
     Overhead,
-    Ignored
+    Ignored,
+    decorationLayers
 };//辅助函数，根据图层名称分类
 
 
@@ -64,6 +65,9 @@ TiledLayerType ClassifyLayer(const std::string& name)
     if(name == "Collision" || name == "collision" || name == "Tree" || name == "Enemy" || name == "NPC" || name == "Objects" || name == "Wall"){
         return TiledLayerType::YSort;
         //墙壁层
+    }
+    if(name == "Decoration" || name == "decoration" || name == "WallDecor"){
+        return TiledLayerType::decorationLayers;
     }
     return TiledLayerType::Ignored;
 }
@@ -102,13 +106,32 @@ void DrawYSortLayer(const GameContext& map)
 {
     vector<SortedRenderable> sortedDrawables;
 
+    // 处理普通的物体
     for(const auto& layerGIDs : map.tileGIDs){
         for(int y = 0;y < map.height;y++){
             for(int x = 0;x < map.width;x++){
                 unsigned int gid = layerGIDs[y][x];
                 if(gid == 0) continue;
-
+                //排序基准为脚底
                 float sortY = (float)((y + 1) * map.tileSize);
+                sortedDrawables.push_back({ sortY, [=, &map]() {
+                    DrawSingleTile(map, x, y, gid);
+                }});
+            }
+        }
+    }
+
+    //处理挂墙物体或者贴墙物体
+    for(const auto& layerGIDs : map.decorationLayers){
+        for(int y = 0;y < map.height;y++){
+            for(int x = 0;x < map.width;x++){
+                unsigned int gid = layerGIDs[y][x];
+                if(gid == 0) continue;
+                //排序基准为脚底
+                // 贴墙物体的脚底位置需要上移半个tileSize
+                // 这样它们才能正确地覆盖在玩家和敌人之上
+                // 假设贴墙物体高度为半个tileSize
+                float sortY = (float)((y + 1) * map.tileSize) + (map.tileSize * 0.5f); 
                 sortedDrawables.push_back({ sortY, [=, &map]() {
                     DrawSingleTile(map, x, y, gid);
                 }});
@@ -286,6 +309,7 @@ bool LoadLevelFromTiled(GameContext& ctx, const char* filepath){
     ctx.tilesetTextures.clear();
     ctx.tilesetFirstGIDs.clear();
     ctx.gameEvents.clear();
+    ctx.decorationLayers.clear();
 
     // 新增：按优先级列出可能的相对路径，兼容不同工作目录
     std::vector<std::string> pathCandidates = {
@@ -423,6 +447,9 @@ bool LoadLevelFromTiled(GameContext& ctx, const char* filepath){
                     break;
                 case TiledLayerType::YSort:
                     ctx.tileGIDs.push_back(currentLayerGIDs);
+                    break;
+                case TiledLayerType::decorationLayers:
+                    ctx.decorationLayers.push_back(currentLayerGIDs);
                     break;
                 default:
                     TraceLog(LOG_INFO, "[Map] 忽略图块图层: %s", layer->getName().c_str());
