@@ -11,6 +11,7 @@
 //================================
 #include "Event.h"
 #include "Dialogue.h"
+#include "Combat.h"
 #include "UI.h"  // 新增：引入UI接口以便在探索状态绘制HUD
 
 
@@ -95,6 +96,37 @@ void exploration_update(GameContext* ctx, void* state_data)
     updatePlayer(*ctx);
     UpdateEnemies(*ctx);
     TryTriggerCombat(ctx);
+
+    //==========战斗状态更新============
+   Rectangle playerRect = {
+        ctx->player.visualPosition.x + 8,
+        ctx->player.visualPosition.y + 32,
+        16,
+        32
+    }; 
+
+    for(auto& enemy : ctx->enemies){
+        if(enemy.isActive){
+            Rectangle EnemyRcet{
+                enemy.visualPosition.x + 8,
+                enemy.visualPosition.y + 32,
+                16,
+                32
+            };
+
+            if(CheckCollisionRecs(playerRect, EnemyRcet)){
+                TraceLog(LOG_INFO, "[Exploration] 玩家与敌人发生碰撞，准备进入战斗状态");
+                
+                GameState* combatState = CreateCombatState(&enemy);
+
+                if(combatState){
+                    GameStateMachine_change(&ctx->state_machine, ctx, combatState);
+                }
+                
+                break; // 只处理第一个碰撞的敌人
+            }
+        }
+    }
 
     //==========开始事件更新============
     ExecuteEvents(*ctx);
