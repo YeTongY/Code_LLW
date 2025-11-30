@@ -72,7 +72,6 @@ void updatePlayer(GameContext& ctx);
  * 
  * @param ctx Gamestate里的GameContext核心数据文件
  */
-// GDD v3.13 架构：职责分离
 void DrawPlayerSprite(const Player& player);  // 纯粹的精灵绘制
 void DrawMapScene(const GameContext& ctx);    // 场景渲染总指挥
 

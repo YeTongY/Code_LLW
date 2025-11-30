@@ -418,9 +418,6 @@ void DrawMapScene(const GameContext& ctx){
     // ============开始玩家和敌人绘制===============
     
 
-    //0.绘制地板
-    //TODO DrawMapLayer(Type_Ground);
-
     //1.创建渲染列表
     vector<RenderEntity> renderList;
 
@@ -434,7 +431,6 @@ void DrawMapScene(const GameContext& ctx){
         }
     }
     
-    //TODO 将墙壁等加入渲染列表
 
     //4.开始排序
 
@@ -453,12 +449,8 @@ void DrawMapScene(const GameContext& ctx){
             const Enemy* e = (const Enemy*)item.data;
             DrawEnemySprite(ctx, *e);
         }
-        //TODO 添加墙壁类型判断 else if
 
     }
-    
-    // 6. 最后画屋顶 (Foreground层)，永远盖在头顶
-    //TODO DrawMapLayer(ctx, "Roof");
     
     
     
@@ -473,6 +465,5 @@ void DrawMapScene(const GameContext& ctx){
     EndMode2D();
     //------结束角色摄像机绘制------
 
-    //TODO P1阶段时，可以在这之后绘制UI
 
 }

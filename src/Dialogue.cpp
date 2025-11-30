@@ -11,7 +11,6 @@
         TraceLog(LOG_WARNING, "[Dialogue] 尝试开始一场没有内容的对话！");
         return; // 直接返回，不执行任何操作
     }
-    //? 这上面不懂
 
      // 3. 初始化对话进度和打字机状态
     data->currentLineIndex = 0;
@@ -81,7 +80,7 @@ void dialogue_update(GameContext* ctx, void* state_data) {
     // 3. 处理用户输入
     if (IsKeyPressed(KEY_SPACE) || IsKeyPressed(KEY_ENTER) || IsMouseButtonPressed(MOUSE_LEFT_BUTTON) || IsKeyPressed(KEY_E)) {
         if (static_cast<size_t>(data->visibleChars) < currentLineLength) {
-            // 意图是“跳过”
+            //“跳过”
             data->skipToEnd = true;
         } else {
             // 意图是“下一句”
@@ -170,7 +169,7 @@ void dialogue_render(GameContext* ctx, void* state_data) {
         return;
     }
 
-    // 3. 准备UI模板 (你的工具)
+    // 3. 准备UI模板
     DialogueBoxTemplate_Normal tpl;
     FillTemplateWithAssets(tpl, *ctx);
 
@@ -181,7 +180,7 @@ void dialogue_render(GameContext* ctx, void* state_data) {
     const Texture2D& portraitToShow = data->currentPortrait;
     const int charsToShow = static_cast<int>(data->visibleChars);
 
-    // 5. 调用你的"万能绘制工具"，完成所有UI的绘制
+    // 5. 调用"万能绘制工具"，完成所有UI的绘制
     DrawDialogueWithTemplate(
         tpl, 
         textToDisplay, 

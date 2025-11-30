@@ -84,7 +84,19 @@ void DrawHUD(const GameContext& ctx) {
     if (hpRatio < 0.0f) hpRatio = 0.0f;
     if (hpRatio > 1.0f) hpRatio = 1.0f;
 
-    // 2. 绘制头像（底层）
+    // 2. 绘制头像框（覆盖在头像上）
+    if (tpl.avatarFrame.id != 0) {
+        Rectangle frameSource = {0, 0, (float)tpl.avatarFrame.width, (float)tpl.avatarFrame.height};
+        Rectangle frameDest = {
+            tpl.position.x,
+            tpl.position.y,
+            100.0f, // 框的尺寸
+            100.0f
+        };
+        DrawTexturePro(tpl.avatarFrame, frameSource, frameDest, {0, 0}, 0.0f, WHITE);
+    }
+
+    // 3. 绘制头像
     if (ctx.playerPortrait.id != 0) {
         Rectangle portraitSource = {0, 0, (float)ctx.playerPortrait.width, (float)ctx.playerPortrait.height};
         Rectangle portraitDest = {
@@ -96,17 +108,7 @@ void DrawHUD(const GameContext& ctx) {
         DrawTexturePro(ctx.playerPortrait, portraitSource, portraitDest, {0, 0}, 0.0f, WHITE);
     }
 
-    // 3. 绘制头像框（覆盖在头像上）
-    if (tpl.avatarFrame.id != 0) {
-        Rectangle frameSource = {0, 0, (float)tpl.avatarFrame.width, (float)tpl.avatarFrame.height};
-        Rectangle frameDest = {
-            tpl.position.x,
-            tpl.position.y,
-            100.0f, // 框的尺寸
-            100.0f
-        };
-        DrawTexturePro(tpl.avatarFrame, frameSource, frameDest, {0, 0}, 0.0f, WHITE);
-    }
+    
 
     // 4. 绘制血条背景（完整长度）
     float barWidth = 200.0f;
