@@ -139,6 +139,9 @@ struct GameContext
     // UI 模板实例
     HUDTemplate hudTemplate;
 
+    //音效
+    Sound footstepfx;
+
     //标题图片
     Texture2D titleScreen;
 

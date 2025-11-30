@@ -25,8 +25,9 @@
 #include "FontLoader.h"     //字体加载
 #include "Event.h"          //事件系统
 #include "UI.h"             //UI资源加载
+#include "Audio.h"          //音频模块
 #include <cstdio>
-#include <cstring>
+#include <cstring>lo
 
 // 前向声明 Windows API 函数，避免包含整个 windows.h
 #ifdef _WIN32
@@ -148,6 +149,9 @@ int main(void)
 
     //==========初始化音频设备==========
     InitAudioDevice(); // 初始化音频设备
+
+    //==========加载音频资源==========
+    ctx.footstepfx = LoadSound("../res/audio/sfx/footstep00.wav");
     
     //==========初始化状态机==========
     GameStateMachine_init(&ctx.state_machine);
@@ -218,6 +222,10 @@ int main(void)
         DrawText("LLW Project v0.1", ctx.screenWidth - 150, ctx.screenHeight - 25, 14, LIGHTGRAY);
         
         EndDrawing();
+
+
+        //=========播放脚步声=========
+        PlayFootstepSound(ctx);
     }
     
     //==========清理资源==========
