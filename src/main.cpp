@@ -27,7 +27,7 @@
 #include "UI.h"             //UI资源加载
 #include "Audio.h"          //音频模块
 #include <cstdio>
-#include <cstring>lo
+#include <cstring>
 
 // 前向声明 Windows API 函数，避免包含整个 windows.h
 #ifdef _WIN32
