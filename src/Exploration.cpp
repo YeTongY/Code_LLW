@@ -13,6 +13,7 @@
 #include "Dialogue.h"
 #include "Combat.h"
 #include "UI.h"  // 新增：引入UI接口以便在探索状态绘制HUD
+#include "Audio.h" // 新增：控制脚步音效
 
 
 
@@ -72,6 +73,9 @@ void exploration_enter(GameContext* ctx, void* state_data)
     ctx->camera.zoom = 3.0f; // 与 drawPlayer 保持一致
 
     TraceLog(LOG_INFO, "[Exploration] 进入探索状态");
+
+    ctx->enableFootstepAudio = true;
+    ctx->footstepIdleTimer = 0.0f;
 }
 
 void exploration_exit(GameContext* ctx, void* state_data)
@@ -80,6 +84,10 @@ void exploration_exit(GameContext* ctx, void* state_data)
     expd->isActive = false;
     
     TraceLog(LOG_INFO, "[Exploration] 退出探索状态");
+
+    ctx->enableFootstepAudio = false;
+    ctx->player.isMoving = false;
+    StopFootstepSound(*ctx);
 }
 
 void exploration_update(GameContext* ctx, void* state_data)

@@ -151,7 +151,30 @@ int main(void)
     InitAudioDevice(); // 初始化音频设备
 
     //==========加载音频资源==========
-    ctx.footstepfx = LoadSound("../res/audio/sfx/footstep00.wav");
+    const char* footstepCandidates[] = {
+        "../res/audio/sfx/footstep00.wav",
+        "res/audio/sfx/footstep00.wav",
+        "../../res/audio/sfx/footstep00.wav"
+    }; // 修改：多路径容错，兼容不同工作目录
+
+    ctx.footstepLoop = Music{0};
+    for (const char* path : footstepCandidates) {
+        Music candidate = LoadMusicStream(path);
+        if (IsMusicValid(candidate)) {
+            candidate.looping = true; // 确保资源本身标记为循环
+            ctx.footstepLoop = candidate;
+            TraceLog(LOG_INFO, "[Audio] 脚步循环加载成功: %s", path);
+            break;
+        }
+        TraceLog(LOG_WARNING, "[Audio] 脚步循环加载失败: %s", path);
+    }
+
+    if (!IsMusicValid(ctx.footstepLoop)) {
+        TraceLog(LOG_ERROR, "[Audio] 无法加载脚步循环音效，后续将无法播放脚步声");
+    } else {
+        SetMusicVolume(ctx.footstepLoop, 0.8f);
+        TraceLog(LOG_INFO, "[Audio] 脚步循环参数: frameCount=%u, sampleRate=%d", ctx.footstepLoop.frameCount, ctx.footstepLoop.stream.sampleRate);
+    }
     
     //==========初始化状态机==========
     GameStateMachine_init(&ctx.state_machine);
@@ -245,6 +268,14 @@ int main(void)
     
     CloseWindow();
     TraceLog(LOG_INFO, "[Main] 窗口已关闭");
+
+    if (IsMusicValid(ctx.footstepLoop)) {
+        if (IsMusicStreamPlaying(ctx.footstepLoop)) {
+            StopMusicStream(ctx.footstepLoop);
+        }
+        UnloadMusicStream(ctx.footstepLoop);
+        TraceLog(LOG_INFO, "[Main] 脚步循环资源已释放");
+    }
 
     CloseAudioDevice(); // 关闭音频设备
     TraceLog(LOG_INFO, "[Main] 音频设备已关闭");

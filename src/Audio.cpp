@@ -1,31 +1,64 @@
-#pragma once
+#include "raylib.h"  // 新增：显式引入 raylib 音频接口
 #include "Audio.h"
+
+void StopFootstepSound(GameContext &ctx)
+{
+    if (!IsMusicValid(ctx.footstepLoop)) {
+        ctx.isFootstepLooping = false;
+        ctx.footstepIdleTimer = 0.0f;
+        return;
+    }
+
+    if (IsMusicStreamPlaying(ctx.footstepLoop)) {
+        StopMusicStream(ctx.footstepLoop);
+        TraceLog(LOG_TRACE, "[音频] 强制停止脚步循环");
+    }
+
+    ctx.isFootstepLooping = false;
+    ctx.footstepIdleTimer = 0.0f;
+}
 
 void PlayFootstepSound(GameContext &ctx)
 {
-    float stepTimer = 0.0f;          // 计时器
-    float stepInterval = 0.4f;     // 间隔时间：每 0.4 秒响一次
+    if (!IsMusicValid(ctx.footstepLoop)) {
+        return; // 音效未加载时直接返回，防止播放失败
+    }
+
+    if (!ctx.enableFootstepAudio) {
+        StopFootstepSound(ctx);
+        return;
+    }
+
+    const float dt = GetFrameTime();
+    constexpr float idleGraceSeconds = 0.1f;
 
     if (ctx.player.isMoving)
     {
-        //计时器累加
-        stepTimer += GetFrameTime();
-
-        //如果时间到了间隔点
-        if (stepTimer >= stepInterval)
+        if (!ctx.isFootstepLooping)
         {
-            // --- 播放声音 ---
-            SetSoundPitch(ctx.footstepfx, 0.9f + ((float)GetRandomValue(0, 20) / 100.0f)); // 加上刚才说的随机音高
-            PlaySound(ctx.footstepfx);
+            TraceLog(LOG_INFO, "[音频] 启动脚步循环音效");
+            ctx.footstepLoop.looping = true; // 确保持续循环
+            PlayMusicStream(ctx.footstepLoop);
+            ctx.isFootstepLooping = true;
+        }
 
-            // --- 重置计时器 ---
-            stepTimer = 0.0f;
+        ctx.footstepIdleTimer = 0.0f;
+    }
+    else if (ctx.isFootstepLooping)
+    {
+        ctx.footstepIdleTimer += dt;
+
+        if (ctx.footstepIdleTimer >= idleGraceSeconds)
+        {
+            TraceLog(LOG_TRACE, "[音频] 玩家停止移动，关闭脚步循环");
+            StopMusicStream(ctx.footstepLoop);
+            ctx.isFootstepLooping = false;
+            ctx.footstepIdleTimer = 0.0f;
         }
     }
-    else
+
+    if (ctx.isFootstepLooping)
     {
-        // 如果停下来了，把计时器设为“满的”
-        // 这样下次起步时，第一脚会立刻响，没有延迟
-        stepTimer = stepInterval;
+        UpdateMusicStream(ctx.footstepLoop); // 维持流式播放
     }
 }
