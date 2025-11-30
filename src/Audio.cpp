@@ -11,7 +11,7 @@ void StopFootstepSound(GameContext &ctx)
 
     if (IsMusicStreamPlaying(ctx.footstepLoop)) {
         StopMusicStream(ctx.footstepLoop);
-        TraceLog(LOG_TRACE, "[音频] 强制停止脚步循环");
+        TraceLog(LOG_TRACE, "[Audio] 强制停止脚步循环");
     }
 
     ctx.isFootstepLooping = false;
@@ -36,7 +36,7 @@ void PlayFootstepSound(GameContext &ctx)
     {
         if (!ctx.isFootstepLooping)
         {
-            TraceLog(LOG_INFO, "[音频] 启动脚步循环音效");
+            TraceLog(LOG_INFO, "[Audio] 启动脚步循环音效");
             ctx.footstepLoop.looping = true; // 确保持续循环
             PlayMusicStream(ctx.footstepLoop);
             ctx.isFootstepLooping = true;
@@ -50,7 +50,7 @@ void PlayFootstepSound(GameContext &ctx)
 
         if (ctx.footstepIdleTimer >= idleGraceSeconds)
         {
-            TraceLog(LOG_TRACE, "[音频] 玩家停止移动，关闭脚步循环");
+            TraceLog(LOG_TRACE, "[Audio] 玩家停止移动，关闭脚步循环");
             StopMusicStream(ctx.footstepLoop);
             ctx.isFootstepLooping = false;
             ctx.footstepIdleTimer = 0.0f;
