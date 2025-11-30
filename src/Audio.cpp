@@ -3,6 +3,8 @@
 
 void PlayFootstepSound(GameContext &ctx)
 {
+    float stepTimer = 0.0f;          // 计时器
+    float stepInterval = 0.4f;     // 间隔时间：每 0.4 秒响一次
 
     if (ctx.player.isMoving)
     {

@@ -1,8 +1,8 @@
 #pragma once
 #include "GameState.h"
 
-float stepTimer = 0.0f;          // 计时器
-float stepInterval = 0.4f;       // 间隔时间：每 0.4 秒响一次
+extern float stepTimer;          // 计时器
+extern float stepInterval;     // 间隔时间：每 0.4 秒响一次
 
 /**
  * @brief 根据移动状态播放脚步声
