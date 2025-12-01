@@ -21,6 +21,7 @@ void combat_enter(GameContext* ctx, void* state_data)
     data->playerAnimating = false;
     data->enemyAnimating = false;
     data->damageDealt = 0;
+    data->playerDefending = false;
     
     // 初始化行动选项
     data->actionNames.clear();
@@ -228,6 +229,10 @@ void combat_render(GameContext* ctx, void* state_data)
 void ProcessPlayerAction(GameContext* ctx, CombatData* data, CombatAction action)
 {
     char msg[256];
+    if(action != ACTION_DEFEND)
+    {
+        data->playerDefending = false;
+    }
     
     switch (action)
     {
@@ -260,6 +265,7 @@ void ProcessPlayerAction(GameContext* ctx, CombatData* data, CombatAction action
         {
             data->battleMessage = "Taffy 进入了防御姿态！";
             data->messageTimer = 1.5f;
+            data->playerDefending = true;
             // 下回合受到的伤害减半（需要在敌人回合实现）
             data->currentPhase = COMBAT_PHASE_ENEMY_TURN;
             break;
@@ -290,10 +296,23 @@ void ProcessEnemyTurn(GameContext* ctx, CombatData* data)
     
     // 简单的敌人AI：直接攻击
     int damage = std::max(1, data->currentEnemy->stats.attack - ctx->player.stats.defense);
+    bool defended = data->playerDefending;
+    if(defended)
+    {
+        damage = std::max(1, damage / 2);
+        data->playerDefending = false;
+    }
     ctx->player.stats.hp -= damage;
     
     char msg[256];
-    std::sprintf(msg, "敌人 对 Taffy 造成了 %d 点伤害！", damage);
+    if(defended)
+    {
+        std::sprintf(msg, "敌人 对 Taffy 造成了 %d 点伤害！（防御减伤）", damage);
+    }
+    else
+    {
+        std::sprintf(msg, "敌人 对 Taffy 造成了 %d 点伤害！", damage);
+    }
     data->battleMessage = msg;
     data->messageTimer = 2.0f;
     data->animationTimer = 1.0f;

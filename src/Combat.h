@@ -32,6 +32,7 @@ struct CombatData
     
     // 参战单位（引用 GameContext 中的数据）
     Enemy* currentEnemy;        // 当前战斗的敌人指针
+    bool playerDefending;       // 玩家是否处于防御姿态
     
     // UI 状态
     int selectedAction;         // 当前选中的行动（0-3对应上面的枚举）
