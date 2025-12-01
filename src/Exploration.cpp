@@ -91,7 +91,7 @@ void exploration_exit(GameContext* ctx, void* state_data)
     ctx->enableFootstepAudio = false;
     ctx->player.isMoving = false;
     StopFootstepSound(*ctx);
-    StopExplorationBGM(*ctx);
+    
 }
 
 void exploration_update(GameContext* ctx, void* state_data)

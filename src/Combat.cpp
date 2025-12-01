@@ -38,6 +38,7 @@ void combat_enter(GameContext* ctx, void* state_data)
     ctx->enableFootstepAudio = false;
     ctx->player.isMoving = false;
     StopFootstepSound(*ctx);
+    StopExplorationBGM(*ctx);
 
     TraceLog(LOG_INFO, "[Combat] 进入战斗状态");
 }
