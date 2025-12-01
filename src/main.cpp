@@ -199,7 +199,7 @@ int main(void)
     if (!IsMusicValid(ctx.explorationBGM)) {
         TraceLog(LOG_ERROR, "[Audio] 无法加载探索背景音乐，后续将无法播放背景音乐");
     } else {
-        SetMusicVolume(ctx.explorationBGM, 0.5f);
+        SetMusicVolume(ctx.explorationBGM, 0.15f); // 默认音量调低，避免遮盖效果音
         TraceLog(LOG_INFO, "[Audio] 探索背景音乐参数: frameCount=%u, sampleRate=%d", ctx.explorationBGM.frameCount, ctx.explorationBGM.stream.sampleRate);
     }
     
@@ -225,7 +225,7 @@ int main(void)
     if (!IsMusicValid(ctx.combatBGM)) {
         TraceLog(LOG_ERROR, "[Audio] 无法加载战斗背景音乐，后续将无法播放背景音乐");
     } else {
-        SetMusicVolume(ctx.combatBGM, 0.5f);
+        SetMusicVolume(ctx.combatBGM, 0.3f);
         TraceLog(LOG_INFO, "[Audio] 战斗背景音乐参数: frameCount=%u, sampleRate=%d", ctx.combatBGM.frameCount, ctx.combatBGM.stream.sampleRate);
     }
 

@@ -69,6 +69,10 @@ void combat_update(GameContext* ctx, void* state_data)
     
     if (!data->isActive) return;
     
+    if (ctx->isCombatBGMPlaying) {
+        UpdateMusicStream(ctx->combatBGM); // 持续刷新战斗BGM，防止播放中断
+    }
+
     float deltaTime = GetFrameTime();
     
     // 更新计时器

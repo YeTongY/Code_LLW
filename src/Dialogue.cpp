@@ -17,7 +17,7 @@
     data->visibleChars = 0.0f;
     data->skipToEnd = false;
     //==============修改bgm音量==============
-    SetMusicVolume(ctx->explorationBGM, 0.5f);
+    SetMusicVolume(ctx->explorationBGM, 0.07f);
 
      // 4. 加载第一句对话的头像
     const DialogueLine& firstLine = data->script[0];
@@ -66,6 +66,9 @@
 
     // 3. 释放为本次对话分配的数据包内存
     delete data;
+
+    //==============恢复bgm音量==============
+    SetMusicVolume(ctx->explorationBGM, 0.1f);
 
     TraceLog(LOG_INFO, "[Dialogue] 退出对话状态，所有资源已清理。");
 }
