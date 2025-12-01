@@ -62,6 +62,24 @@ void LoadPlayerAssets(GameContext& ctx){
         TraceLog(LOG_ERROR, "[Player] 将使用红色方块作为占位符");
     }
 
+    // 初始化动画相关数据，默认以 TILE_SIZE 为帧宽，双倍高度
+    ctx.player.frameWidth = TILE_SIZE;
+    ctx.player.frameHeight = TILE_SIZE * 2;
+    ctx.player.frameDuration = 0.1667f; // ≈6 FPS（较之前快 1.5 倍）
+    ctx.player.animationTimer = 0.0f;
+    ctx.player.currentFrame = 0;
+
+    if (ctx.player.spriteSheet.id != 0) {
+        // 自动推断行数与每行帧数，便于兼容不同尺寸的贴图
+        ctx.player.framesPerDirection = std::max(1, ctx.player.spriteSheet.width / ctx.player.frameWidth);
+        ctx.player.animationRowCount = std::max(1, ctx.player.spriteSheet.height / ctx.player.frameHeight);
+        ctx.player.usesRowBasedSheet = (ctx.player.framesPerDirection > 1);
+    } else {
+        ctx.player.framesPerDirection = 1;
+        ctx.player.animationRowCount = 1;
+        ctx.player.usesRowBasedSheet = false;
+    }
+
 
     //------开始加载滤镜------
     TraceLog(LOG_INFO, "[Shader] 开始加载滤镜，屏幕尺寸: %.0fx%.0f", ctx.screenWidth, ctx.screenHeight);
@@ -209,8 +227,10 @@ void updatePlayer(GameContext& ctx){
 
     //------ 2. 开始移动状态更新 ------
 
+    PlayerDirection previousDirection = ctx.player.currentDirection;
     float dt = GetFrameTime(); 
     float moveSpeed = ctx.player.moveSpeed;
+    bool wasMoving = ctx.player.isMoving;
     
     // 处理平滑移动动画
     if (ctx.player.isMoving)
@@ -273,6 +293,33 @@ void updatePlayer(GameContext& ctx){
             }
         }
     }
+
+    // 当方向发生变化时重置动画阶段，保证起始帧一致
+    if (ctx.player.currentDirection != previousDirection && ctx.player.usesRowBasedSheet) {
+        // 新方向从首帧开始播放，避免跨方向残影
+        ctx.player.currentFrame = 0;
+        ctx.player.animationTimer = 0.0f;
+    }
+
+    // 更新行走动画
+    if (ctx.player.usesRowBasedSheet && ctx.player.framesPerDirection > 1) {
+        float frameDuration = (ctx.player.frameDuration > 0.0f) ? ctx.player.frameDuration : 0.12f;
+
+        if (ctx.player.isMoving) {
+            // 积累帧时间到达阈值后推进一帧
+            ctx.player.animationTimer += dt;
+
+            while (ctx.player.animationTimer >= frameDuration) {
+                ctx.player.animationTimer -= frameDuration;
+                ctx.player.currentFrame = (ctx.player.currentFrame + 1) % ctx.player.framesPerDirection;
+            }
+        }
+        else if (wasMoving && ctx.player.inputStack.empty()) {
+            // 只有完全松开方向键时才复位站立帧
+            ctx.player.currentFrame = 0;
+            ctx.player.animationTimer = 0.0f;
+        }
+    }
 }
 
 
@@ -287,37 +334,82 @@ void updatePlayer(GameContext& ctx){
  */
 void DrawPlayerSprite(const Player& player)
 {
-    Rectangle source = { 0.0f, 0.0f, 32.0f, 64.0f };
+    int frameWidth = (player.frameWidth > 0) ? player.frameWidth : TILE_SIZE;
+    int frameHeight = (player.frameHeight > 0) ? player.frameHeight : TILE_SIZE * 2;
+    Rectangle source = { 0.0f, 0.0f, (float)frameWidth, (float)frameHeight };
 
-    switch (player.currentDirection)
-    {
-        case PLAYER_DIR_LEFT:
-            source.x = 0.0f;
-            break;
-        case PLAYER_DIR_DOWN:
-            source.x = 32.0f;
-            break;
-        case PLAYER_DIR_RIGHT:
-            source.x = 64.0f;
-            break;
-        case PLAYER_DIR_UP:
-            source.x = 96.0f;
-            break;
-        default:
-            source.x = 32.0f;
-            TraceLog(LOG_WARNING, "[Player] 检测到异常的 currentDirection 值: %d, 使用默认朝向", player.currentDirection);
-            break;
+    if (player.spriteSheet.id != 0) {
+        if (player.usesRowBasedSheet) {
+            // 当精灵表以“行=方向、列=帧”组织时，按方向挑选行并播放帧序列
+            int framesPerDirection = (player.framesPerDirection > 0) ? player.framesPerDirection : 1;
+            int frameIndex = (framesPerDirection > 0) ? player.currentFrame % framesPerDirection : 0;
+            int availableRows = (player.animationRowCount > 0) ? player.animationRowCount : ((frameHeight > 0) ? player.spriteSheet.height / frameHeight : 1);
+            if (availableRows <= 0) availableRows = 1;
+
+            int rowIndex = 0;
+            switch (player.currentDirection)
+            {
+                case PLAYER_DIR_LEFT:
+                    rowIndex = (availableRows >= 2) ? 1 : 0;
+                    break;
+                case PLAYER_DIR_RIGHT:
+                    rowIndex = (availableRows >= 3) ? 2 : ((availableRows >= 2) ? 1 : 0);
+                    break;
+                case PLAYER_DIR_UP:
+                    rowIndex = (availableRows >= 4) ? 3 : (availableRows - 1);
+                    break;
+                case PLAYER_DIR_DOWN:
+                    rowIndex = 0;
+                    break;
+                default:
+                    rowIndex = 0;
+                    TraceLog(LOG_WARNING, "[Player] 检测到异常的 currentDirection 值: %d, 使用默认朝向", player.currentDirection);
+                    break;
+            }
+
+            if (rowIndex < 0) rowIndex = 0;
+            if (rowIndex >= availableRows) rowIndex = availableRows - 1;
+
+            source.x = (float)(frameIndex * frameWidth);
+            source.y = (float)(rowIndex * frameHeight);
+        } else {
+            // 旧版贴图：横向排列四个朝向，只有静态帧
+            switch (player.currentDirection)
+            {
+                case PLAYER_DIR_LEFT:
+                    source.x = 0.0f;
+                    break;
+                case PLAYER_DIR_DOWN:
+                    source.x = (float)frameWidth;
+                    break;
+                case PLAYER_DIR_RIGHT:
+                    source.x = (float)(frameWidth * 2);
+                    break;
+                case PLAYER_DIR_UP:
+                    source.x = (float)(frameWidth * 3);
+                    break;
+                default:
+                    source.x = (float)frameWidth;
+                    TraceLog(LOG_WARNING, "[Player] 检测到异常的 currentDirection 值: %d, 使用默认朝向", player.currentDirection);
+                    break;
+            }
+        }
+    }
+
+    float verticalOffset = (float)frameHeight - TILE_SIZE;
+    if (verticalOffset < 0.0f) {
+        verticalOffset = 0.0f;
     }
 
     Vector2 drawDestPosition = {
         player.visualPosition.x,
-        player.visualPosition.y - TILE_SIZE
+        player.visualPosition.y - verticalOffset
     };
 
     if (player.spriteSheet.id != 0) {
         DrawTextureRec(player.spriteSheet, source, drawDestPosition, WHITE);
     } else {
-        DrawRectangle((int)drawDestPosition.x, (int)drawDestPosition.y, 32, 64, RED);
+        DrawRectangle((int)drawDestPosition.x, (int)drawDestPosition.y, frameWidth, frameHeight, RED);
         DrawText("NO SPRITE", (int)player.visualPosition.x, (int)player.visualPosition.y, 10, WHITE);
     }
 }
