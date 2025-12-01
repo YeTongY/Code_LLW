@@ -139,12 +139,15 @@ struct GameContext
     // UI 模板实例
     HUDTemplate hudTemplate;
 
-    bool enableFootstepAudio = false; // 新增：探索状态控制脚步音效
-    bool isFootstepLooping = false;   // 新增：脚步声循环标记
-    float footstepIdleTimer = 0.0f;   // 新增：停止前的缓冲计时
+    bool enableFootstepAudio = false; // 探索状态控制脚步音效
+    bool isFootstepLooping = false;   // 脚步声循环标记
+    float footstepIdleTimer = 0.0f;   // 停止前的缓冲计时
+
+    bool isExplorationBGMPlaying = false; // 探索背景音乐播放标记
 
     //音效
     Music footstepLoop = {0};
+    Music explorationBGM = {0};
 
     //标题图片
     Texture2D titleScreen;
