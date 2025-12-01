@@ -40,6 +40,7 @@ void combat_enter(GameContext* ctx, void* state_data)
     ctx->player.isMoving = false;
     StopFootstepSound(*ctx);
     StopExplorationBGM(*ctx);
+    PlayCombatBGM(*ctx);
 
     TraceLog(LOG_INFO, "[Combat] 进入战斗状态");
 }
@@ -57,6 +58,7 @@ void combat_exit(GameContext* ctx, void* state_data)
     ctx->enableFootstepAudio = false;
     ctx->player.isMoving = false;
     StopFootstepSound(*ctx);
+    StopCombatBGM(*ctx);
     
     TraceLog(LOG_INFO, "[Combat] 退出战斗状态");
 }

@@ -144,10 +144,12 @@ struct GameContext
     float footstepIdleTimer = 0.0f;   // 停止前的缓冲计时
 
     bool isExplorationBGMPlaying = false; // 探索背景音乐播放标记
+    bool isCombatBGMPlaying = false;      // 战斗背景音乐播放标记
 
     //音效
     Music footstepLoop = {0};
     Music explorationBGM = {0};
+    Music combatBGM = {0};
 
     //标题图片
     Texture2D titleScreen;

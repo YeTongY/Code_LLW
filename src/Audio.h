@@ -23,3 +23,6 @@ void PlayExplorationBGM(GameContext &ctx);
  * @brief 停止探索背景音乐
  */
 void StopExplorationBGM(GameContext &ctx);
+
+void PlayCombatBGM(GameContext &ctx);
+void StopCombatBGM(GameContext &ctx);

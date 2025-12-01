@@ -179,9 +179,9 @@ int main(void)
 
     //============加载探索背景音乐==========
     const char* explorationBGMCandidates[] = {
-        "../res/audio/music/A CLUE.wav",
-        "res/audio/music/A CLUE.wav",
-        "../../res/audio/music/A CLUE.wav"
+        "../res/audio/music/tartarus_0d04 (P3R ver.).wav",
+        "res/audio/music/tartarus_0d04 (P3R ver.).wav",
+        "../../res/audio/music/tartarus_0d04 (P3R ver.).wav"
     };
 
     ctx.explorationBGM = Music{0};
@@ -203,7 +203,31 @@ int main(void)
         TraceLog(LOG_INFO, "[Audio] 探索背景音乐参数: frameCount=%u, sampleRate=%d", ctx.explorationBGM.frameCount, ctx.explorationBGM.stream.sampleRate);
     }
     
+    //============加载战斗背景音乐==========
+    const char* combatBGMCandidates[] = {
+        "../res/audio/music/A CLUE.wav",
+        "res/audio/music/A CLUE.wav",
+        "../../res/audio/music/A CLUE.wav"
+    };
 
+    ctx.combatBGM = Music{0};
+    for (const char* path : combatBGMCandidates) {
+        Music candidate = LoadMusicStream(path);
+        if (IsMusicValid(candidate)) {
+            candidate.looping = true; // 确保资源本身标记为循环
+            ctx.combatBGM = candidate;
+            TraceLog(LOG_INFO, "[Audio] 战斗背景音乐加载成功: %s", path);
+            break;
+        }
+        TraceLog(LOG_WARNING, "[Audio] 战斗背景音乐加载失败: %s", path);
+    }
+
+    if (!IsMusicValid(ctx.combatBGM)) {
+        TraceLog(LOG_ERROR, "[Audio] 无法加载战斗背景音乐，后续将无法播放背景音乐");
+    } else {
+        SetMusicVolume(ctx.combatBGM, 0.5f);
+        TraceLog(LOG_INFO, "[Audio] 战斗背景音乐参数: frameCount=%u, sampleRate=%d", ctx.combatBGM.frameCount, ctx.combatBGM.stream.sampleRate);
+    }
 
 
     //==========初始化状态机==========

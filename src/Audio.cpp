@@ -116,3 +116,35 @@ void StopExplorationBGM(GameContext &ctx)
         TraceLog(LOG_INFO, "[Audio] 停止探索背景音乐");
     }
 }
+
+void PlayCombatBGM(GameContext &ctx)
+{
+    // 如果音效未加载，直接返回
+    if (!IsMusicValid(ctx.combatBGM)) {
+        return;
+    }
+    // 如果已经在播放，直接返回
+    if (IsMusicStreamPlaying(ctx.combatBGM)) {
+        return;
+    }
+    // 设置为循环播放并启动
+    ctx.combatBGM.looping = true;
+    PlayMusicStream(ctx.combatBGM);
+    ctx.isCombatBGMPlaying = true;
+    TraceLog(LOG_INFO, "[Audio] 启动战斗背景音乐");
+}
+
+void StopCombatBGM(GameContext &ctx)
+{
+    // 如果音效未加载，直接返回
+    if (!IsMusicValid(ctx.combatBGM)) {
+        return;
+    }
+
+    // 如果正在播放，则停止
+    if (IsMusicStreamPlaying(ctx.combatBGM)) {
+        StopMusicStream(ctx.combatBGM);
+        ctx.isCombatBGMPlaying = false;
+        TraceLog(LOG_INFO, "[Audio] 停止战斗背景音乐");
+    }
+}
