@@ -39,6 +39,8 @@ struct Enemy {//声明敌人主结构体
     Stats stats; // 敌人的属性
 
     EnemyDirection currentDirection; // 敌人"当前"的方向
+
+    string textureKey; // 敌人纹理的键值
 };
 
 void DrawEnemySprite(const GameContext &ctx, const Enemy &enemy);                                                 // 在地图上绘制敌人

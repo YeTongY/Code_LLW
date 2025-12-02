@@ -148,24 +148,8 @@ void DrawYSortLayer(const GameContext& map)
         if(!enemy.isActive) continue;
         const Enemy* enemyPtr = &enemy;
         sortedDrawables.push_back({ enemy.visualPosition.y + map.tileSize, [ctxPtr, enemyPtr]() {
-            Rectangle source = {0,0,32,64};
-            source.height = 64.0f;
-            source.y = 0.0f;
-            switch (enemyPtr->currentDirection){
-                case ENEMY_DIR_RIGHT: source.x = 0.0f; break;
-                case ENEMY_DIR_UP: source.x = 32.0f; break;
-                case ENEMY_DIR_LEFT: source.x = 64.0f; break;
-                case ENEMY_DIR_DOWN: default: source.x = 96.0f; break;
-            }
-            Vector2 drawDestPosition = {
-                enemyPtr->visualPosition.x,
-                enemyPtr->visualPosition.y - ctxPtr->tileSize
-            };
-            if(ctxPtr->enemySpriteSheet.id != 0){
-                DrawTextureRec(ctxPtr->enemySpriteSheet, source, drawDestPosition, WHITE);
-            } else {
-                DrawRectangle((int)drawDestPosition.x, (int)drawDestPosition.y, 32, 64, BLUE);
-            }
+            // 绘制敌人正确素材
+            DrawEnemySprite(*ctxPtr, *enemyPtr);
         }});
     }
 
@@ -489,14 +473,23 @@ bool LoadLevelFromTiled(GameContext& ctx, const char* filepath){
                 //从tilesMap中获取敌人数据
                 //严肃声明，在tilesmap里面自定义敌人数据的时候，不要修改变量名，将对象层的敌人模块复制粘贴并且仅修改属性值
                 for(const auto& prop : object.getProperties()){
-                    if (prop.getName() == "hp") enemy.stats.hp = prop.getIntValue();
-                    if (prop.getName() == "maxHp") enemy.stats.maxHp = prop.getIntValue();
-                    if (prop.getName() == "attack") enemy.stats.attack = prop.getIntValue();
-                    if (prop.getName() == "defense") enemy.stats.defense = prop.getIntValue();
-                    if (prop.getName() == "moveSpeed") enemy.moveSpeed = prop.getFloatValue();
+                    string propName = prop.getName();//属性名称
+
+                    if (propName == "hp") enemy.stats.hp = prop.getIntValue();
+                    if (propName == "maxHp") enemy.stats.maxHp = prop.getIntValue();
+                    if (propName == "attack") enemy.stats.attack = prop.getIntValue();
+                    if (propName == "defense") enemy.stats.defense = prop.getIntValue();
+                    if (propName == "moveSpeed") enemy.moveSpeed = prop.getFloatValue();
                     //读取ai逻辑
-                    if (prop.getName() == "patrolRange") enemy.patrolRange = prop.getFloatValue();
-                    if (prop.getName() == "aggroRange") enemy.aggroRange = prop.getFloatValue();
+                    if (propName == "patrolRange") enemy.patrolRange = prop.getFloatValue();
+                    if (propName == "aggroRange") enemy.aggroRange = prop.getFloatValue();
+                    //读取敌人素材图
+                    if (propName == "enemyType") enemy.textureKey = prop.getStringValue();
+                }
+
+                if(enemy.textureKey.empty()){
+                    TraceLog(LOG_WARNING, "[Map] 敌人对象缺少 enemyType 属性，使用默认纹理");
+                    enemy.textureKey = "Default";
                 }
 
                 //设置其他默认属性

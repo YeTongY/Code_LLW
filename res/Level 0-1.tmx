@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="25" height="25" tilewidth="32" tileheight="32" infinite="0" nextlayerid="2" nextobjectid="1">
+ <tileset firstgid="1" name="UI_32x32" tilewidth="32" tileheight="32" tilecount="288" columns="18">
+  <image source="graphics/tilesets/UI_32x32.png" width="576" height="512"/>
+ </tileset>
+ <tileset firstgid="289" name="UI_thinking_emotes_animation_32x32" tilewidth="32" tileheight="32" tilecount="100" columns="10">
+  <image source="graphics/tilesets/UI_thinking_emotes_animation_32x32.png" width="320" height="320"/>
+ </tileset>
+ <tileset firstgid="389" name="1_Generic_32x32" tilewidth="32" tileheight="32" tilecount="1248" columns="16">
+  <image source="graphics/tilesets/1_Generic_32x32.png" width="512" height="2496"/>
+ </tileset>
+ <tileset firstgid="1637" name="Interiors_32x32" tilewidth="32" tileheight="32" tilecount="17024" columns="16">
+  <image source="graphics/tilesets/Interiors_32x32.png" width="512" height="34048"/>
+ </tileset>
+ <tileset firstgid="18661" name="Interiors_Part1" tilewidth="32" tileheight="32" tilecount="4096" columns="16">
+  <image source="graphics/tilesets/Interiors_Part1.png" width="512" height="8192"/>
+ </tileset>
+ <tileset firstgid="22757" name="Interiors_Part2" tilewidth="32" tileheight="32" tilecount="4096" columns="16">
+  <image source="graphics/tilesets/Interiors_Part2.png" width="512" height="8192"/>
+ </tileset>
+ <tileset firstgid="26853" name="Interiors_Part3" tilewidth="32" tileheight="32" tilecount="4096" columns="16">
+  <image source="graphics/tilesets/Interiors_Part3.png" width="512" height="8192"/>
+ </tileset>
+ <tileset firstgid="30949" name="Interiors_Part4" tilewidth="32" tileheight="32" tilecount="4096" columns="16">
+  <image source="graphics/tilesets/Interiors_Part4.png" width="512" height="8192"/>
+ </tileset>
+ <tileset firstgid="35045" name="Interiors_Part5" tilewidth="32" tileheight="32" tilecount="640" columns="16">
+  <image source="graphics/tilesets/Interiors_Part5.png" width="512" height="1280"/>
+ </tileset>
+ <tileset firstgid="35685" name="Modern_Exteriors_Complete_Tileset_32x32" tilewidth="32" tileheight="32" tilecount="79728" columns="176">
+  <image source="graphics/tilesets/Modern_Exteriors_Complete_Tileset_32x32.png" width="5632" height="14496"/>
+ </tileset>
+ <tileset firstgid="115413" name="Room_Builder_32x32" tilewidth="32" tileheight="32" tilecount="8588" columns="76">
+  <image source="graphics/tilesets/Room_Builder_32x32.png" width="2432" height="3616"/>
+ </tileset>
+ <layer id="1" name="图块层 1" width="25" height="25">
+  <data encoding="csv">
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+</data>
+ </layer>
+</map>
