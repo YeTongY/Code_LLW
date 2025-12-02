@@ -29,9 +29,13 @@ struct DialogueData {
     float visibleChars; 
     bool skipToEnd;
     float charsPerSecond;
+
+    GameState* nextState = nullptr;//2025/12/2 Warning新增 对话结束后的目标状态
 };
 
-GameState* createDialogueState(const vector<DialogueLine>& script);
+//GameState* createDialogueState(const vector<DialogueLine>& script);
+GameState* createDialogueState(const vector<DialogueLine>& script, GameState* nextState = nullptr);//新的剧本状态创建函数
+//2025/12/2 by Warning
 
 
 vector<DialogueLine> LoadDialogueScript(const char* filepath);

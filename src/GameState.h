@@ -110,6 +110,8 @@ struct GameContext
     vector<int> tilesetFirstGIDs;                       // 每个 tileset 的起始 GID
 
     Enemy* currentCombatant;            //当前战斗的敌人指针
+    string pendingPreCombatDialogue;    // 即将触发的战斗前对话脚本
+    string pendingPostCombatDialogue;   // 即将触发的战斗后对话脚本
     vector<Enemy> enemies;
     Texture2D enemySpriteSheet;
     map<string, Texture2D> enemyTextures;

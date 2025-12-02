@@ -50,6 +50,11 @@ struct CombatData
     // 战斗统计
     int turnCount;              // 回合数
     int damageDealt;            // 本回合造成的伤害
+
+    // 对话脚本
+    std::string preDialogueScript;   // 战前的对话脚本路径
+    std::string postDialogueScript;  // 战后的对话脚本路径
+    bool postDialogueQueued;         // 是否已经触发过战后对话
 };
 
 // 战斗状态生命周期函数
@@ -59,7 +64,7 @@ void combat_update(GameContext* ctx, void* state_data);
 void combat_render(GameContext* ctx, void* state_data);
 
 // 战斗状态创建函数
-GameState* CreateCombatState(Enemy* targetEnemy);
+GameState* CreateCombatState(GameContext* ctx, Enemy* targetEnemy);
 
 // 战斗逻辑辅助函数
 void ProcessPlayerAction(GameContext* ctx, CombatData* data, CombatAction action);

@@ -3,8 +3,30 @@
 #include "raylib.h"
 #include "GameState.h"
 #include "Audio.h"
+#include "Dialogue.h"
 #include <cstdio>
 #include <algorithm>
+
+static GameState* CreateDialogueStateForScript(const std::string& scriptPath, GameState* nextState, bool destroyNextOnFailure)
+{
+    if (scriptPath.empty() || !nextState) {
+        return nullptr;
+    }
+
+    std::vector<DialogueLine> script = LoadDialogueScript(scriptPath.c_str());
+    if (script.empty()) {
+        if (destroyNextOnFailure) {
+            GameState_destory(nextState);
+        }
+        return nullptr;
+    }
+
+    GameState* dialogueState = createDialogueState(script, nextState);
+    if (!dialogueState && destroyNextOnFailure) {
+        GameState_destory(nextState);
+    }
+    return dialogueState;
+}
 
 //=========================战斗状态实现=========================
 
@@ -124,11 +146,6 @@ void combat_update(GameContext* ctx, void* state_data)
         case COMBAT_PHASE_VICTORY:
             // 胜利结算
             if (IsKeyPressed(KEY_ENTER) || IsKeyPressed(KEY_SPACE)) {
-                // 标记敌人为已击败
-                if (data->currentEnemy) {
-                    data->currentEnemy->isActive = false;
-                }
-                
                 // 返回探索状态
                 GameState* explorationState = createExplorationState();
                 if (explorationState) {
@@ -331,6 +348,24 @@ void CheckBattleEnd(GameContext* ctx, CombatData* data)
 {
     // 检查敌人是否被击败
     if (data->currentEnemy && data->currentEnemy->stats.hp <= 0) {
+        data->currentEnemy->isActive = false;
+
+        if (!data->postDialogueScript.empty() && !data->postDialogueQueued) {
+            GameState* nextState = createExplorationState();
+            if (nextState) {
+                GameState* dialogueState = CreateDialogueStateForScript(
+                    data->postDialogueScript,
+                    nextState,
+                    true);
+                if (dialogueState) {
+                    data->postDialogueQueued = true;
+                    TraceLog(LOG_INFO, "[Combat] 触发战后对话：%s", data->postDialogueScript.c_str());
+                    GameStateMachine_change(&ctx->state_machine, ctx, dialogueState);
+                    return;
+                }
+            }
+        }
+
         data->battleMessage = "战斗胜利！";
         data->currentPhase = COMBAT_PHASE_VICTORY;
         return;
@@ -356,8 +391,13 @@ void CheckBattleEnd(GameContext* ctx, CombatData* data)
 
 //=========================战斗状态创建=========================
 
-GameState* CreateCombatState(Enemy* targetEnemy)
+GameState* CreateCombatState(GameContext* ctx, Enemy* targetEnemy)
 {
+    if (!targetEnemy) {
+        TraceLog(LOG_ERROR, "[Combat] 创建失败：缺少敌人目标");
+        return nullptr;
+    }
+
     CombatData* data = new CombatData(); // 为战斗状态分配的数据块
     if (!data) {
         TraceLog(LOG_ERROR, "[Combat] 内存分配失败");
@@ -365,8 +405,19 @@ GameState* CreateCombatState(Enemy* targetEnemy)
     }
     
     data->currentEnemy = targetEnemy;
+    data->postDialogueQueued = false;
+
+    if (ctx) {
+        data->preDialogueScript = ctx->pendingPreCombatDialogue;
+        data->postDialogueScript = ctx->pendingPostCombatDialogue;
+        ctx->pendingPreCombatDialogue.clear();
+        ctx->pendingPostCombatDialogue.clear();
+    } else {
+        data->preDialogueScript.clear();
+        data->postDialogueScript.clear();
+    }
     
-    GameState* state = Gamestate_create(
+    GameState* combatState = Gamestate_create(
         combat_enter,
         combat_exit,
         combat_update,
@@ -374,14 +425,26 @@ GameState* CreateCombatState(Enemy* targetEnemy)
         data,
         sizeof(CombatData)
     );
-    // state 即注册到状态机的战斗 GameState
+    // combatState 即注册到状态机的战斗 GameState
     
-    if (!state) {
+    if (!combatState) {
         TraceLog(LOG_ERROR, "[Combat] 创建状态失败");
         delete data;
         return nullptr;
     }
+
+    if (!data->preDialogueScript.empty()) {
+        GameState* dialogueState = CreateDialogueStateForScript(
+            data->preDialogueScript,
+            combatState,
+            false);
+        if (dialogueState) {
+            TraceLog(LOG_INFO, "[Combat] 触发战前对话：%s", data->preDialogueScript.c_str());
+            data->preDialogueScript.clear();
+            return dialogueState;
+        }
+    }
     
     TraceLog(LOG_INFO, "[Combat] 战斗状态创建成功");
-    return state;
+    return combatState;
 }
