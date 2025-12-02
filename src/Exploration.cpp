@@ -35,7 +35,7 @@ static void TryTriggerCombat(GameContext* ctx)
         if (distanceSq > triggerDistanceSq) continue;
 
         ctx->currentCombatant = &enemy;
-        GameState* combatState = CreateCombatState(&enemy); // 进入与该敌人的战斗状态
+        GameState* combatState = CreateCombatState(ctx, &enemy); // 进入与该敌人的战斗状态
         if (combatState)
         {
             TraceLog(LOG_INFO, "[Exploration] 触发与敌人(%d,%d)的战斗", enemy.gridX, enemy.gridY);
@@ -133,8 +133,12 @@ void exploration_update(GameContext* ctx, void* state_data)
 
             if(CheckCollisionRecs(playerRect, EnemyRcet)){
                 TraceLog(LOG_INFO, "[Exploration] 玩家与敌人发生碰撞，准备进入战斗状态");
+                //====================12/2 剧本加载 Warning start
+                ctx->pendingPreCombatDialogue = "res/data/dialogue/Level0/L0_before_battle.csv";
+                ctx->pendingPostCombatDialogue = "res/data/dialogue/Level0/L0_after_battle.csv";
+                //====================12/2 Warning end
                 
-                GameState* combatState = CreateCombatState(&enemy); // 与该敌人开战
+                GameState* combatState = CreateCombatState(ctx, &enemy); // 与该敌人开战
 
                 if(combatState){
                     GameStateMachine_change(&ctx->state_machine, ctx, combatState);

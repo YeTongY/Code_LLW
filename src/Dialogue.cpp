@@ -3,7 +3,7 @@
 #include "UI.h"
 
 
-    void dialogue_enter(GameContext* ctx, void* state_data) {
+void dialogue_enter(GameContext* ctx, void* state_data) {
     // 1. 类型转换，获取我们的数据包
     DialogueData* data = static_cast<DialogueData*>(state_data); // 当前对话状态数据
     // 2. 安全检查
@@ -31,6 +31,7 @@
         }; // 头像贴图的候选路径
         
         data->currentPortrait.id = 0;
+
         for (const auto& path : paths) {
             data->currentPortrait = LoadTexture(path.c_str());
             if (data->currentPortrait.id != 0) {
@@ -96,13 +97,13 @@ void dialogue_update(GameContext* ctx, void* state_data) {
             data->currentLineIndex++;
             
             if (static_cast<size_t>(data->currentLineIndex) >= data->script.size()) {
-                // 对话结束，切换回探索状态
-                TraceLog(LOG_INFO, "[Dialogue] 对话结束，准备返回探索状态");
-                GameState* explorationState = createExplorationState(); // 准备返回的探索状态实例
-                if (explorationState) {
-                    GameStateMachine_change(&ctx->state_machine, ctx, explorationState);
+                // 对话结束，切换到预定状态（默认为探索）
+                TraceLog(LOG_INFO, "[Dialogue] 对话结束，准备跳转");
+                GameState* targetState = data->nextState ? data->nextState : createExplorationState();
+                if (targetState) {
+                    GameStateMachine_change(&ctx->state_machine, ctx, targetState);
                 } else {
-                    TraceLog(LOG_ERROR, "[Dialogue] 创建探索状态失败，退出游戏");
+                    TraceLog(LOG_ERROR, "[Dialogue] 创建目标状态失败，退出游戏");
                     ctx->isRunning = false;
                 }
                 return;
@@ -209,10 +210,11 @@ void dialogue_render(GameContext* ctx, void* state_data) {
 
 
 
-GameState* createDialogueState(const vector<DialogueLine>& script){
+GameState* createDialogueState(const vector<DialogueLine>& script, GameState* nextState){
     DialogueData* data = new DialogueData(); // 为本次对话分配的数据缓存
 
     data->script = script; // 把剧本复制进去
+    data->nextState = nextState;
 
     // 初始化所有状态
     data->currentLineIndex = 0;
