@@ -505,6 +505,7 @@ void DrawMapScene(const GameContext& ctx){
         
         // 第四步：重新开启摄像机以绘制玩家
         BeginMode2D(camera);
+        DrawPlayerSprite(ctx.player);
     }
 
     EndMode2D();

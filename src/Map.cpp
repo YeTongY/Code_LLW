@@ -140,9 +140,7 @@ void DrawYSortLayer(const GameContext& map)
     }
 
     const GameContext* ctxPtr = &map;
-    sortedDrawables.push_back({ map.player.visualPosition.y + map.tileSize, [ctxPtr]() {
-        DrawPlayerSprite(ctxPtr->player);
-    }});
+    
 
     for(const Enemy& enemy : map.enemies){
         if(!enemy.isActive) continue;
