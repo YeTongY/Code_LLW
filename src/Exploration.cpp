@@ -76,6 +76,9 @@ void exploration_enter(GameContext* ctx, void* state_data)
 
     ctx->enableFootstepAudio = true;
     ctx->footstepIdleTimer = 0.0f;
+
+    //=========播放探索背景音乐=========
+    PlayExplorationBGM(*ctx);
 }
 
 void exploration_exit(GameContext* ctx, void* state_data)
@@ -88,6 +91,7 @@ void exploration_exit(GameContext* ctx, void* state_data)
     ctx->enableFootstepAudio = false;
     ctx->player.isMoving = false;
     StopFootstepSound(*ctx);
+    
 }
 
 void exploration_update(GameContext* ctx, void* state_data)
@@ -104,6 +108,11 @@ void exploration_update(GameContext* ctx, void* state_data)
     updatePlayer(*ctx);
     UpdateEnemies(*ctx);
     TryTriggerCombat(ctx);
+
+    // 持续刷新探索背景音乐的流缓冲，避免播放停顿
+    if (ctx->isExplorationBGMPlaying) {
+        UpdateMusicStream(ctx->explorationBGM);
+    }
 
     //==========战斗状态更新============
    Rectangle playerRect = {
@@ -136,11 +145,13 @@ void exploration_update(GameContext* ctx, void* state_data)
         }
     }
 
+
+
     //==========开始事件更新============
     ExecuteEvents(*ctx);
 
 
-    // 摄像机在 drawPlayer() 中设置，无需在此更新
+    
 
     // --- 事件处理逻辑 ---
     if (IsKeyPressed(KEY_E)) {

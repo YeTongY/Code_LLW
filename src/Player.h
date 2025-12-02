@@ -56,6 +56,16 @@ struct Player {//声明玩家主结构体
 
     Texture2D spriteSheet; // 玩家的精灵图贴图
     PlayerDirection currentDirection; // 玩家"当前"的方向
+
+    // 动画采样数据
+    int frameWidth = 32;        // 单帧宽度，像素单位
+    int frameHeight = 64;       // 单帧高度，用于对齐人物脚底
+    int framesPerDirection = 1; // 每个方向可用的帧数
+    int animationRowCount = 1;  // 精灵表的方向行数量
+    int currentFrame = 0;       // 当前播放的帧索引
+    float animationTimer = 0.0f;// 自增计时器，用于切换帧
+    float frameDuration = 0.12f;// 单帧持续时间（秒）
+    bool usesRowBasedSheet = false; // true 表示精灵表按行划分方向
 };
 
 

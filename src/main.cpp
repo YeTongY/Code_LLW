@@ -175,7 +175,61 @@ int main(void)
         SetMusicVolume(ctx.footstepLoop, 0.8f);
         TraceLog(LOG_INFO, "[Audio] 脚步循环参数: frameCount=%u, sampleRate=%d", ctx.footstepLoop.frameCount, ctx.footstepLoop.stream.sampleRate);
     }
+
+
+    //============加载探索背景音乐==========
+    const char* explorationBGMCandidates[] = {
+        "../res/audio/music/tartarus_0d04 (P3R ver.).wav",
+        "res/audio/music/tartarus_0d04 (P3R ver.).wav",
+        "../../res/audio/music/tartarus_0d04 (P3R ver.).wav"
+    };
+
+    ctx.explorationBGM = Music{0};
+    for (const char* path : explorationBGMCandidates) {
+        Music candidate = LoadMusicStream(path);
+        if (IsMusicValid(candidate)) {
+            candidate.looping = true; // 确保资源本身标记为循环
+            ctx.explorationBGM = candidate;
+            TraceLog(LOG_INFO, "[Audio] 探索背景音乐加载成功: %s", path);
+            break;
+        }
+        TraceLog(LOG_WARNING, "[Audio] 探索背景音乐加载失败: %s", path);
+    }
+
+    if (!IsMusicValid(ctx.explorationBGM)) {
+        TraceLog(LOG_ERROR, "[Audio] 无法加载探索背景音乐，后续将无法播放背景音乐");
+    } else {
+        SetMusicVolume(ctx.explorationBGM, 0.15f); // 默认音量调低，避免遮盖效果音
+        TraceLog(LOG_INFO, "[Audio] 探索背景音乐参数: frameCount=%u, sampleRate=%d", ctx.explorationBGM.frameCount, ctx.explorationBGM.stream.sampleRate);
+    }
     
+    //============加载战斗背景音乐==========
+    const char* combatBGMCandidates[] = {
+        "../res/audio/music/A CLUE.wav",
+        "res/audio/music/A CLUE.wav",
+        "../../res/audio/music/A CLUE.wav"
+    };
+
+    ctx.combatBGM = Music{0};
+    for (const char* path : combatBGMCandidates) {
+        Music candidate = LoadMusicStream(path);
+        if (IsMusicValid(candidate)) {
+            candidate.looping = true; // 确保资源本身标记为循环
+            ctx.combatBGM = candidate;
+            TraceLog(LOG_INFO, "[Audio] 战斗背景音乐加载成功: %s", path);
+            break;
+        }
+        TraceLog(LOG_WARNING, "[Audio] 战斗背景音乐加载失败: %s", path);
+    }
+
+    if (!IsMusicValid(ctx.combatBGM)) {
+        TraceLog(LOG_ERROR, "[Audio] 无法加载战斗背景音乐，后续将无法播放背景音乐");
+    } else {
+        SetMusicVolume(ctx.combatBGM, 0.3f);
+        TraceLog(LOG_INFO, "[Audio] 战斗背景音乐参数: frameCount=%u, sampleRate=%d", ctx.combatBGM.frameCount, ctx.combatBGM.stream.sampleRate);
+    }
+
+
     //==========初始化状态机==========
     GameStateMachine_init(&ctx.state_machine);
     TraceLog(LOG_INFO, "[Main] 状态机初始化完成, isRunning=%d", ctx.isRunning);
@@ -213,6 +267,8 @@ int main(void)
     //==========主游戏循环==========
     float elapsedTime = 0.0f;
     int frameCount = 0;
+
+    
 
     TraceLog(LOG_INFO, "[Main] 准备进入主循环，isRunning = %d, WindowShouldClose = %d", ctx.isRunning, WindowShouldClose());
     while (ctx.isRunning && !WindowShouldClose())
@@ -277,6 +333,14 @@ int main(void)
         TraceLog(LOG_INFO, "[Main] 脚步循环资源已释放");
     }
 
+    if (IsMusicValid(ctx.explorationBGM)) {
+        if (IsMusicStreamPlaying(ctx.explorationBGM)) {
+            StopMusicStream(ctx.explorationBGM);
+        }
+        UnloadMusicStream(ctx.explorationBGM);
+        TraceLog(LOG_INFO, "[Main] 探索背景音乐资源已释放");
+    }
+     
     CloseAudioDevice(); // 关闭音频设备
     TraceLog(LOG_INFO, "[Main] 音频设备已关闭");
     

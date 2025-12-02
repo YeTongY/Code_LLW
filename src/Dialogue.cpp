@@ -16,6 +16,8 @@
     data->currentLineIndex = 0;
     data->visibleChars = 0.0f;
     data->skipToEnd = false;
+    //==============修改bgm音量==============
+    SetMusicVolume(ctx->explorationBGM, 0.07f);
 
      // 4. 加载第一句对话的头像
     const DialogueLine& firstLine = data->script[0];
@@ -65,6 +67,9 @@
     // 3. 释放为本次对话分配的数据包内存
     delete data;
 
+    //==============恢复bgm音量==============
+    SetMusicVolume(ctx->explorationBGM, 0.1f);
+
     TraceLog(LOG_INFO, "[Dialogue] 退出对话状态，所有资源已清理。");
 }
 
@@ -76,6 +81,9 @@ void dialogue_update(GameContext* ctx, void* state_data) {
     // 2. 准备当前行的数据
     const DialogueLine& currentLine = data->script[data->currentLineIndex];
     const size_t currentLineLength = currentLine.text.length();
+
+    //============更新音频流============
+    UpdateMusicStream(ctx->explorationBGM);
 
     // 3. 处理用户输入
     if (IsKeyPressed(KEY_SPACE) || IsKeyPressed(KEY_ENTER) || IsMouseButtonPressed(MOUSE_LEFT_BUTTON) || IsKeyPressed(KEY_E)) {

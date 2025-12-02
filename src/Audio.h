@@ -12,3 +12,17 @@ void PlayFootstepSound(GameContext &ctx);
  * @brief 立刻终止脚步循环音效并重置内部状态
  */
 void StopFootstepSound(GameContext &ctx);
+
+
+/**
+ * @brief 播放探索背景音乐
+ */
+void PlayExplorationBGM(GameContext &ctx);
+
+/**
+ * @brief 停止探索背景音乐
+ */
+void StopExplorationBGM(GameContext &ctx);
+
+void PlayCombatBGM(GameContext &ctx);
+void StopCombatBGM(GameContext &ctx);
