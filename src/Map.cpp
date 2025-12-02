@@ -627,6 +627,11 @@ bool LoadLevelFromTiled(GameContext& ctx, const char* filepath){
 
                 portal.bounds = newPortalEvent.area;
 
+                float rawTargetPosX = 0.0f;
+                float rawTargetPosY = 0.0f;
+                bool hasTargetPosX = false;
+                bool hasTargetPosY = false;
+
                 for(const auto& prop : object.getProperties()){
                     const auto propName = prop.getName();
                     const auto propType = prop.getType();
@@ -647,18 +652,22 @@ bool LoadLevelFromTiled(GameContext& ctx, const char* filepath){
                     }
                     if( propName == "targetPosX") {
                         if (propType == tmx::Property::Type::Float) {
-                            portal.targetPosition.x = prop.getFloatValue();
+                            rawTargetPosX = prop.getFloatValue();
+                            hasTargetPosX = true;
                         } else if (propType == tmx::Property::Type::Int || propType == tmx::Property::Type::Object) {
-                            portal.targetPosition.x = static_cast<float>(prop.getIntValue());
+                            rawTargetPosX = static_cast<float>(prop.getIntValue());
+                            hasTargetPosX = true;
                         } else {
                             TraceLog(LOG_WARNING, "[Map] targetPosX 属性类型不是数值");
                         }
                     }
                     if( propName == "targetPosY") {
                         if (propType == tmx::Property::Type::Float) {
-                            portal.targetPosition.y = prop.getFloatValue();
+                            rawTargetPosY = prop.getFloatValue();
+                            hasTargetPosY = true;
                         } else if (propType == tmx::Property::Type::Int || propType == tmx::Property::Type::Object) {
-                            portal.targetPosition.y = static_cast<float>(prop.getIntValue());
+                            rawTargetPosY = static_cast<float>(prop.getIntValue());
+                            hasTargetPosY = true;
                         } else {
                             TraceLog(LOG_WARNING, "[Map] targetPosY 属性类型不是数值");
                         }
@@ -686,6 +695,14 @@ bool LoadLevelFromTiled(GameContext& ctx, const char* filepath){
                             TraceLog(LOG_WARNING, "[Map] 传送 isOneShot 属性类型不受支持");
                         }
                     }
+                }
+
+                float tileSize = (ctx.tileSize > 0) ? static_cast<float>(ctx.tileSize) : 32.0f;
+                if (hasTargetPosX) {
+                    portal.targetPosition.x = rawTargetPosX * tileSize;
+                }
+                if (hasTargetPosY) {
+                    portal.targetPosition.y = rawTargetPosY * tileSize;
                 }
 
                 newPortalEvent.portal.push_back(portal);
