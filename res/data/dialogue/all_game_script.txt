@@ -41,3 +41,44 @@ Taffy 进入了防御姿态！
 战斗胜利！
 战斗失败...
 选择你的行动
+
+Taffy,res/graphics/portraits/taffy.png,"好吵...警报声响了多久了？"
+Taffy,res/graphics/portraits/taffy.png,"空气里有种...熟悉的味道。大家都去哪了？"
+
+System,nullptr,"正在建立加密连接...接入者：主席MMK"
+MMK,res/graphics/portraits/mmk.png,"Taffy！谢天谢地你还清醒着。我是MMK。"
+Taffy,res/graphics/portraits/taffy.png,"主席？外面的人头发都变成了粉色...系统也瘫痪了。"
+MMK,res/graphics/portraits/mmk.png,"那是LLW病毒。它正在重构所有人的思维。"
+MMK,res/graphics/portraits/mmk.png,"我现在被困在安全屋。你是唯一免疫的人...我需要你进入内部网络。"
+MMK,res/graphics/portraits/mmk.png,"记住：不要杀死他们。用你的装置使他们过载...断开他们与病毒的连接！"
+System,nullptr,"安全闸门已通过远程授权开启。"
+
+System,nullptr,"[系统] 连接已强制中断。病毒信号消退中..."
+Taffy,res/graphics/portraits/taffy.png,"呼...他倒下了。我是不是下手太重了？"
+MMK,res/graphics/portraits/mmk.png,"正在扫描生命体征...心率正常，脑波正在恢复平稳。你做得很好。"
+MMK,res/graphics/portraits/mmk.png,"看，他头发上的粉色正在褪去。病毒被你的攻击‘剥离’了。"
+Taffy,res/graphics/portraits/taffy.png,"（看着自己的手）这感觉很奇怪...我攻击他的时候，我也能感觉到他脑子里的噪音消失了。"
+MMK,res/graphics/portraits/mmk.png,"这就是为什么只有你能做到这件事。你是特殊的，Taffy。"
+MMK,res/graphics/portraits/mmk.png,"好了，别停留。在他醒来之前，快去电梯井！"
+
+System,nullptr,"[警告] 检测到高浓度思维病毒反应。"
+Security_Guard,res/graphics/portraits/npc_guard_infected.png,"站...住...未授...权..."
+Security_Guard,res/graphics/portraits/npc_guard_infected.png,"一切...为了...LLW...粉色...真理..."
+Taffy,res/graphics/portraits/taffy.png,"他的眼睛...完全失焦了。他想攻击我！"
+MMK,res/graphics/portraits/mmk.png,"[通讯接入] 别冲动 Taffy！那是老张，科协的保安。他只是被控制了。"
+MMK,res/graphics/portraits/mmk.png,"听着，你的力量不仅能破坏，也能‘阻断’。不要瞄准他的要害。"
+MMK,res/graphics/portraits/mmk.png,"攻击他的神经连接端口！制造数据过载，让他强制下线！"
+Taffy,res/graphics/portraits/taffy.png,"强制下线...也就是让他晕过去，对吧？明白了。"
+System,nullptr,"[教程] 战斗模式已启动。将敌人 HP 归零以执行“强制断开”。"
+
+MMK,res/graphics/portraits/mmk.png,"Taffy... 你来了。你是唯一一个回应我呼叫的。"
+Taffy,res/graphics/portraits/taffy.png,"外面完全乱套了。那些粉色头发的人...他们攻击了我。"
+MMK,res/graphics/portraits/mmk.png,"那是 LLW 病毒。它不致命 但会重构人的思维。"
+MMK,res/graphics/portraits/mmk.png,"现在整个 SIPC 都被那个统一的'意志'接管了。"
+MMK,res/graphics/portraits/mmk.png,"听着 Taffy。你的体质特殊 对病毒免疫。你是最后的希望。"
+Taffy,res/graphics/portraits/taffy.png,"我该怎么做？把他们都消灭吗？"
+MMK,res/graphics/portraits/mmk.png,"不！他们曾经是我们的同伴。他们的心智只是被囚禁了。"
+MMK,res/graphics/portraits/mmk.png,"我给你上传了一段【反病毒代码】。"
+MMK,res/graphics/portraits/mmk.png,"在战斗中...你需要让他们的连接过载。不要杀人 而是要【净化】他们。"
+MMK,res/graphics/portraits/mmk.png,"去第一部门吧。那里的干部被强化了...救回他 我们就能找到真相碎片。"
+System,nullptr,"【已获得任务物品：净化程序 V1.0】"
