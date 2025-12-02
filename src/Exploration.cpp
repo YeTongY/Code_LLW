@@ -23,9 +23,9 @@ static void TryTriggerCombat(GameContext* ctx)
 {
     if (!ctx) return;
 
-    const float triggerDistance = ctx->tileSize > 0 ? ctx->tileSize * 0.75f : TILE_SIZE * 0.75f;
-    const float triggerDistanceSq = triggerDistance * triggerDistance;
-    const Vector2 playerPos = ctx->player.visualPosition;
+    const float triggerDistance = ctx->tileSize > 0 ? ctx->tileSize * 0.75f : TILE_SIZE * 0.75f; // 触发战斗的距离阈值
+    const float triggerDistanceSq = triggerDistance * triggerDistance; // 阈值平方，用于平方距离比较
+    const Vector2 playerPos = ctx->player.visualPosition; // 玩家当前像素位置
 
     for (Enemy& enemy : ctx->enemies)
     {
@@ -35,7 +35,7 @@ static void TryTriggerCombat(GameContext* ctx)
         if (distanceSq > triggerDistanceSq) continue;
 
         ctx->currentCombatant = &enemy;
-        GameState* combatState = CreateCombatState(&enemy);
+        GameState* combatState = CreateCombatState(&enemy); // 进入与该敌人的战斗状态
         if (combatState)
         {
             TraceLog(LOG_INFO, "[Exploration] 触发与敌人(%d,%d)的战斗", enemy.gridX, enemy.gridY);
@@ -54,7 +54,7 @@ static void TryTriggerCombat(GameContext* ctx)
 
 void exploration_enter(GameContext* ctx, void* state_data)
 {
-    ExplorationData* expd = static_cast<ExplorationData*>(state_data);
+    ExplorationData* expd = static_cast<ExplorationData*>(state_data); // 当前探索状态数据
 
     //初始化探索数据
     expd->isActive = true;
@@ -62,7 +62,7 @@ void exploration_enter(GameContext* ctx, void* state_data)
 
     //初始化摄像机 - 跟随玩家
     ctx->camera.target = Vector2{
-        static_cast<float>(ctx->player.gridX * TILE_SIZE) + (TILE_SIZE / 2.0f),
+        static_cast<float>(ctx->player.gridX * TILE_SIZE) + (TILE_SIZE / 2.0f), // 将玩家中心对准摄像机
         static_cast<float>(ctx->player.gridY * TILE_SIZE) + (TILE_SIZE / 2.0f)
     };
     ctx->camera.offset = Vector2{ 
@@ -83,7 +83,7 @@ void exploration_enter(GameContext* ctx, void* state_data)
 
 void exploration_exit(GameContext* ctx, void* state_data)
 {
-    ExplorationData* expd = static_cast<ExplorationData*>(state_data);
+    ExplorationData* expd = static_cast<ExplorationData*>(state_data); // 待关闭的探索状态
     expd->isActive = false;
     
     TraceLog(LOG_INFO, "[Exploration] 退出探索状态");
@@ -96,7 +96,7 @@ void exploration_exit(GameContext* ctx, void* state_data)
 
 void exploration_update(GameContext* ctx, void* state_data)
 {
-    ExplorationData* expd = static_cast<ExplorationData*>(state_data);
+    ExplorationData* expd = static_cast<ExplorationData*>(state_data); // 探索状态运行数据
     
     if (!expd->isActive) return;
 
@@ -120,7 +120,7 @@ void exploration_update(GameContext* ctx, void* state_data)
         ctx->player.visualPosition.y + 32,
         16,
         32
-    }; 
+    }; // 玩家碰撞检测矩形
 
     for(auto& enemy : ctx->enemies){
         if(enemy.isActive){
@@ -129,12 +129,12 @@ void exploration_update(GameContext* ctx, void* state_data)
                 enemy.visualPosition.y + 32,
                 16,
                 32
-            };
+            }; // 敌人碰撞检测矩形
 
             if(CheckCollisionRecs(playerRect, EnemyRcet)){
                 TraceLog(LOG_INFO, "[Exploration] 玩家与敌人发生碰撞，准备进入战斗状态");
                 
-                GameState* combatState = CreateCombatState(&enemy);
+                GameState* combatState = CreateCombatState(&enemy); // 与该敌人开战
 
                 if(combatState){
                     GameStateMachine_change(&ctx->state_machine, ctx, combatState);
@@ -169,7 +169,7 @@ void exploration_update(GameContext* ctx, void* state_data)
 
 void exploration_render(GameContext* ctx, void* state_data)
 {
-    ExplorationData* expd = static_cast<ExplorationData*>(state_data);
+    ExplorationData* expd = static_cast<ExplorationData*>(state_data); // 当前渲染引用的数据
     
     // 安全检查：允许从对话状态调用（此时 state_data 为 nullptr）
     if (expd != nullptr && !expd->isActive) return;
@@ -189,19 +189,19 @@ void exploration_render(GameContext* ctx, void* state_data)
     DrawTextEx(ctx->mainFont, "  ESC - 退出", Vector2{10, 100}, 24, 1, DARKGRAY);
     
     //显示玩家坐标
-    char posText[64];
+    char posText[64]; // 玩家坐标文本缓冲
     std::sprintf(posText, "(%d, %d)", ctx->player.gridX, ctx->player.gridY);
     DrawTextEx(ctx->mainFont, "位置: ", Vector2{10, (float)ctx->screenHeight - 60}, 24, 1, DARKGREEN);
     DrawText(posText, 80, static_cast<int>(ctx->screenHeight) - 60, 24, DARKGREEN);
     
     //显示玩家属性
-    char hpText[64];
+    char hpText[64]; // 玩家血量文本缓冲
     std::sprintf(hpText, "%d/%d", ctx->player.stats.hp, ctx->player.stats.maxHp);
     DrawTextEx(ctx->mainFont, "HP: ", Vector2{10, (float)ctx->screenHeight - 40}, 24, 1, RED);
     DrawText(hpText, 80, static_cast<int>(ctx->screenHeight) - 40, 24, RED);
     
     //显示运行时间
-    char timeText[64];
+    char timeText[64]; // 运行时间文本缓冲
     std::sprintf(timeText, "%.1fs", expd ? expd->elapsedTime : 0.0f);
     DrawTextEx(ctx->mainFont, "时间: ", Vector2{10, (float)ctx->screenHeight - 20}, 20, 1, DARKGRAY);
     DrawText(timeText, 80, static_cast<int>(ctx->screenHeight) - 20, 20, DARKGRAY);
@@ -213,7 +213,7 @@ void exploration_render(GameContext* ctx, void* state_data)
 GameState* createExplorationState()
 {
     //使用 new 分配探索状态数据
-    ExplorationData* expd = new ExplorationData();
+    ExplorationData* expd = new ExplorationData(); // 探索状态专用的数据包
     if (!expd) {
         TraceLog(LOG_ERROR, "[Exploration] 创建失败：内存分配失败");
         return nullptr;
@@ -228,6 +228,7 @@ GameState* createExplorationState()
         expd,                   // 状态数据
         sizeof(ExplorationData) // 数据大小
     );
+    // state 为注册进状态机的探索状态指针
     
     if (!state) {
         TraceLog(LOG_ERROR, "[Exploration] 创建失败");

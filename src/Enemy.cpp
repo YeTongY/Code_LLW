@@ -158,63 +158,76 @@ namespace
  * @param ctx
  * @param enemy
  */
+// --- 请替换 Enemy.cpp 中的 DrawEnemySprite ---
+
 void DrawEnemySprite(const GameContext &ctx, const Enemy &enemy)
 {
+    Texture2D textureToDraw = {0}; // 初始化为空
+    bool hasTexture = false;
+    Color debugColor = WHITE; // 用于调试
 
-    // 绘制角色
-    Rectangle source = {0, 0, 32, 64};
-    source.width = 32.0f;
-    source.height = 64.0f;
-    source.y = 0.0f;
+    // 1. 尝试查找贴图
+    auto it = ctx.enemyTextures.find(enemy.textureKey);
 
-    // 修改 source.x 来“裁剪”正确的帧
-    switch (enemy.currentDirection)
-    {
-    // 第 1 帧 (x=0)
-    case ENEMY_DIR_RIGHT:
-        source.x = 0.0f; // 0 * 32
-        break;
-
-    // 第 2 帧 (x=32)
-    case ENEMY_DIR_UP:
-        source.x = 32.0f; // 1 * 32
-        break;
-    // 第 3 帧 (x=64)
-    case ENEMY_DIR_LEFT:
-        source.x = 64.0f; // 2 * 32
-        break;
-    // 第 4 帧 (x=96)
-    case ENEMY_DIR_DOWN:
-        source.x = 96.0f; // 3 * 32
-        break;
-
-    // 防止未初始化或垃圾值导致的花屏Bug
-    default:
-        source.x = 32.0f; // 默认朝下 (Down)
-        TraceLog(LOG_WARNING, "[Enemy] 检测到异常的 currentDirection 值: %d, 使用默认朝向", enemy.currentDirection);
-        break;
+    if (it != ctx.enemyTextures.end()) {
+        textureToDraw = it->second;
+        hasTexture = true;
+        // 调试：找到了 Key，但图片本身ID是否有效？
+        if (textureToDraw.id <= 0) {
+            debugColor = RED; // 找到了Key，但图片ID无效
+            hasTexture = false;
+        }
+    } 
+    else {
+        // 没找到 Key，尝试用 Default
+        if (ctx.enemyTextures.count("Default")) {
+            textureToDraw = ctx.enemyTextures.at("Default");
+            hasTexture = true;
+            debugColor = YELLOW; // 使用了 Default 保底
+        } else {
+            debugColor = MAGENTA; // 连 Default 都没有
+        }
     }
 
-    //  让角色精灵图绘制在平滑的"视觉位置"上
-    Vector2 drawDestPosition = {
-        enemy.visualPosition.x,
-        enemy.visualPosition.y - TILE_SIZE // 向上偏移一个瓦片高度，使脚踩在格子上
-    };
+    // 2. 绘制逻辑
+    if (hasTexture && textureToDraw.id > 0) {
+        // 正常绘制
+        Rectangle source = {0, 0, 32, 64};
+        source.width = 32.0f;
+        source.height = 64.0f;
+        source.y = 0.0f;
 
-    // 绘制玩家精灵图
-    if (ctx.enemySpriteSheet.id != 0)
-    {
-        // 纹理加载成功，绘制精灵图
-        DrawTextureRec(ctx.enemySpriteSheet, source, drawDestPosition, WHITE);
-    }
-    else
-    {
-        // 纹理未加载，绘制蓝色方块作为占位符
-        DrawRectangle(
-            (int)drawDestPosition.x,
-            (int)drawDestPosition.y,
-            32, 64, BLUE);
-        DrawText("NO SPRITE", enemy.gridX * TILE_SIZE, enemy.gridY * TILE_SIZE, 10, WHITE);
+        switch (enemy.currentDirection)
+        {
+            case ENEMY_DIR_RIGHT: source.x = 0.0f; break;
+            case ENEMY_DIR_UP:    source.x = 32.0f; break;
+            case ENEMY_DIR_LEFT:  source.x = 64.0f; break;
+            case ENEMY_DIR_DOWN:  source.x = 96.0f; break;
+            default: source.x = 32.0f; break;
+        }
+
+        Vector2 drawDestPosition = {
+            enemy.visualPosition.x,
+            enemy.visualPosition.y - TILE_SIZE 
+        };
+
+        DrawTextureRec(textureToDraw, source, drawDestPosition, WHITE);
+        
+        // 调试文字：画出当前用的 Key，方便确认
+        // DrawText(enemy.textureKey.c_str(), (int)drawDestPosition.x, (int)drawDestPosition.y - 20, 10, GREEN);
+    } 
+    else {
+        // 异常绘制：画一个带颜色的方块，根据颜色判断错误类型
+        Rectangle dest = {
+            enemy.visualPosition.x, 
+            enemy.visualPosition.y - TILE_SIZE, 
+            32, 
+            64
+        };
+        DrawRectangleRec(dest, debugColor);
+        
+        // 显示具体的 Key，方便排查拼写错误
+        DrawText(enemy.textureKey.c_str(), (int)dest.x, (int)dest.y - 15, 10, debugColor);
     }
 }
 
@@ -281,33 +294,40 @@ void UpdateEnemies(GameContext &ctx)
  */
 void LoadEnemyAssets(GameContext &ctx)
 {
-    const char *possiblePaths[] = {
-        "res/graphics/enemy/Enemy_Sprite.png",
-        "../res/graphics/enemy/Enemy_Sprite.png",
-        "../../res/graphics/enemy/Enemy_Sprite.png"};
+    ctx.enemyTextures.clear();
 
-    bool loaded = false;
-    for (int i = 0; i < 3; i++)
-    {
-        ctx.enemySpriteSheet = LoadTexture(possiblePaths[i]);
-        if (ctx.enemySpriteSheet.id != 0)
-        {
-            TraceLog(LOG_INFO, "[Enemy] 敌人精灵图加载成功: %s (ID: %d, 尺寸: %dx%d)",
-                     possiblePaths[i],
-                     ctx.enemySpriteSheet.id,
-                     ctx.enemySpriteSheet.width,
-                     ctx.enemySpriteSheet.height);
-            loaded = true;
-            break;
+    // 定义你要加载的素材清单 (名字 -> 路径)
+    // 这里的名字 (如 "Default", "Pink") 就是在 Tiled 里要填的值
+    map<string, const char*> assetsToLoad = {
+        {"Default", "../res/graphics/enemy/Enemy_Sprite.png"}, // 默认西装男
+        {"Pink",    "../res/graphics/enemy/Enemy_Pink.png"},   // 粉发妹
+        {"Guard",   "../res/graphics/enemy/Enemy_Guard.png"}   // 保安
+    };
+    
+    //循环加载
+    for(auto const& [key, path] : assetsToLoad){
+        //兼容路径尝试
+        const char* possiblePaths[] = { path, nullptr, nullptr};
+        string path1 = string("../") + path;
+        string path2 = string("../../") + path;
+        possiblePaths[1] = path1.c_str();
+        possiblePaths[2] = path2.c_str();
+
+        bool loaded = false;
+        for(int i = 0; i < 3; i++){
+            Texture2D tex = LoadTexture(possiblePaths[i]);
+            if(tex.id != 0){
+                ctx.enemyTextures[key] = tex;
+                TraceLog(LOG_INFO, "[Enemy] 加载敌人素材 [%s] 成功", key.c_str());
+                loaded = true;
+                break;
+            }
+        }
+        if(!loaded){
+            TraceLog(LOG_ERROR, "[Enemy] 加载敌人素材 [%s] 失败，尝试了所有路径", key.c_str());
         }
     }
 
-    if (!loaded)
-    {
-        TraceLog(LOG_ERROR, "[Enemy] 敌人精灵图加载失败，尝试了所有路径");
-        TraceLog(LOG_ERROR, "[Enemy] 当前工作目录: %s", GetWorkingDirectory());
-        TraceLog(LOG_ERROR, "[Enemy] 将使用蓝色方块作为占位符");
-    }
 }
 
 /**
@@ -317,8 +337,11 @@ void LoadEnemyAssets(GameContext &ctx)
  */
 void UnloadEnemyAssets(GameContext &ctx)
 {
-    if (ctx.enemySpriteSheet.id != 0)
-    {
-        UnloadTexture(ctx.enemySpriteSheet);
+    for(auto const& [key, tex] : ctx.enemyTextures){
+        if(tex.id != 0){
+            UnloadTexture(tex);
+            TraceLog(LOG_INFO, "[Enemy] 卸载敌人素材 [%s] 成功", key.c_str());
+        }
     }
+    ctx.enemyTextures.clear();
 }

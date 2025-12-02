@@ -507,53 +507,6 @@ void DrawMapScene(const GameContext& ctx){
         BeginMode2D(camera);
     }
 
-    // ============开始玩家和敌人绘制===============
-    
-
-    //1.创建渲染列表
-    vector<RenderEntity> renderList;
-
-    //2.将玩家加入渲染列表
-    renderList.push_back({ENTITY_PLAYER, (void*)&ctx.player, ctx.player.visualPosition.y + 64.0f});
-
-    //3.将所有敌人加入渲染列表
-    for(const auto& enemy: ctx.enemies){
-        if(enemy.isActive){
-            renderList.push_back({ENTITY_ENEMY, (void*)&enemy, enemy.visualPosition.y +64.0f});
-        }
-    }
-    
-
-    //4.开始排序
-
-    sort(renderList.begin(),renderList.end(),[](const RenderEntity& a, const RenderEntity& b){
-        return a.sortY < b.sortY;
-    });
-    
-    
-    //5.开始绘制
-    for(const auto& item: renderList){
-        if(item.type == ENTITY_PLAYER){
-            const Player* p = (const Player*)item.data;
-            DrawPlayerSprite(*p);
-        }
-        else if(item.type == ENTITY_ENEMY){
-            const Enemy* e = (const Enemy*)item.data;
-            DrawEnemySprite(ctx, *e);
-        }
-
-    }
-    
-    
-    
-    
-
-
-    
-    
-    
-    
-    // ============结束玩家和敌人绘制===============
     EndMode2D();
     //------结束角色摄像机绘制------
 
