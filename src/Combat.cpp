@@ -10,7 +10,7 @@
 
 void combat_enter(GameContext* ctx, void* state_data)
 {
-    CombatData* data = static_cast<CombatData*>(state_data);
+    CombatData* data = static_cast<CombatData*>(state_data); // 当前战斗状态数据
     
     data->isActive = true;
     data->currentPhase = COMBAT_PHASE_START;
@@ -25,10 +25,10 @@ void combat_enter(GameContext* ctx, void* state_data)
     
     // 初始化行动选项
     data->actionNames.clear();
-    data->actionNames.push_back("攻击");
-    data->actionNames.push_back("技能");
-    data->actionNames.push_back("防御");
-    data->actionNames.push_back("逃跑");
+    data->actionNames.push_back("攻击");   // 行动列表[0]
+    data->actionNames.push_back("技能");   // 行动列表[1]
+    data->actionNames.push_back("防御");   // 行动列表[2]
+    data->actionNames.push_back("逃跑");   // 行动列表[3]
     
     // 设置初始消息
     if (data->currentEnemy) {
@@ -47,7 +47,7 @@ void combat_enter(GameContext* ctx, void* state_data)
 
 void combat_exit(GameContext* ctx, void* state_data)
 {
-    CombatData* data = static_cast<CombatData*>(state_data);
+    CombatData* data = static_cast<CombatData*>(state_data); // 待释放的战斗数据
     
     if (data) {
         data->isActive = false;
@@ -65,7 +65,7 @@ void combat_exit(GameContext* ctx, void* state_data)
 
 void combat_update(GameContext* ctx, void* state_data)
 {
-    CombatData* data = static_cast<CombatData*>(state_data);
+    CombatData* data = static_cast<CombatData*>(state_data); // 当前帧使用的战斗数据
     
     if (!data->isActive) return;
     
@@ -73,7 +73,7 @@ void combat_update(GameContext* ctx, void* state_data)
         UpdateMusicStream(ctx->combatBGM); // 持续刷新战斗BGM，防止播放中断
     }
 
-    float deltaTime = GetFrameTime();
+    float deltaTime = GetFrameTime(); // 本帧耗时（秒）
     
     // 更新计时器
     if (data->messageTimer > 0.0f) {
@@ -149,7 +149,7 @@ void combat_update(GameContext* ctx, void* state_data)
 
 void combat_render(GameContext* ctx, void* state_data)
 {
-    CombatData* data = static_cast<CombatData*>(state_data);
+    CombatData* data = static_cast<CombatData*>(state_data); // 当前绘制所需的战斗数据
     
     if (!data->isActive) return;
     
@@ -162,26 +162,26 @@ void combat_render(GameContext* ctx, void* state_data)
     DrawTextEx(ctx->mainFont, "战斗模式", {20, 20}, 32, 1, CYBER_CYAN);
     
     // 绘制玩家信息（左侧）
-    float playerX = 100;
-    float playerY = ctx->screenHeight / 2 - 100;
+    float playerX = 100; // 玩家信息区域左上角 X
+    float playerY = ctx->screenHeight / 2 - 100; // 玩家信息区域左上角 Y
     
     DrawTextEx(ctx->mainFont, "Taffy", {playerX, playerY}, 36, 1, WHITE);
     
-    char hpText[64];
+    char hpText[64]; // 复用的数值文本缓冲
     std::sprintf(hpText, "HP: %d/%d", ctx->player.stats.hp, ctx->player.stats.maxHp);
     DrawTextEx(ctx->mainFont, hpText, {playerX, playerY + 50}, 28, 1, CYBER_LIME);
     
     // 绘制HP条
-    float hpBarWidth = 200;
-    float hpBarHeight = 20;
-    float hpPercent = (float)ctx->player.stats.hp / ctx->player.stats.maxHp;
+    float hpBarWidth = 200; // 玩家血条宽度
+    float hpBarHeight = 20; // 玩家血条高度
+    float hpPercent = (float)ctx->player.stats.hp / ctx->player.stats.maxHp; // 百分比
     DrawRectangle(playerX, playerY + 90, hpBarWidth, hpBarHeight, DARKGRAY);
     DrawRectangle(playerX, playerY + 90, hpBarWidth * hpPercent, hpBarHeight, GREEN);
     
     // 绘制敌人信息（右侧）
     if (data->currentEnemy) {
-        float enemyX = ctx->screenWidth - 400;
-        float enemyY = ctx->screenHeight / 2 - 100;
+        float enemyX = ctx->screenWidth - 400; // 敌人信息区域 X
+        float enemyY = ctx->screenHeight / 2 - 100; // 敌人信息区域 Y
         
         DrawTextEx(ctx->mainFont, "敌人", {enemyX, enemyY}, 36, 1, CYBER_RED);
         
@@ -189,14 +189,14 @@ void combat_render(GameContext* ctx, void* state_data)
         DrawTextEx(ctx->mainFont, hpText, {enemyX, enemyY + 50}, 28, 1, CYBER_MAGENTA);
         
         // 绘制敌人HP条
-        float enemyHpPercent = (float)data->currentEnemy->stats.hp / data->currentEnemy->stats.maxHp;
+        float enemyHpPercent = (float)data->currentEnemy->stats.hp / data->currentEnemy->stats.maxHp; // 敌人血量百分比
         DrawRectangle(enemyX, enemyY + 90, hpBarWidth, hpBarHeight, DARKGRAY);
         DrawRectangle(enemyX, enemyY + 90, hpBarWidth * enemyHpPercent, hpBarHeight, RED);
     }
     
     // 绘制战斗消息
     if (!data->battleMessage.empty()) {
-        float msgY = ctx->screenHeight - 200;
+        float msgY = ctx->screenHeight - 200; // 信息框顶部 Y
         DrawRectangle(50, msgY - 20, ctx->screenWidth - 100, 80, UI_BACKGROUND);
         DrawRectangleLines(50, msgY - 20, ctx->screenWidth - 100, 80, CYBER_CYAN);
         DrawTextEx(ctx->mainFont, data->battleMessage.c_str(), {70, msgY}, 32, 1, UI_TEXT);
@@ -204,8 +204,8 @@ void combat_render(GameContext* ctx, void* state_data)
     
     // 绘制行动菜单（仅在玩家回合）
     if (data->currentPhase == COMBAT_PHASE_PLAYER_TURN) {
-        float menuX = ctx->screenWidth / 2 - 200;
-        float menuY = ctx->screenHeight - 300;
+        float menuX = ctx->screenWidth / 2 - 200; // 行动菜单左上角 X
+        float menuY = ctx->screenHeight - 300;    // 行动菜单左上角 Y
         
         DrawRectangle(menuX - 20, menuY - 20, 400, 200, UI_BACKGROUND);
         DrawRectangleLines(menuX - 20, menuY - 20, 400, 200, CYBER_CYAN);
@@ -213,14 +213,14 @@ void combat_render(GameContext* ctx, void* state_data)
         for (size_t i = 0; i < data->actionNames.size(); i++) {
             Color textColor = ((int)i == data->selectedAction) ? CYBER_CYAN : WHITE;
             const char* prefix = ((int)i == data->selectedAction) ? "> " : "  ";
-            char optionText[128];
+            char optionText[128]; // 逐项绘制的菜单文字缓冲
             std::sprintf(optionText, "%s%s", prefix, data->actionNames[i].c_str());
             DrawTextEx(ctx->mainFont, optionText, {menuX, menuY + i * 40}, 32, 1, textColor);
         }
     }
     
     // 绘制回合数
-    char turnText[64];
+    char turnText[64]; // 回合数显示缓冲
     std::sprintf(turnText, "回合: %d", data->turnCount);
     DrawTextEx(ctx->mainFont, turnText, {ctx->screenWidth - 200, 20}, 24, 1, GRAY);
     
@@ -234,7 +234,7 @@ void combat_render(GameContext* ctx, void* state_data)
 
 void ProcessPlayerAction(GameContext* ctx, CombatData* data, CombatAction action)
 {
-    char msg[256];
+    char msg[256]; // 行动阶段临时消息缓冲
     if(action != ACTION_DEFEND)
     {
         data->playerDefending = false;
@@ -245,7 +245,7 @@ void ProcessPlayerAction(GameContext* ctx, CombatData* data, CombatAction action
         case ACTION_ATTACK:
         {
             // 计算伤害
-            int damage = std::max(1, ctx->player.stats.attack - data->currentEnemy->stats.defense);
+            int damage = std::max(1, ctx->player.stats.attack - data->currentEnemy->stats.defense); // 计算所得伤害
             data->currentEnemy->stats.hp -= damage;
             data->damageDealt = damage;
             
@@ -301,8 +301,8 @@ void ProcessEnemyTurn(GameContext* ctx, CombatData* data)
     if (!data->currentEnemy) return;
     
     // 简单的敌人AI：直接攻击
-    int damage = std::max(1, data->currentEnemy->stats.attack - ctx->player.stats.defense);
-    bool defended = data->playerDefending;
+    int damage = std::max(1, data->currentEnemy->stats.attack - ctx->player.stats.defense); // 敌人基础伤害
+    bool defended = data->playerDefending; // 记录玩家是否防御，用于减伤与提示
     if(defended)
     {
         damage = std::max(1, damage / 2);
@@ -310,7 +310,7 @@ void ProcessEnemyTurn(GameContext* ctx, CombatData* data)
     }
     ctx->player.stats.hp -= damage;
     
-    char msg[256];
+    char msg[256]; // 敌人回合消息缓冲
     if(defended)
     {
         std::sprintf(msg, "敌人 对 Taffy 造成了 %d 点伤害！（防御减伤）", damage);
@@ -358,7 +358,7 @@ void CheckBattleEnd(GameContext* ctx, CombatData* data)
 
 GameState* CreateCombatState(Enemy* targetEnemy)
 {
-    CombatData* data = new CombatData();
+    CombatData* data = new CombatData(); // 为战斗状态分配的数据块
     if (!data) {
         TraceLog(LOG_ERROR, "[Combat] 内存分配失败");
         return nullptr;
@@ -374,6 +374,7 @@ GameState* CreateCombatState(Enemy* targetEnemy)
         data,
         sizeof(CombatData)
     );
+    // state 即注册到状态机的战斗 GameState
     
     if (!state) {
         TraceLog(LOG_ERROR, "[Combat] 创建状态失败");

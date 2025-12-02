@@ -5,7 +5,7 @@
 
     void dialogue_enter(GameContext* ctx, void* state_data) {
     // 1. 类型转换，获取我们的数据包
-    DialogueData* data = static_cast<DialogueData*>(state_data);
+    DialogueData* data = static_cast<DialogueData*>(state_data); // 当前对话状态数据
     // 2. 安全检查
     if (data->script.empty()) {
         TraceLog(LOG_WARNING, "[Dialogue] 尝试开始一场没有内容的对话！");
@@ -20,7 +20,7 @@
     SetMusicVolume(ctx->explorationBGM, 0.07f);
 
      // 4. 加载第一句对话的头像
-    const DialogueLine& firstLine = data->script[0];
+    const DialogueLine& firstLine = data->script[0]; // 第一行对话内容
     
     if (firstLine.portraitPath != "nullptr" && !firstLine.portraitPath.empty()) {
         // 尝试多个路径加载头像
@@ -28,7 +28,7 @@
             "../" + firstLine.portraitPath,
             firstLine.portraitPath,
             "../../" + firstLine.portraitPath
-        };
+        }; // 头像贴图的候选路径
         
         data->currentPortrait.id = 0;
         for (const auto& path : paths) {
@@ -52,7 +52,7 @@
 
     void dialogue_exit(GameContext* ctx, void* state_data) {
     // 1. 获取数据包并进行安全检查
-    DialogueData* data = static_cast<DialogueData*>(state_data);
+    DialogueData* data = static_cast<DialogueData*>(state_data); // 需要回收的对话数据
     if (data == nullptr) {
         TraceLog(LOG_WARNING, "[Dialogue] 尝试退出一个空的对话状态。");
         return;
@@ -75,12 +75,12 @@
 
 void dialogue_update(GameContext* ctx, void* state_data) {
     // 1. 获取数据，安全检查
-    DialogueData* data = static_cast<DialogueData*>(state_data);
+    DialogueData* data = static_cast<DialogueData*>(state_data); // 当前对话进度数据
     if (!data || data->script.empty()) return;
 
     // 2. 准备当前行的数据
-    const DialogueLine& currentLine = data->script[data->currentLineIndex];
-    const size_t currentLineLength = currentLine.text.length();
+    const DialogueLine& currentLine = data->script[data->currentLineIndex]; // 当前正在播放的行
+    const size_t currentLineLength = currentLine.text.length(); // 当前行文本长度
 
     //============更新音频流============
     UpdateMusicStream(ctx->explorationBGM);
@@ -92,13 +92,13 @@ void dialogue_update(GameContext* ctx, void* state_data) {
             data->skipToEnd = true;
         } else {
             // 意图是“下一句”
-            string oldPath = currentLine.portraitPath;
+            string oldPath = currentLine.portraitPath; // 旧头像路径，用于判断是否需要切换
             data->currentLineIndex++;
             
             if (static_cast<size_t>(data->currentLineIndex) >= data->script.size()) {
                 // 对话结束，切换回探索状态
                 TraceLog(LOG_INFO, "[Dialogue] 对话结束，准备返回探索状态");
-                GameState* explorationState = createExplorationState();
+                GameState* explorationState = createExplorationState(); // 准备返回的探索状态实例
                 if (explorationState) {
                     GameStateMachine_change(&ctx->state_machine, ctx, explorationState);
                 } else {
@@ -113,7 +113,7 @@ void dialogue_update(GameContext* ctx, void* state_data) {
             data->skipToEnd = false;
             
             // 处理头像切换
-            const DialogueLine& nextLine = data->script[data->currentLineIndex];
+            const DialogueLine& nextLine = data->script[data->currentLineIndex]; // 下一句对话引用
             if (nextLine.portraitPath != oldPath) {
                 // 卸载旧头像
                 if (data->currentPortrait.id != 0) {
@@ -127,7 +127,7 @@ void dialogue_update(GameContext* ctx, void* state_data) {
                         "../" + nextLine.portraitPath,
                         nextLine.portraitPath,
                         "../../" + nextLine.portraitPath
-                    };
+                    }; // 新头像的候选加载路径
                     
                     for (const auto& path : paths) {
                         data->currentPortrait = LoadTexture(path.c_str());
@@ -160,14 +160,14 @@ void dialogue_update(GameContext* ctx, void* state_data) {
 
 
 void dialogue_render(GameContext* ctx, void* state_data) {
-    static int renderCount = 0;
+    static int renderCount = 0; // 用于周期性输出渲染日志的计数器
     renderCount++;
     if (renderCount % 60 == 0) {
         TraceLog(LOG_INFO, "[Dialogue] 渲染帧 %d", renderCount);
     }
     
     // 1. 获取数据包并进行安全检查
-    DialogueData* data = static_cast<DialogueData*>(state_data);
+    DialogueData* data = static_cast<DialogueData*>(state_data); // 当前帧需要绘制的对话数据
 
     // 2. 绘制游戏世界背景
     exploration_render(ctx, nullptr); // 直接调用，实现叠加效果
@@ -178,15 +178,15 @@ void dialogue_render(GameContext* ctx, void* state_data) {
     }
 
     // 3. 准备UI模板
-    DialogueBoxTemplate_Normal tpl;
+    DialogueBoxTemplate_Normal tpl; // UI 模板占位结构
     FillTemplateWithAssets(tpl, *ctx);
 
     // 4. 从 DialogueData 中准备好要绘制的所有“材料”
-    const DialogueLine& currentLine = data->script[data->currentLineIndex];
-    const string& textToDisplay = currentLine.text;
-    const string& speakerToShow = currentLine.speaker;
-    const Texture2D& portraitToShow = data->currentPortrait;
-    const int charsToShow = static_cast<int>(data->visibleChars);
+    const DialogueLine& currentLine = data->script[data->currentLineIndex]; // 正在显示的对话行
+    const string& textToDisplay = currentLine.text; // 当前需要绘制的文字
+    const string& speakerToShow = currentLine.speaker; // 当前说话人的名字
+    const Texture2D& portraitToShow = data->currentPortrait; // 当前展示的头像
+    const int charsToShow = static_cast<int>(data->visibleChars); // 打字机效果需要显示的字符数
 
     // 5. 调用"万能绘制工具"，完成所有UI的绘制
     DrawDialogueWithTemplate(
@@ -210,7 +210,7 @@ void dialogue_render(GameContext* ctx, void* state_data) {
 
 
 GameState* createDialogueState(const vector<DialogueLine>& script){
-    DialogueData* data = new DialogueData();
+    DialogueData* data = new DialogueData(); // 为本次对话分配的数据缓存
 
     data->script = script; // 把剧本复制进去
 
@@ -229,6 +229,7 @@ GameState* createDialogueState(const vector<DialogueLine>& script){
     data,                
     sizeof(DialogueData) 
     );
+    // state 指向最终注册到状态机的对话状态
 
     //安全检查
     if (!state) {
@@ -244,23 +245,23 @@ GameState* createDialogueState(const vector<DialogueLine>& script){
 
 
 vector<DialogueLine> LoadDialogueScript(const char* filepath) {
-    vector<DialogueLine> script;
+    vector<DialogueLine> script; // 存放解析结果的剧本集合
     
     // 从 build 目录运行，优先尝试带 ../ 的路径
     const char* possiblePaths[] = {
         filepath,
         nullptr,
         nullptr
-    };
+    }; // 备选读取路径列表
     
     // 构建备用路径
-    string path1 = string("../") + filepath;
-    string path2 = string("../../") + filepath;
+    string path1 = string("../") + filepath; // 向上一级的候选路径
+    string path2 = string("../../") + filepath; // 向上两级的候选路径
     possiblePaths[1] = path1.c_str();
     possiblePaths[2] = path2.c_str();
     
-    ifstream file;
-    const char* actualPath = nullptr;
+    ifstream file; // 文件流
+    const char* actualPath = nullptr; // 成功打开的真实路径
     
     for (int i = 0; i < 3; i++) {
         file.open(possiblePaths[i]);
@@ -281,17 +282,17 @@ vector<DialogueLine> LoadDialogueScript(const char* filepath) {
         return script;
     }
 
-    string line;
+    string line; // 当前读取的一行原始数据
     while (getline(file, line)) {
         // 跳过空行或注释行 
         if (line.empty() || line[0] == '#') {
             continue;
         }
 
-        stringstream ss(line);
-        string speaker;
-        string path;
-        string text;
+        stringstream ss(line); // 行级解析器
+        string speaker; // 角色名字段
+        string path; // 头像路径字段
+        string text; // 对话正文字段
 
         getline(ss, speaker, ',');
         getline(ss, path, ',');
