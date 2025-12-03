@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="50" height="40" tilewidth="32" tileheight="32" infinite="0" nextlayerid="11" nextobjectid="12">
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="50" height="40" tilewidth="32" tileheight="32" infinite="0" nextlayerid="11" nextobjectid="14">
  <tileset firstgid="1" name="Modern_Exteriors_Complete_Tileset_32x32" tilewidth="32" tileheight="32" tilecount="79728" columns="176">
   <image source="graphics/tilesets/Modern_Exteriors_Complete_Tileset_32x32.png" width="5632" height="14496"/>
  </tileset>
@@ -43,6 +43,7 @@
   <image source="../../地图素材/Legacy Collection/Assets/Misc/top-down-boss/Previews/bolt.gif" width="8" height="8"/>
  </tileset>
  <tileset firstgid="128450" source="tsx/Characters_MV.tsx"/>
+ <tileset firstgid="128882" source="tsx/Room_Builder_32x32.tsx"/>
  <layer id="1" name="Ground" width="50" height="40">
   <data encoding="csv">
 81977,82052,82052,82051,81975,82052,81975,81977,81977,82051,82052,82051,82053,82051,82053,82052,82053,82051,81977,81977,82051,82053,82052,81975,82052,81977,82052,82052,82053,82051,81977,82053,81975,82052,82053,82427,80832,80755,80831,80832,80832,80833,80832,80832,80757,80755,80756,80756,80833,80756,
@@ -128,7 +129,7 @@
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,105749,0,105715,0,106321,106322,106323,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,105748,0,0,105718,0,0,0,105749,0,106337,106338,106339,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,105765,0,0,0,0,0,0,106353,106354,106355,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,105656,0,0,0,0,0,0
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,129395,0,105656,0,0,0,0,0,0
 </data>
  </layer>
  <layer id="3" name="Collision" width="50" height="40">
@@ -260,7 +261,7 @@
 0,0,0,108522,108523,0,0,108520,108521,0,0,108522,108523,0,0,108522,108523,0,0,108518,108519,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,108538,108539,0,0,108536,108537,0,0,108538,108539,0,0,108538,108539,0,0,108534,108535,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,88415,0,0,0,0,0,0,0,0
 </data>
  </layer>
  <layer id="10" name="ground" width="50" height="40" offsetx="-54" offsety="4">
@@ -316,6 +317,13 @@
     <property name="triggerType" value="ON_ENTER_ZONE"/>
    </properties>
   </object>
+  <object id="12" x="1292" y="1225" width="76" height="67">
+   <properties>
+    <property name="eventType" value="RECOVER"/>
+    <property name="isOneShot" type="bool" value="false"/>
+    <property name="triggerType" value="ON_INTERACT"/>
+   </properties>
+  </object>
  </objectgroup>
  <objectgroup id="8" name="Enemies">
   <object id="9" x="887" y="1089">
@@ -363,9 +371,9 @@
    <properties>
     <property name="eventType" value="TELEPORT"/>
     <property name="isOneShot" type="bool" value="true"/>
-    <property name="targetMap" value="res/Level 1 0x00.tmx"/>
-    <property name="targetPosX" type="float" value="47"/>
-    <property name="targetPosY" type="float" value="35"/>
+    <property name="targetMap" value="res/Level 2 404.tmx"/>
+    <property name="targetPosX" type="float" value="2"/>
+    <property name="targetPosY" type="float" value="47"/>
     <property name="triggerType" value="ON_ENTER_ZONE"/>
    </properties>
   </object>

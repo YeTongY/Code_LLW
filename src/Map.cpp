@@ -166,6 +166,7 @@ void DrawOverheadLayers(const GameContext& map)
     DrawLayerList(map, map.overheadLayers);
 }
 
+//绘制整个地图
 void DrawMap(const GameContext& map) {
     if (map.width <= 0 || map.height <= 0) {
         TraceLog(LOG_WARNING, "[Map] 地图尺寸无效: %dx%d", map.width, map.height);
@@ -564,9 +565,11 @@ bool LoadLevelFromTiled(GameContext& ctx, const char* filepath){
                     if (propName == "eventType") {
                         if (propType == tmx::Property::Type::String) {
                             string typeStr = prop.getStringValue();
+                            //事件分类
                             if(typeStr == "DIALOGUE") event.eventType = DIALOGUE;
                             else if(typeStr == "TELEPORT") event.eventType = TELEPORT;
                             else if(typeStr == "COMBAT") event.eventType = COMBAT;
+                            else if(typeStr == "RECOVER") event.eventType = RECOVER;
                             else {
                                 TraceLog(LOG_WARNING, "[Map] 未知的事件类型: %s", typeStr.c_str());
                                 event.eventType = NONE;
@@ -586,7 +589,11 @@ bool LoadLevelFromTiled(GameContext& ctx, const char* filepath){
 
                 event.dialogue.push_back(dialogueData);
 
-                if(event.triggerType != ON_NONE && !event.scriptPath.empty()){
+                bool hasSrcipt = !event.scriptPath.empty();
+                bool isSpecialEvent = (event.eventType == COMBAT || event.eventType == RECOVER);
+
+                 // 仅当事件类型和触发类型有效时才添加事件
+                if(event.triggerType != ON_NONE && (hasSrcipt || isSpecialEvent)){
                     ctx.gameEvents.push_back(event);
                 }
             }

@@ -194,7 +194,7 @@
   <object id="4" x="414" y="238" width="188" height="202">
    <properties>
     <property name="eventType" value="DIALOGUE"/>
-    <property name="isOneShot" type="bool" value="false"/>
+    <property name="isOneShot" type="bool" value="true"/>
     <property name="scriptPath" value="res/data/dialogue/Level0_1/L0_1_mmk_briefing.csv"/>
     <property name="triggerType" value="ON_ENTER_ZONE"/>
    </properties>
