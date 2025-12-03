@@ -175,6 +175,28 @@ void ExecuteEvents(GameContext &ctx)
                 return;
             }
 
+            case RECOVER:{
+                const std::string &scriptPath = "res/data/dialogue/Special/Recover.csv";
+                auto script = LoadDialogueScript(scriptPath.c_str());
+                if (script.empty())
+                {
+                    TraceLog(LOG_WARNING, "[Event] 恢复脚本为空或加载失败: %s", scriptPath.c_str());
+                    continue;
+                }
+                // 恢复玩家生命值
+                ctx.player.stats.hp = ctx.player.stats.maxHp;
+                // 切换到对话状态并标记事件
+                GameState *dialogueState = createDialogueState(script);
+                if (!dialogueState)
+                {
+                    TraceLog(LOG_ERROR, "[Event] 无法创建对话状态: %s", scriptPath.c_str());
+                    continue;
+                }
+                GameStateMachine_change(&ctx.state_machine, &ctx, dialogueState);
+                event.isTrigged = true;
+                continue;
+            }
+
             default:
                 TraceLog(LOG_INFO, "[Event] 未实现的事件类型: %d", event.eventType);
                 event.isTrigged = true;

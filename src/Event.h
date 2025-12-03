@@ -17,7 +17,8 @@ typedef enum{
     NONE = 0,   // 占位：不执行任何逻辑
     DIALOGUE,   // 对话事件
     TELEPORT,   // 传送事件
-    COMBAT      // 战斗事件（待实现）
+    COMBAT,     // 战斗事件
+    RECOVER    // 恢复事件
 }EventType;
 
 /**
