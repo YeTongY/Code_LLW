@@ -201,7 +201,7 @@
   </object>
  </objectgroup>
  <objectgroup id="7" name="Portals">
-  <object id="1" x="320" y="630" width="102" height="107">
+  <object id="1" x="320" y="648" width="91" height="89">
    <properties>
     <property name="eventType" value="TELEPORT"/>
     <property name="isOneShot" type="bool" value="true"/>
