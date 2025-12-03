@@ -175,6 +175,41 @@ void ExecuteEvents(GameContext &ctx)
                 return;
             }
 
+            case TELEPORT_WITHOUT_LOADING:
+            {
+                // 保护性检查：至少需要一个目的地配置
+                if (event.portal.empty())
+                {
+                    TraceLog(LOG_WARNING, "[Event] 传送事件缺少目的地数据");
+                    continue;
+                }
+
+                // 复制出第一个传送目的地
+                const EventData_Portal portal = event.portal.front();
+
+                TraceLog(LOG_INFO, "[Event] 传送到位置 (%.2f, %.2f)", portal.targetPosition.x, portal.targetPosition.y);
+
+                // 更新玩家与相机状态
+                Vector2 teleportPos = portal.targetPosition;
+                if (teleportPos.x == 0.0f && teleportPos.y == 0.0f)
+                {
+                    teleportPos = {
+                        portal.bounds.x + portal.bounds.width * 0.5f,
+                        portal.bounds.y + portal.bounds.height * 0.5f
+                    };
+                }
+
+                float tile = ctx.tileSize > 0 ? static_cast<float>(ctx.tileSize) : 32.0f;
+                ctx.player.visualPosition = teleportPos;
+                ctx.player.moveTarget = teleportPos;
+                ctx.player.gridX = static_cast<int>(teleportPos.x / tile);
+                ctx.player.gridY = static_cast<int>(teleportPos.y / tile);
+                ctx.camera.target = teleportPos;
+
+                event.isTrigged = true;
+                continue;
+            }
+
             case RECOVER:{
                 const std::string &scriptPath = "res/data/dialogue/Special/Recover.csv";
                 auto script = LoadDialogueScript(scriptPath.c_str());
