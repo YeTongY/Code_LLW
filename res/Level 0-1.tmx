@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="25" height="25" tilewidth="32" tileheight="32" infinite="0" nextlayerid="9" nextobjectid="3">
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="25" height="25" tilewidth="32" tileheight="32" infinite="0" nextlayerid="9" nextobjectid="5">
  <tileset firstgid="1" source="tsx/1_Generic_32x32.tsx"/>
  <tileset firstgid="1249" source="tsx/Characters_MV.tsx"/>
  <tileset firstgid="1681" source="tsx/Interiors_Part1.tsx"/>
@@ -190,7 +190,16 @@
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 </data>
  </layer>
- <objectgroup id="6" name="Events"/>
+ <objectgroup id="6" name="Events">
+  <object id="4" x="414" y="238" width="188" height="202">
+   <properties>
+    <property name="eventType" value="DIALOGUE"/>
+    <property name="isOneShot" type="bool" value="false"/>
+    <property name="scriptPath" value="res/data/dialogue/Level0_1/L0_1_mmk_briefing.csv"/>
+    <property name="triggerType" value="ON_ENTER_ZONE"/>
+   </properties>
+  </object>
+ </objectgroup>
  <objectgroup id="7" name="Portals">
   <object id="1" x="320" y="630" width="102" height="107">
    <properties>
@@ -200,14 +209,6 @@
     <property name="targetPosX" type="float" value="47"/>
     <property name="targetPosY" type="float" value="35"/>
     <property name="triggerType" value="ON_ENTER_ZONE"/>
-   </properties>
-  </object>
-  <object id="2" x="427" y="232.5" width="188" height="202">
-   <properties>
-    <property name="eventType" value="DIALOGUE"/>
-    <property name="isOneShot" type="bool" value="false"/>
-    <property name="scriptPath" value="res/data/dialogue/Level0_1/L0_1_mmk_briefing.csv"/>
-    <property name="triggerType" value="ON_INTERACT"/>
    </properties>
   </object>
  </objectgroup>
