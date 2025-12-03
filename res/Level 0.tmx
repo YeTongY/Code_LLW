@@ -278,7 +278,7 @@
    <properties>
     <property name="eventType" value="DIALOGUE"/>
     <property name="isOneShot" type="bool" value="false"/>
-    <property name="scriptPath" value="res/data/dialogue/Level/L0_mmk_call.csv"/>
+    <property name="scriptPath" value="res/data/dialogue/Level0/L0_mmk_call.csv"/>
     <property name="triggerType" value="ON_INTERACT"/>
    </properties>
   </object>
@@ -305,7 +305,7 @@
     <property name="isOneShot" type="bool" value="true"/>
     <property name="targetMap" value="res/Level 0-1.tmx"/>
     <property name="targetPosX" type="float" value="1"/>
-    <property name="targetPosY" type="float" value="10"/>
+    <property name="targetPosY" type="float" value="11"/>
     <property name="triggerType" value="ON_ENTER_ZONE"/>
    </properties>
   </object>
