@@ -1,0 +1,7 @@
+Taffy,res/graphics/portraits/taffy.png,"这里好安静...只有单调的黑白格子。刚才的吵闹声像假的一样。"
+System_AI,nullptr,"警告。检测到未定义对象...对象类型：未知。"
+System_AI,nullptr,"内存占用率异常上升。判定为...内存泄漏 (Memory Leak)。"
+Taffy,res/graphics/portraits/taffy.png,"内存泄漏？真失礼啊。我可是经过完美优化的「高级程序」。"
+System_AI,nullptr,"启动递归防御协议。正在构建二叉树迷宫..."
+System_AI,nullptr,"除非找到唯一的退出条件 (Exit Condition) ...否则你将永远困在死循环里。"
+Taffy,res/graphics/portraits/taffy.png,"死循环？呵...只要把挡路的垃圾全部「回收」掉...循环自然就崩坏了吧。"

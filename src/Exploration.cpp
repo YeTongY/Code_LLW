@@ -35,6 +35,10 @@ static void TryTriggerCombat(GameContext* ctx)
         if (distanceSq > triggerDistanceSq) continue;
 
         ctx->currentCombatant = &enemy;
+        //==========================12/2 Warning start
+        ctx->pendingPreCombatDialogue = "res/data/dialogue/Level0/L0_before_battle.csv";
+        ctx->pendingPostCombatDialogue = "res/data/dialogue/Level0/L0_after_battle.csv";
+        //==========================12/2 Warning end
         GameState* combatState = CreateCombatState(ctx, &enemy); // 进入与该敌人的战斗状态
         if (combatState)
         {
