@@ -173,7 +173,13 @@ void combat_render(GameContext* ctx, void* state_data)
     ClearBackground(BLACK);
     
     // 绘制战斗背景
-    DrawRectangle(0, 0, ctx->screenWidth, ctx->screenHeight, (Color){10, 10, 20, 255});
+    if (ctx->combatBackground.id != 0) {
+        Rectangle src = {0.0f, 0.0f, (float)ctx->combatBackground.width, (float)ctx->combatBackground.height};
+        Rectangle dest = {0.0f, 0.0f, ctx->screenWidth, ctx->screenHeight};
+        DrawTexturePro(ctx->combatBackground, src, dest, Vector2{0.0f, 0.0f}, 0.0f, WHITE);
+    } else {
+        DrawRectangle(0, 0, ctx->screenWidth, ctx->screenHeight, (Color){10, 10, 20, 255});
+    }
     
     // 绘制标题
     DrawTextEx(ctx->mainFont, "战斗模式", {20, 20}, 32, 1, CYBER_CYAN);

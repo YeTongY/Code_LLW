@@ -54,6 +54,7 @@ int main(void)
     //==========创建游戏上下文==========
     GameContext ctx;
     ctx.currentCombatant = nullptr;
+    ctx.combatBackground = Texture2D{0};
     TraceLog(LOG_INFO, "[Main] GameContext 创建后，默认尺寸: %.0fx%.0f, isRunning=%d", ctx.screenWidth, ctx.screenHeight, ctx.isRunning);
     
     ctx.screenWidth = screenWidth;
@@ -146,6 +147,27 @@ int main(void)
     //==========加载UI资源==========
     LoadUIAssets(ctx);
     TraceLog(LOG_INFO, "[Main] UI资源加载完成, isRunning=%d", ctx.isRunning);
+
+    //==========加载战斗背景图==========
+    const char* combatBackgroundCandidates[] = {
+        "res/graphics/battebackground/L0_Battle_Background_Blur.png",
+        "../res/graphics/battebackground/L0_Battle_Background_Blur.png",
+        "../../res/graphics/battebackground/L0_Battle_Background_Blur.png"
+    };
+
+    for (const char* path : combatBackgroundCandidates) {
+        Texture2D candidate = LoadTexture(path);
+        if (candidate.id != 0) {
+            ctx.combatBackground = candidate;
+            TraceLog(LOG_INFO, "[Main] 战斗背景图加载成功: %s", path);
+            break;
+        }
+        TraceLog(LOG_WARNING, "[Main] 战斗背景图加载失败: %s", path);
+    }
+
+    if (ctx.combatBackground.id == 0) {
+        TraceLog(LOG_ERROR, "[Main] 未能加载战斗背景图，战斗画面将使用纯色背景");
+    }
 
     //==========初始化音频设备==========
     InitAudioDevice(); // 初始化音频设备
@@ -315,6 +337,11 @@ int main(void)
     
     UnloadUIAssets(ctx);
     TraceLog(LOG_INFO, "[Main] UI资源已释放");
+
+    if (ctx.combatBackground.id != 0) {
+        UnloadTexture(ctx.combatBackground);
+        TraceLog(LOG_INFO, "[Main] 战斗背景图资源已释放");
+    }
     
     unloadGameFont(ctx);
     TraceLog(LOG_INFO, "[Main] 字体资源已释放");
