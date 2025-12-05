@@ -35,10 +35,11 @@ static void TryTriggerCombat(GameContext* ctx)
         if (distanceSq > triggerDistanceSq) continue;
 
         ctx->currentCombatant = &enemy;
-        //==========================12/2 Warning start
-        ctx->pendingPreCombatDialogue = "res/data/dialogue/Level0/L0_before_battle.csv";
-        ctx->pendingPostCombatDialogue = "res/data/dialogue/Level0/L0_after_battle.csv";
-        //==========================12/2 Warning end
+        if (!ctx->level0CombatDialogueTriggered) {
+            ctx->pendingPreCombatDialogue = "res/data/dialogue/Level0/L0_before_battle.csv";
+            ctx->pendingPostCombatDialogue = "res/data/dialogue/Level0/L0_after_battle.csv";
+            ctx->level0CombatDialogueTriggered = true;
+        }
         GameState* combatState = CreateCombatState(ctx, &enemy); // 进入与该敌人的战斗状态
         if (combatState)
         {
@@ -137,10 +138,11 @@ void exploration_update(GameContext* ctx, void* state_data)
 
             if(CheckCollisionRecs(playerRect, EnemyRcet)){
                 TraceLog(LOG_INFO, "[Exploration] 玩家与敌人发生碰撞，准备进入战斗状态");
-                //====================12/2 剧本加载 Warning start
-                ctx->pendingPreCombatDialogue = "res/data/dialogue/Level0/L0_before_battle.csv";
-                ctx->pendingPostCombatDialogue = "res/data/dialogue/Level0/L0_after_battle.csv";
-                //====================12/2 Warning end
+                if (!ctx->level0CombatDialogueTriggered) {
+                    ctx->pendingPreCombatDialogue = "res/data/dialogue/Level0/L0_before_battle.csv";
+                    ctx->pendingPostCombatDialogue = "res/data/dialogue/Level0/L0_after_battle.csv";
+                    ctx->level0CombatDialogueTriggered = true;
+                }
                 
                 GameState* combatState = CreateCombatState(ctx, &enemy); // 与该敌人开战
 

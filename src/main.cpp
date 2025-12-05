@@ -55,6 +55,7 @@ int main(void)
     GameContext ctx;
     ctx.currentCombatant = nullptr;
     ctx.combatBackground = Texture2D{0};
+    ctx.level0CombatDialogueTriggered = false;
     TraceLog(LOG_INFO, "[Main] GameContext 创建后，默认尺寸: %.0fx%.0f, isRunning=%d", ctx.screenWidth, ctx.screenHeight, ctx.isRunning);
     
     ctx.screenWidth = screenWidth;

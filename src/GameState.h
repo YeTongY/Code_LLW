@@ -148,6 +148,7 @@ struct GameContext
 
     bool isExplorationBGMPlaying = false; // 探索背景音乐播放标记
     bool isCombatBGMPlaying = false;      // 战斗背景音乐播放标记
+    bool level0CombatDialogueTriggered = false; // Level0 战斗对话是否已触发
 
     //音效
     Music footstepLoop = {0};

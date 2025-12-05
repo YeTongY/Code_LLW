@@ -267,12 +267,22 @@ void ProcessPlayerAction(GameContext* ctx, CombatData* data, CombatAction action
     {
         case ACTION_ATTACK:
         {
-            // 计算伤害
-            int damage = std::max(1, ctx->player.stats.attack - data->currentEnemy->stats.defense); // 计算所得伤害
+            // 计算伤害（包含浮动与暴击）
+            int baseDamage = std::max(1, ctx->player.stats.attack - data->currentEnemy->stats.defense);
+            int variance = GetRandomValue(-2, 2); // ±2 点浮动
+            bool isCrit = GetRandomValue(0, 100) < 15; // 15% 暴击概率
+            int damage = std::max(1, baseDamage + variance);
+            if (isCrit) {
+                damage *= 2;
+            }
             data->currentEnemy->stats.hp -= damage;
             data->damageDealt = damage;
             
-            std::sprintf(msg, "Taffy 对 敌人 造成了 %d 点伤害！", damage);
+            if (isCrit) {
+                std::sprintf(msg, "Taffy 暴击造成 %d 点伤害！", damage);
+            } else {
+                std::sprintf(msg, "Taffy 对 敌人 造成了 %d 点伤害！", damage);
+            }
             data->battleMessage = msg;
             data->messageTimer = 2.0f;
             data->animationTimer = 1.0f;
@@ -324,7 +334,13 @@ void ProcessEnemyTurn(GameContext* ctx, CombatData* data)
     if (!data->currentEnemy) return;
     
     // 简单的敌人AI：直接攻击
-    int damage = std::max(1, data->currentEnemy->stats.attack - ctx->player.stats.defense); // 敌人基础伤害
+    int baseDamage = std::max(1, data->currentEnemy->stats.attack - ctx->player.stats.defense);
+    int variance = GetRandomValue(-1, 2); // 敌人浮动略小
+    bool isCrit = GetRandomValue(0, 100) < 10; // 10% 暴击概率
+    int damage = std::max(1, baseDamage + variance);
+    if (isCrit) {
+        damage = std::max(1, damage * 2);
+    }
     bool defended = data->playerDefending; // 记录玩家是否防御，用于减伤与提示
     if(defended)
     {
@@ -336,11 +352,19 @@ void ProcessEnemyTurn(GameContext* ctx, CombatData* data)
     char msg[256]; // 敌人回合消息缓冲
     if(defended)
     {
-        std::sprintf(msg, "敌人 对 Taffy 造成了 %d 点伤害！（防御减伤）", damage);
+        if (isCrit) {
+            std::sprintf(msg, "敌人暴击被格挡，对 Taffy 造成 %d 点伤害！", damage);
+        } else {
+            std::sprintf(msg, "敌人 对 Taffy 造成了 %d 点伤害！（防御减伤）", damage);
+        }
     }
     else
     {
-        std::sprintf(msg, "敌人 对 Taffy 造成了 %d 点伤害！", damage);
+        if (isCrit) {
+            std::sprintf(msg, "敌人暴击，对 Taffy 造成了 %d 点伤害！", damage);
+        } else {
+            std::sprintf(msg, "敌人 对 Taffy 造成了 %d 点伤害！", damage);
+        }
     }
     data->battleMessage = msg;
     data->messageTimer = 2.0f;
