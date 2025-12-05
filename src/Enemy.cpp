@@ -301,7 +301,8 @@ void LoadEnemyAssets(GameContext &ctx)
     map<string, const char*> assetsToLoad = {
         {"Default", "../res/graphics/enemy/Enemy_Sprite.png"}, // 默认西装男
         {"Pink",    "../res/graphics/enemy/Enemy_Pink.png"},   // 粉发妹
-        {"Guard",   "../res/graphics/enemy/Enemy_Guard.png"}   // 保安
+        {"Guard",   "../res/graphics/enemy/Enemy_Guard.png"},   // 保安
+        {"Boss",    "../res/graphics/enemy/Enemy_Boss.png"}    // Boss
     };
     
     //循环加载

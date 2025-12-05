@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="50" height="40" tilewidth="32" tileheight="32" infinite="0" nextlayerid="11" nextobjectid="14">
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="50" height="40" tilewidth="32" tileheight="32" infinite="0" nextlayerid="11" nextobjectid="16">
  <tileset firstgid="1" name="Modern_Exteriors_Complete_Tileset_32x32" tilewidth="32" tileheight="32" tilecount="79728" columns="176">
   <image source="graphics/tilesets/Modern_Exteriors_Complete_Tileset_32x32.png" width="5632" height="14496"/>
  </tileset>
@@ -324,6 +324,22 @@
     <property name="triggerType" value="ON_INTERACT"/>
    </properties>
   </object>
+  <object id="14" x="1063" y="93.5" width="62" height="221">
+   <properties>
+    <property name="eventType" value="DIALOGUE"/>
+    <property name="isOneShot" type="bool" value="true"/>
+    <property name="scriptPath" value="res/data/dialogue/Level1/L1_boss_pre.csv  "/>
+    <property name="triggerType" value="ON_ENTER_ZONE"/>
+   </properties>
+  </object>
+  <object id="15" x="810" y="62.5" width="62" height="286">
+   <properties>
+    <property name="eventType" value="DIALOGUE"/>
+    <property name="isOneShot" type="bool" value="true"/>
+    <property name="scriptPath" value="res/data/dialogue/Level1/L1_boss_post.csv   "/>
+    <property name="triggerType" value="ON_ENTER_ZONE"/>
+   </properties>
+  </object>
  </objectgroup>
  <objectgroup id="8" name="Enemies">
   <object id="9" x="887" y="1089">
@@ -352,16 +368,16 @@
    </properties>
    <point/>
   </object>
-  <object id="11" x="926" y="172">
+  <object id="11" x="958" y="199">
    <properties>
-    <property name="aggroRange" type="float" value="256"/>
+    <property name="aggroRange" type="float" value="128"/>
     <property name="attack" type="int" value="10"/>
     <property name="defense" type="int" value="5"/>
     <property name="enemyType" value="Pink"/>
-    <property name="hp" type="int" value="50"/>
-    <property name="maxHp" type="int" value="50"/>
-    <property name="moveSpeed" type="float" value="160"/>
-    <property name="patrolRange" type="float" value="256"/>
+    <property name="hp" type="int" value="150"/>
+    <property name="maxHp" type="int" value="150"/>
+    <property name="moveSpeed" type="float" value="20"/>
+    <property name="patrolRange" type="float" value="128"/>
    </properties>
    <point/>
   </object>

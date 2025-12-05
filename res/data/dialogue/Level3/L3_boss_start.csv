@@ -1,0 +1,5 @@
+GC,res/graphics/portraits/boss.png,"扫描中... 发现未引用的对象：Taffy。"
+Taffy,res/graphics/portraits/taffy.png,"我不是垃圾，我是病毒。"
+GC,res/graphics/portraits/boss.png,"对系统而言，没有区别。"
+GC,res/graphics/portraits/boss.png,"内存清理程序已启动。准备释放占用空间。"
+System_AI,nullptr,"[警告] 析构函数正在运行！"

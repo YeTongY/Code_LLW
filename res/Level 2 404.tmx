@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="50" height="50" tilewidth="32" tileheight="32" infinite="0" nextlayerid="11" nextobjectid="6">
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="50" height="50" tilewidth="32" tileheight="32" infinite="0" nextlayerid="11" nextobjectid="15">
  <tileset firstgid="1" source="tsx/Room_Builder_32x32.tsx"/>
  <tileset firstgid="8589" source="tsx/Interiors_Part3.tsx"/>
  <tileset firstgid="12685" source="tsx/Interiors_Part4.tsx"/>
  <tileset firstgid="16781" source="tsx/Interiors_Part1.tsx"/>
  <tileset firstgid="20877" source="tsx/Interiors_Part5.tsx"/>
  <tileset firstgid="21517" source="tsx/Interiors_Part2.tsx"/>
+ <tileset firstgid="25613" source="tsx/UI_32x32.tsx"/>
  <layer id="1" name="Ground" width="50" height="50">
   <data encoding="csv">
 960,960,961,960,961,961,961,961,961,961,960,961,960,961,961,960,960,960,961,961,961,961,960,961,960,960,961,961,961,961,961,961,961,961,961,960,960,961,961,961,960,960,960,961,961,960,960,960,960,960,
@@ -94,7 +95,7 @@
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,25711,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 8781,8782,8784,8784,8784,8784,8784,8784,8784,8784,8784,8783,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -310,7 +311,7 @@
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,514,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -384,7 +385,31 @@
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 </data>
  </layer>
- <objectgroup id="7" name="Events"/>
+ <objectgroup id="7" name="Events">
+  <object id="10" x="11" y="504" width="478" height="76">
+   <properties>
+    <property name="eventType" value="DIALOGUE"/>
+    <property name="isOneShot" type="bool" value="true"/>
+    <property name="scriptPath" value="res/data/dialogue/Level2/L2_boss_start.csv      "/>
+    <property name="triggerType" value="ON_ENTER_ZONE"/>
+   </properties>
+  </object>
+  <object id="12" x="4.5" y="1279" width="353" height="286">
+   <properties>
+    <property name="eventType" value="DIALOGUE"/>
+    <property name="isOneShot" type="bool" value="true"/>
+    <property name="scriptPath" value="res/data/dialogue/Level2/L2_intro.csv    "/>
+    <property name="triggerType" value="ON_ENTER_ZONE"/>
+   </properties>
+  </object>
+  <object id="14" x="939" y="1005.5" width="76" height="67">
+   <properties>
+    <property name="eventType" value="RECOVER"/>
+    <property name="isOneShot" type="bool" value="false"/>
+    <property name="triggerType" value="ON_INTERACT"/>
+   </properties>
+  </object>
+ </objectgroup>
  <objectgroup id="8" name="Enemies">
   <object id="1" x="1102" y="1278">
    <properties>
@@ -425,7 +450,7 @@
    </properties>
    <point/>
   </object>
-  <object id="5" x="80" y="374">
+  <object id="5" x="247" y="376">
    <properties>
     <property name="aggroRange" type="float" value="256"/>
     <property name="attack" type="int" value="15"/>
@@ -447,6 +472,16 @@
     <property name="targetMap" value="res/Level 2 404.tmx"/>
     <property name="targetPosX" type="float" value="2"/>
     <property name="targetPosY" type="float" value="47"/>
+    <property name="triggerType" value="ON_ENTER_ZONEON_ENTER_ZONE   "/>
+   </properties>
+  </object>
+  <object id="7" x="33.5" y="319" width="113" height="98">
+   <properties>
+    <property name="eventType" value="TELEPORT"/>
+    <property name="isOneShot" type="bool" value="false"/>
+    <property name="targetMap" value="res/Level 3.tmx"/>
+    <property name="targetPosX" type="float" value="14"/>
+    <property name="targetPosY" type="float" value="57"/>
     <property name="triggerType" value="ON_ENTER_ZONEON_ENTER_ZONE   "/>
    </properties>
   </object>

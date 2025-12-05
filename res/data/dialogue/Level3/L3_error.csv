@@ -1,0 +1,5 @@
+System_AI,nullptr,"[系统警告] 检测到非法访问。"
+System_AI,nullptr,"正在调用防火墙守护进程..."
+Taffy,res/graphics/portraits/taffy.png,"让我过去。"
+System_AI,nullptr,"错误：权限不足 (HTTP 403 Forbidden)。"
+System_AI,nullptr,"执行指令：sudo rm -rf /taffy"
