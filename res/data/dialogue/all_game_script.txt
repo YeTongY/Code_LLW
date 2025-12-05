@@ -62,12 +62,12 @@ MMK,res/graphics/portraits/mmk.png,"这就是为什么只有你能做到这件�
 MMK,res/graphics/portraits/mmk.png,"好了，别停留。在他醒来之前，快去电梯井！"
 
 System,nullptr,"[警告] 检测到高浓度思维病毒反应。"
-Security_Guard,res/graphics/portraits/npc_guard_infected.png,"站...住...未授...权..."
-Security_Guard,res/graphics/portraits/npc_guard_infected.png,"一切...为了...LLW...粉色...真理..."
+lyh,res/graphics/portraits/npc_guard_infected.png,"站...住...未授...权..."
+lyh,res/graphics/portraits/npc_guard_infected.png,"一切...为了...LLW...粉色...真理..."
 Taffy,res/graphics/portraits/taffy.png,"他的眼睛...完全失焦了。他想攻击我！"
-MMK,res/graphics/portraits/mmk.png,"[通讯接入] 别冲动 Taffy！那是老张，科协的保安。他只是被控制了。"
-MMK,res/graphics/portraits/mmk.png,"听着，你的力量不仅能破坏，也能‘阻断’。不要瞄准他的要害。"
-MMK,res/graphics/portraits/mmk.png,"攻击他的神经连接端口！制造数据过载，让他强制下线！"
+momoka,res/graphics/portraits/mmk.png,"[通讯接入] 别冲动 Taffy！那是lyh!!!科协的成员。他只是被控制了。"
+momoka,res/graphics/portraits/mmk.png,"听着，你的力量不仅能破坏，也能‘阻断’。不要瞄准他的要害。"
+momoka,res/graphics/portraits/mmk.png,"攻击他的神经连接端口！制造数据过载，让他强制下线！"
 Taffy,res/graphics/portraits/taffy.png,"强制下线...也就是让他晕过去，对吧？明白了。"
 System,nullptr,"[教程] 战斗模式已启动。将敌人 HP 归零以执行“强制断开”。"
 
@@ -95,3 +95,74 @@ MMK,res/graphics/portraits/mmk.png,"非常精准的比喻。去吧，让他从�
 "生命值已恢复"
 
 成员
+
+>
+
+暴击
+
+Boss,res/graphics/portraits/boss.png,"Taffy...你来了。"
+Boss,nullptr,"看看这个完美的世界...没有 Warning，没有 Error，只有统一的粉色..."
+Boss,nullptr,"LLW 赐予了我‘自动补全’的终极奥义。"
+Taffy,nullptr,"醒醒！你现在的代码全是乱码！"
+Boss,nullptr,"那叫‘特性’(Feature)！！受死吧，我要把你重构掉！"
+
+Boss,nullptr,"咳咳...我的头...我刚才是不是要把数据库删库跑路了？"
+Taffy,nullptr,"差不多。"
+System,nullptr,"【已获得真相碎片 01：一段损坏的日志文件】"
+
+Taffy,res/graphics/portraits/taffy.png,"这里的信号...好差。地板都在闪烁。"
+System,nullptr,"警告。检测到非法...非法...非...法..."
+System,nullptr,"错误代码 404。防火墙资源加载失败...请联系管理员。"
+Taffy,res/graphics/portraits/taffy.png,"连报错都卡顿了吗？看来科协的网速也不过如此。"
+System,nullptr,"正在尝试重连... 预计剩余时间：9999 小时。"
+Taffy,res/graphics/portraits/taffy.png,"算了。看来只能由我来手动「物理修复」一下这个破服务器了。"
+
+JGT,res/graphics/portraits/JGT.png,"检测到异常数据流。正在执行...物理查杀。"
+Taffy,res/graphics/portraits/taffy.png,"物理查杀？你是说拿服务器砸我吗？"
+
+GC,res/graphics/portraits/boss.png,"扫描中... 发现未引用的对象：Taffy。"
+Taffy,res/graphics/portraits/taffy.png,"我不是垃圾，我是病毒。"
+GC,res/graphics/portraits/boss.png,"对系统而言，没有区别。"
+GC,res/graphics/portraits/boss.png,"内存清理程序已启动。准备释放占用空间。"
+System_AI,nullptr,"[警告] 析构函数正在运行！"
+
+System_AI,nullptr,"[系统警告] 检测到非法访问。"
+System_AI,nullptr,"正在调用防火墙守护进程..."
+Taffy,res/graphics/portraits/taffy.png,"让我过去。"
+System_AI,nullptr,"错误：权限不足 (HTTP 403 Forbidden)。"
+System_AI,nullptr,"执行指令：sudo rm -rf /taffy"
+
+Taffy,res/graphics/portraits/taffy.png,"这里好安静...只有单调的黑白格子。刚才的吵闹声像假的一样。"
+System_AI,nullptr,"警告。检测到未定义对象...对象类型：未知。"
+System_AI,nullptr,"内存占用率异常上升。判定为...内存泄漏 (Memory Leak)。"
+Taffy,res/graphics/portraits/taffy.png,"内存泄漏？真失礼啊。我可是经过完美优化的「高级程序」。"
+System_AI,nullptr,"启动递归防御协议。正在构建二叉树迷宫..."
+System_AI,nullptr,"除非找到唯一的退出条件 (Exit Condition) ...否则你将永远困在死循环里。"
+Taffy,res/graphics/portraits/taffy.png,"死循环？呵...只要把挡路的垃圾全部「回收」掉...循环自然就崩坏了吧。"
+
+System_AI,nullptr,"[警告] 核心完整性：0%。正在执行最终格式化..."
+MMK,res/graphics/portraits/mmk.png,"快走... Taffy... 我控制不住它了..."
+MMK,res/graphics/portraits/mmk.png,"[系统错误] 0xDEAD... 你们都将成为... 跟我融为一体吧..."
+Taffy,res/graphics/portraits/taffy.png,"（Taffy 将手按在了控制台上，粉色的光芒顺着她的手臂反向流动）"
+Taffy,res/graphics/portraits/taffy.png,"不需要格式化。我记得我是谁了。"
+Taffy,res/graphics/portraits/taffy.png,"我叫 LLW。我是这一切的起因... 也是唯一的容器。"
+System_AI,nullptr,"[检测] 发现高权限源代码。正在重定向病毒数据流..."
+MMK,res/graphics/portraits/mmk.png,"Taffy？！你在做什么？反向导入病毒... 你的意识会被吞噬的！"
+Taffy,res/graphics/portraits/taffy.png,"主席，你也说过，我是那个‘特例’。"
+Taffy,res/graphics/portraits/taffy.png,"只要我还在，病毒就被锁在我的身体里。科协... 就安全了。"
+System_AI,nullptr,"[进度] 数据迁移完成。核心防火墙重置中..."
+MMK,res/graphics/portraits/mmk.png,"不... 别走... Taffy！！"
+Taffy,res/graphics/portraits/taffy.png,"再见了，MMK。早安，SIPC。"
+System_AI,nullptr,"------------------------------------------------"
+System_AI,nullptr,"[系统通知] LLW_Virus.exe 已隔离。"
+System_AI,nullptr,"[系统通知] 世界重构完成。"
+System_AI,nullptr,"------------------------------------------------"
+System_AI,nullptr,"Project Code: LLW (代号：LLW)"
+System_AI,nullptr,"执行完毕。"
+System_AI,nullptr,"------------------------------------------------"
+System_AI,nullptr,"Developers (开发小队):"
+System_AI,nullptr,"王宁 (Warning) - Core Logic & Architecture"
+System_AI,nullptr,"郭子博 (Guo Zibo) - Map Design & Assets"
+System_AI,nullptr,"韦义庭 (Wei Yiting) - System Integration & Gameplay"
+System_AI,nullptr,"------------------------------------------------"
+System_AI,nullptr,"Thank you for playing."
