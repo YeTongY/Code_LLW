@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="50" height="50" tilewidth="32" tileheight="32" infinite="0" nextlayerid="11" nextobjectid="15">
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="50" height="50" tilewidth="32" tileheight="32" infinite="0" nextlayerid="11" nextobjectid="16">
  <tileset firstgid="1" source="tsx/Room_Builder_32x32.tsx"/>
  <tileset firstgid="8589" source="tsx/Interiors_Part3.tsx"/>
  <tileset firstgid="12685" source="tsx/Interiors_Part4.tsx"/>
@@ -414,30 +414,17 @@
   <object id="1" x="1102" y="1278">
    <properties>
     <property name="aggroRange" type="float" value="256"/>
-    <property name="attack" type="int" value="10"/>
+    <property name="attack" type="int" value="15"/>
     <property name="defense" type="int" value="5"/>
     <property name="enemyType" value="Pink"/>
-    <property name="hp" type="int" value="50"/>
-    <property name="maxHp" type="int" value="50"/>
+    <property name="hp" type="int" value="80"/>
+    <property name="maxHp" type="int" value="80"/>
     <property name="moveSpeed" type="float" value="160"/>
     <property name="patrolRange" type="float" value="256"/>
    </properties>
    <point/>
   </object>
   <object id="3" x="577" y="1037">
-   <properties>
-    <property name="aggroRange" type="float" value="256"/>
-    <property name="attack" type="int" value="10"/>
-    <property name="defense" type="int" value="5"/>
-    <property name="enemyType" value="Pink"/>
-    <property name="hp" type="int" value="50"/>
-    <property name="maxHp" type="int" value="50"/>
-    <property name="moveSpeed" type="float" value="160"/>
-    <property name="patrolRange" type="float" value="256"/>
-   </properties>
-   <point/>
-  </object>
-  <object id="4" x="1127" y="777">
    <properties>
     <property name="aggroRange" type="float" value="256"/>
     <property name="attack" type="int" value="10"/>
@@ -459,6 +446,19 @@
     <property name="hp" type="int" value="150"/>
     <property name="maxHp" type="int" value="150"/>
     <property name="moveSpeed" type="float" value="30"/>
+    <property name="patrolRange" type="float" value="256"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="15" x="1130" y="763">
+   <properties>
+    <property name="aggroRange" type="float" value="256"/>
+    <property name="attack" type="int" value="15"/>
+    <property name="defense" type="int" value="5"/>
+    <property name="enemyType" value="Pink"/>
+    <property name="hp" type="int" value="80"/>
+    <property name="maxHp" type="int" value="80"/>
+    <property name="moveSpeed" type="float" value="160"/>
     <property name="patrolRange" type="float" value="256"/>
    </properties>
    <point/>
