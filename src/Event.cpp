@@ -220,6 +220,8 @@ void ExecuteEvents(GameContext &ctx)
                 }
                 // 恢复玩家生命值
                 ctx.player.stats.hp = ctx.player.stats.maxHp;
+                // 恢复玩家魔法值
+                ctx.player.stats.mp = ctx.player.stats.maxMp;
                 // 切换到对话状态并标记事件
                 GameState *dialogueState = createDialogueState(script);
                 if (!dialogueState)

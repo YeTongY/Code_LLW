@@ -189,3 +189,4 @@ momoka,res/graphics/portraits/mmk.png,"顺带一提，剥离病毒时产生的�
 "Esc 返回/取消"
 
 你获得了一个奇怪的能力！
+生命值和法力值已恢复。
