@@ -152,7 +152,7 @@ Taffy,res/graphics/portraits/taffy.png,"主席，你也说过，我是那个‘�
 Taffy,res/graphics/portraits/taffy.png,"只要我还在，病毒就被锁在我的身体里。科协... 就安全了。"
 System_AI,nullptr,"[进度] 数据迁移完成。核心防火墙重置中..."
 momoka,res/graphics/portraits/mmk.png,"不... 别走... Taffy！！"
-Taffy,res/graphics/portraits/taffy.png,"再见了，MMK。早安，SIPC。"
+Taffy,res/graphics/portraits/taffy.png,"再见了，momoka。早安，科协。"
 System_AI,nullptr,"------------------------------------------------"
 System_AI,nullptr,"[系统通知] LLW_Virus.exe 已隔离。"
 System_AI,nullptr,"[系统通知] 世界重构完成。"
@@ -183,3 +183,7 @@ momoka,res/graphics/portraits/mmk.png,"顺带一提，剥离病毒时产生的�
 返回
 
 操作指南
+
+"↑↓ 选择行动"
+"Enter 确认"
+"Esc 返回/取消"
