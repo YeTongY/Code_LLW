@@ -245,6 +245,13 @@ void ExecuteEvents(GameContext &ctx)
                 }
                 ctx.player.stats.maxMp += 20;
                 ctx.player.stats.mp = ctx.player.stats.maxMp;
+                GameState *dialogueState = createDialogueState(script);
+                if (!dialogueState)
+                {
+                    TraceLog(LOG_ERROR, "[Event] 无法创建对话状态: %s", scriptPath.c_str());
+                    continue;
+                }
+                GameStateMachine_change(&ctx.state_machine, &ctx, dialogueState);
                 event.isTrigged = true;
                 continue;
             }
