@@ -55,6 +55,11 @@ struct CombatData
     std::string preDialogueScript;   // 战前的对话脚本路径
     std::string postDialogueScript;  // 战后的对话脚本路径
     bool postDialogueQueued;         // 是否已经触发过战后对话
+
+    // 技能菜单
+    bool skillMenuActive;            // 是否正在选择技能
+    int selectedSkillIndex;          // 当前高亮的技能
+    std::vector<std::string> skillNames; // 可用技能列表
 };
 
 // 战斗状态生命周期函数
@@ -70,3 +75,4 @@ GameState* CreateCombatState(GameContext* ctx, Enemy* targetEnemy);
 void ProcessPlayerAction(GameContext* ctx, CombatData* data, CombatAction action);
 void ProcessEnemyTurn(GameContext* ctx, CombatData* data);
 void CheckBattleEnd(GameContext* ctx, CombatData* data);
+void UseSkill(GameContext* ctx, CombatData* data, int skillIndex);
