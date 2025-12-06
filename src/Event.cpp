@@ -234,6 +234,13 @@ void ExecuteEvents(GameContext &ctx)
 
             case HIDDEN:
             {
+                const std::string &scriptPath = "res/data/dialogue/Special/Hidden.csv";
+                auto script = LoadDialogueScript(scriptPath.c_str());
+                if (script.empty())
+                {
+                    TraceLog(LOG_WARNING, "[Event] 隐藏剧本为空或加载失败: %s", scriptPath.c_str());
+                    continue;
+                }
                 ctx.player.stats.maxMp += 20;
                 ctx.player.stats.mp = ctx.player.stats.maxMp;
                 event.isTrigged = true;

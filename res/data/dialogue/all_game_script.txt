@@ -187,3 +187,5 @@ momoka,res/graphics/portraits/mmk.png,"顺带一提，剥离病毒时产生的�
 "↑↓ 选择行动"
 "Enter 确认"
 "Esc 返回/取消"
+
+你获得了一个奇怪的能力！
