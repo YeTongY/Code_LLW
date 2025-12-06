@@ -79,10 +79,6 @@ void PlayFootstepSound(GameContext &ctx)
         UpdateMusicStream(ctx.footstepLoop);
     }
 }
-
-
-
-
 void PlayExplorationBGM(GameContext &ctx)
 {
     // 如果音效未加载，直接返回
