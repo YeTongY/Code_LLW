@@ -12,8 +12,8 @@
 #include "Event.h"
 #include "Dialogue.h"
 #include "Combat.h"
-#include "UI.h"  // 新增：引入UI接口以便在探索状态绘制HUD
-#include "Audio.h" // 新增：控制脚步音效
+#include "UI.h"  // 引入UI接口以便在探索状态绘制HUD
+#include "Audio.h" // 控制脚步音效
 
 
 

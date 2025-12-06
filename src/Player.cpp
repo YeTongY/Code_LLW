@@ -2,32 +2,9 @@
 #include "raylib.h"
 #include "Map.h"//TODO 需等待map完成
 #include "raymath.h"
-#include <algorithm>
 
 const int TILE_SIZE = 32;//标准图块大小
 const char* playerSpriteAddress = "res/graphics/player/Pixel_Taffy/Pixel_Taffy_Sprite.png";//玩家精灵位置
-
-
-//辅助函数，用于比较两个实体的y坐标
-bool CompareEntities(const RenderEntity& a, const RenderEntity& b){
-    return a.sortY < b.sortY;
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 /**
  * @brief (P1) 加载玩家所需的美术资源 (贴图)
@@ -181,10 +158,8 @@ void UnloadPlayerAssets(GameContext& ctx){
  * @param ctx Gamestate里的GameContext核心数据文件
  */
 void updatePlayer(GameContext& ctx){
-
-    //------ 1. 实时处理输入栈 (无论是否正在移动都要处理) ------
     
-    // 我们关心的四个方向键
+    // 四个方向键
     int directionKeys[] = { KEY_W, KEY_S, KEY_A, KEY_D };
 
     for (int key : directionKeys) {
@@ -216,7 +191,6 @@ void updatePlayer(GameContext& ctx){
     }
 
     // 【安全检查】清理那些实际上没有被按住的键
-    // (防止因窗口切换等原因导致的“卡键”现象)
     for (int i = 0; i < ctx.player.inputStack.size(); ) {
         if (!IsKeyDown(ctx.player.inputStack[i])) {
             ctx.player.inputStack.erase(ctx.player.inputStack.begin() + i);
@@ -225,7 +199,6 @@ void updatePlayer(GameContext& ctx){
         }
     }
 
-    //------ 2. 开始移动状态更新 ------
 
     PlayerDirection previousDirection = ctx.player.currentDirection;
     float dt = GetFrameTime(); 
@@ -340,7 +313,7 @@ void DrawPlayerSprite(const Player& player)
 
     if (player.spriteSheet.id != 0) {
         if (player.usesRowBasedSheet) {
-            // 当精灵表以“行=方向、列=帧”组织时，按方向挑选行并播放帧序列
+            //按方向挑选行并播放帧序列
             int framesPerDirection = (player.framesPerDirection > 0) ? player.framesPerDirection : 1;
             int frameIndex = (framesPerDirection > 0) ? player.currentFrame % framesPerDirection : 0;
             int availableRows = (player.animationRowCount > 0) ? player.animationRowCount : ((frameHeight > 0) ? player.spriteSheet.height / frameHeight : 1);
@@ -372,27 +345,6 @@ void DrawPlayerSprite(const Player& player)
 
             source.x = (float)(frameIndex * frameWidth);
             source.y = (float)(rowIndex * frameHeight);
-        } else {
-            // 旧版贴图：横向排列四个朝向，只有静态帧
-            switch (player.currentDirection)
-            {
-                case PLAYER_DIR_LEFT:
-                    source.x = 0.0f;
-                    break;
-                case PLAYER_DIR_DOWN:
-                    source.x = (float)frameWidth;
-                    break;
-                case PLAYER_DIR_RIGHT:
-                    source.x = (float)(frameWidth * 2);
-                    break;
-                case PLAYER_DIR_UP:
-                    source.x = (float)(frameWidth * 3);
-                    break;
-                default:
-                    source.x = (float)frameWidth;
-                    TraceLog(LOG_WARNING, "[Player] 检测到异常的 currentDirection 值: %d, 使用默认朝向", player.currentDirection);
-                    break;
-            }
         }
     }
 
