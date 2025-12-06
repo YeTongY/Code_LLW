@@ -326,8 +326,10 @@ int main(void)
         EndDrawing();
 
 
+        UpdateActiveMusicStreams(ctx);
+
         //=========播放脚步声=========
-        PlayFootstepSound(ctx);
+        PlayFootstepSound(ctx, deltaTime);
     }
     
     //==========清理资源==========
