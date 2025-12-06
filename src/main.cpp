@@ -50,7 +50,7 @@ int main(void)
     
     InitWindow(screenWidth, screenHeight, "LLW Project - Exploration State Test");
 
-
+    SetTraceLogLevel(LOG_WARNING); // 设置日志级别为 WARNING 及以上
     SetTargetFPS(60);
     
     //==========创建游戏上下文==========
