@@ -507,7 +507,7 @@
     <property name="targetMap" value="res/Level 3.tmx"/>
     <property name="targetPosX" type="float" value="14"/>
     <property name="targetPosY" type="float" value="57"/>
-    <property name="triggerType" value="ON_ENTER_ZONEON_ENTER_ZONE   "/>
+    <property name="triggerType" value="TELEPORT_WITHOUT_LOADING "/>
    </properties>
   </object>
  </objectgroup>
