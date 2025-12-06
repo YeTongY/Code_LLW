@@ -203,6 +203,18 @@ void combat_render(GameContext* ctx, void* state_data)
     
     // 绘制标题
     DrawTextEx(ctx->mainFont, "战斗模式", {20, 20}, 32, 1, CYBER_CYAN);
+
+    // 操作指南（右上角，与探索界面风格一致）
+    const float panelWidth = 360.0f;
+    const float panelHeight = 150.0f;
+    Vector2 panelPos = {ctx->screenWidth - panelWidth - 40.0f, 20.0f};
+    DrawRectangleV(panelPos, {panelWidth, panelHeight}, Fade(CYBER_CYAN, 0.25f));
+    DrawRectangleLines((int)panelPos.x, (int)panelPos.y, (int)panelWidth, (int)panelHeight, CYBER_CYAN);
+    Vector2 textPos = {panelPos.x + 20.0f, panelPos.y + 10.0f};
+    DrawTextEx(ctx->mainFont, "操作指南", textPos, 30, 1, CYBER_CYAN);
+    DrawTextEx(ctx->mainFont, "↑↓ 选择行动", {textPos.x, textPos.y + 40.0f}, 26, 1, WHITE);
+    DrawTextEx(ctx->mainFont, "Enter 确认", {textPos.x, textPos.y + 70.0f}, 26, 1, WHITE);
+    DrawTextEx(ctx->mainFont, "Esc 返回/取消", {textPos.x, textPos.y + 100.0f}, 24, 1, WHITE);
     
     // 绘制玩家信息（左侧）
     float playerX = 100; // 玩家信息区域左上角 X
