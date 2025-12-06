@@ -57,6 +57,9 @@ LDFLAGS = -L$(LIB_DIR)/lib
 # 在 Windows 上使用 Raylib，这些都是必需的
 LIBS = -lraylib -lopengl32 -lgdi32 -lwinmm
 
+# 静态链接选项，确保可执行文件包含运行时库
+STATIC_FLAGS = -static -static-libgcc -static-libstdc++
+
 # 4. 文件和最终目标 + 外部库源文件编译（tmxlite）
 # ------------------------------------------------------------------------------
 # 你最终想要生成的可执行文件的名字
@@ -94,7 +97,7 @@ all: $(TARGET)
 # 这个规则依赖于所有的 .o 文件都已经被成功编译出来。
 $(TARGET): $(OBJS)
 	@echo "链接生成可执行文件: $(TARGET)"
-	$(CC) $(OBJS) -o $(TARGET) $(LDFLAGS) $(LIBS)
+	$(CC) $(OBJS) -o $(TARGET) $(STATIC_FLAGS) $(LDFLAGS) $(LIBS)
 	@echo "复制着色器文件到 build 目录..."
 	@mkdir -p $(BUILD_DIR)/res/graphics/shaders
 	@cp -f res/graphics/shaders/cyberpunk.fs $(BUILD_DIR)/res/graphics/shaders/
