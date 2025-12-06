@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="50" height="40" tilewidth="32" tileheight="32" infinite="0" nextlayerid="11" nextobjectid="18">
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="50" height="40" tilewidth="32" tileheight="32" infinite="0" nextlayerid="11" nextobjectid="20">
  <tileset firstgid="1" name="Modern_Exteriors_Complete_Tileset_32x32" tilewidth="32" tileheight="32" tilecount="79728" columns="176">
   <image source="graphics/tilesets/Modern_Exteriors_Complete_Tileset_32x32.png" width="5632" height="14496"/>
  </tileset>
@@ -338,6 +338,14 @@
     <property name="isOneShot" type="bool" value="true"/>
     <property name="scriptPath" value="res/data/dialogue/Level1/L1_boss_post.csv   "/>
     <property name="triggerType" value="ON_ENTER_ZONE"/>
+   </properties>
+  </object>
+  <object id="19" x="0.5" y="386.5" width="156" height="146">
+   <properties>
+    <property name="eventType" value="DIALOGUE"/>
+    <property name="isOneShot" type="bool" value="false"/>
+    <property name="scriptPath" value="res/data/dialogue/Level1/L1_error.csv"/>
+    <property name="triggerType" value="ON_INTERACT"/>
    </properties>
   </object>
  </objectgroup>

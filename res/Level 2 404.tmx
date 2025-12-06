@@ -437,16 +437,16 @@
    </properties>
    <point/>
   </object>
-  <object id="5" x="247" y="376">
+  <object id="5" x="272" y="376">
    <properties>
-    <property name="aggroRange" type="float" value="256"/>
+    <property name="aggroRange" type="float" value="64"/>
     <property name="attack" type="int" value="18"/>
     <property name="defense" type="int" value="5"/>
     <property name="enemyType" value="Pink"/>
     <property name="hp" type="int" value="150"/>
     <property name="maxHp" type="int" value="150"/>
-    <property name="moveSpeed" type="float" value="30"/>
-    <property name="patrolRange" type="float" value="256"/>
+    <property name="moveSpeed" type="float" value="240"/>
+    <property name="patrolRange" type="float" value="64"/>
    </properties>
    <point/>
   </object>

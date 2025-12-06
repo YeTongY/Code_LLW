@@ -427,7 +427,7 @@
    <properties>
     <property name="eventType" value="DIALOGUE"/>
     <property name="isOneShot" type="bool" value="true"/>
-    <property name="scriptPath" value="res/data/dialogue/Level3/L3_boss_start.csv      "/>
+    <property name="scriptPath" value="res/data/dialogue/Level3/L3_end.csv      "/>
     <property name="triggerType" value="ON_ENTER_ZONE"/>
    </properties>
   </object>
@@ -459,15 +459,15 @@
    </properties>
    <point/>
   </object>
-  <object id="12" x="475" y="195">
+  <object id="12" x="497" y="147">
    <properties>
-    <property name="aggroRange" type="float" value="64"/>
+    <property name="aggroRange" type="float" value="128"/>
     <property name="attack" type="int" value="20"/>
     <property name="defense" type="int" value="5"/>
     <property name="enemyType" value="Boss"/>
     <property name="hp" type="int" value="200"/>
     <property name="maxHp" type="int" value="200"/>
-    <property name="moveSpeed" type="float" value="30"/>
+    <property name="moveSpeed" type="float" value="240"/>
     <property name="patrolRange" type="float" value="128"/>
    </properties>
    <point/>
