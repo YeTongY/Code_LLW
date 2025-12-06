@@ -49,6 +49,8 @@ int main(void)
     const int screenHeight = 1080;
     
     InitWindow(screenWidth, screenHeight, "LLW Project - Exploration State Test");
+
+
     SetTargetFPS(60);
     
     //==========创建游戏上下文==========
@@ -300,12 +302,6 @@ int main(void)
         elapsedTime += deltaTime;
         frameCount++;
         
-        //每秒输出一次性能信息
-        if (frameCount % 60 == 0) {
-            TraceLog(LOG_INFO, "[Main] FPS: %d, 玩家位置: (%d, %d)", 
-                     GetFPS(), ctx.player.gridX, ctx.player.gridY);
-        }
-        
         //==========更新==========
         GameStateMachine_update(&ctx.state_machine, &ctx, deltaTime);
         
@@ -325,11 +321,8 @@ int main(void)
         
         EndDrawing();
 
-
-        UpdateActiveMusicStreams(ctx);
-
         //=========播放脚步声=========
-        PlayFootstepSound(ctx, deltaTime);
+        PlayFootstepSound(ctx);
     }
     
     //==========清理资源==========

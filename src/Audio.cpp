@@ -23,7 +23,7 @@ void StopFootstepSound(GameContext &ctx)
 }
 
 // 每帧调用：根据移动状态控制脚步循环播放
-void PlayFootstepSound(GameContext &ctx, float deltaTime)
+void PlayFootstepSound(GameContext &ctx)
 {
     if (!IsMusicValid(ctx.footstepLoop)) {
         return; // 音效未加载时直接返回，防止播放失败
@@ -36,7 +36,7 @@ void PlayFootstepSound(GameContext &ctx, float deltaTime)
     }
 
     // 获取本帧时间差
-    const float dt = deltaTime;
+    const float dt = GetFrameTime();
     // 停止移动后的缓冲时间（秒），防止瞬间停动产生杂音
     constexpr float idleGraceSeconds = 0.1f;
 
@@ -79,22 +79,6 @@ void PlayFootstepSound(GameContext &ctx, float deltaTime)
         UpdateMusicStream(ctx.footstepLoop);
     }
 }
-
-
-
-    void UpdateActiveMusicStreams(GameContext &ctx)
-    {
-        if (IsMusicValid(ctx.explorationBGM) && IsMusicStreamPlaying(ctx.explorationBGM)) {
-            UpdateMusicStream(ctx.explorationBGM);
-        }
-
-        if (IsMusicValid(ctx.combatBGM) && IsMusicStreamPlaying(ctx.combatBGM)) {
-            UpdateMusicStream(ctx.combatBGM);
-        }
-
-    }
-
-
 void PlayExplorationBGM(GameContext &ctx)
 {
     // 如果音效未加载，直接返回

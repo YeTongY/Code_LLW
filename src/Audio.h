@@ -6,7 +6,7 @@
  *
  * @param ctx 游戏核心数据库，包含玩家和音频信息。
  */
-void PlayFootstepSound(GameContext &ctx, float deltaTime);
+void PlayFootstepSound(GameContext &ctx);
 
 /**
  * @brief 立刻终止脚步循环音效并重置内部状态
@@ -26,5 +26,3 @@ void StopExplorationBGM(GameContext &ctx);
 
 void PlayCombatBGM(GameContext &ctx);
 void StopCombatBGM(GameContext &ctx);
-
-void UpdateActiveMusicStreams(GameContext &ctx);
