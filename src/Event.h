@@ -19,7 +19,8 @@ typedef enum{
     TELEPORT,   // 传送事件
     COMBAT,     // 战斗事件
     RECOVER,    // 恢复事件
-    TELEPORT_WITHOUT_LOADING // 传送但不加载新地图（仅更新位置）
+    TELEPORT_WITHOUT_LOADING, // 传送但不加载新地图（仅更新位置）
+    HIDDEN
 }EventType;
 
 /**

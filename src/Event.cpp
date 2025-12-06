@@ -232,6 +232,14 @@ void ExecuteEvents(GameContext &ctx)
                 continue;
             }
 
+            case HIDDEN:
+            {
+                ctx.player.stats.maxMp += 20;
+                ctx.player.stats.mp = ctx.player.stats.maxMp;
+                event.isTrigged = true;
+                continue;
+            }
+
             default:
                 TraceLog(LOG_INFO, "[Event] 未实现的事件类型: %d", event.eventType);
                 event.isTrigged = true;

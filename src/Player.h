@@ -38,6 +38,8 @@ struct Stats {//声明玩家基础属性
     int maxHp;//hp上限
     int attack;//攻击力
     int defense;//防御力
+    int mp;
+    int maxMp;
 };
 
 

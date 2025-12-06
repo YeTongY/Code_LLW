@@ -221,6 +221,16 @@ void combat_render(GameContext* ctx, void* state_data)
     DrawRectangle(playerX, playerY + 90, hpBarWidth, hpBarHeight, DARKGRAY);
     DrawRectangle(playerX, playerY + 90, hpBarWidth * hpPercent, hpBarHeight, GREEN);
     
+    // 绘制MP文本
+    char mpText[64];
+    std::sprintf(mpText, "MP: %d/%d", ctx->player.stats.mp, ctx->player.stats.maxMp);
+    DrawTextEx(ctx->mainFont, mpText, {playerX, playerY + 120}, 28, 1, SKYBLUE);
+    
+    // 绘制MP条
+    float mpPercent = (float)ctx->player.stats.mp / ctx->player.stats.maxMp;
+    DrawRectangle(playerX, playerY + 160, hpBarWidth, hpBarHeight, DARKGRAY);
+    DrawRectangle(playerX, playerY + 160, hpBarWidth * mpPercent, hpBarHeight, BLUE);
+    
     // 绘制敌人信息（右侧）
     if (data->currentEnemy) {
         float enemyX = ctx->screenWidth - 400; // 敌人信息区域 X

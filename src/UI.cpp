@@ -43,6 +43,15 @@ void LoadUIAssets(GameContext& ctx){
     if(ctx.hudTemplate.hpBarFill.id == 0) TraceLog(LOG_WARNING, "[UI] 加载失败: %s", hp_bar_fill_path);
     else TraceLog(LOG_INFO, "[UI] 加载成功: 血条填充");
 
+    // 加载MP条资源（复用血条图片）
+    ctx.hudTemplate.mpBarEmpty = LoadTexture(hp_bar_bg_path);
+    if(ctx.hudTemplate.mpBarEmpty.id == 0) TraceLog(LOG_WARNING, "[UI] 加载失败（MP底图）: %s", hp_bar_bg_path);
+    else TraceLog(LOG_INFO, "[UI] 加载成功: MP条背景");
+
+    ctx.hudTemplate.mpBarFill = LoadTexture(hp_bar_fill_path);
+    if(ctx.hudTemplate.mpBarFill.id == 0) TraceLog(LOG_WARNING, "[UI] 加载失败（MP填充）: %s", hp_bar_fill_path);
+    else TraceLog(LOG_INFO, "[UI] 加载成功: MP条填充");
+
     // --- 4. 其他兼容性设置 ---
     ctx.playerPortraitFrame = ctx.portraitFrameTexture; // 保持兼容
 
@@ -61,6 +70,8 @@ void UnloadUIAssets(GameContext& ctx){
     // 注意：avatarFrame 是复用的 portraitFrameTexture，不要重复卸载！
     if(ctx.hudTemplate.hpBarEmpty.id != 0) UnloadTexture(ctx.hudTemplate.hpBarEmpty);
     if(ctx.hudTemplate.hpBarFill.id != 0) UnloadTexture(ctx.hudTemplate.hpBarFill);
+    if(ctx.hudTemplate.mpBarEmpty.id != 0) UnloadTexture(ctx.hudTemplate.mpBarEmpty);
+    if(ctx.hudTemplate.mpBarFill.id != 0) UnloadTexture(ctx.hudTemplate.mpBarFill);
 
     TraceLog(LOG_INFO, "================ [UI] 资源卸载结束 ================");
 }
@@ -147,14 +158,65 @@ void DrawHUD(const GameContext& ctx) {
     // 6. 绘制 HP 文字数值
     char hpText[32];
     std::sprintf(hpText, "%d/%d", ctx.player.stats.hp, ctx.player.stats.maxHp);
-    DrawTextEx(ctx.mainFont, hpText, 
+    DrawTextGlow(ctx.mainFont, hpText, 
                {barPos.x + 5, barPos.y - 25}, 
-               20, 1, WHITE);
+               20, 1, WHITE, RED);
     
-    DrawTextEx(ctx.mainFont, "HP", 
-               {barPos.x - 35, barPos.y}, 
-               20, 1, RED);
+    DrawTextGlow(ctx.mainFont, "HP", 
+               {barPos.x - 40, barPos.y}, 
+               20, 1, RED, DARKGRAY);
+
+    // 7. 绘制 MP 条
+    float mp = (float)ctx.player.stats.mp;
+    float maxMp = (float)ctx.player.stats.maxMp;
+    float mpRatio = (maxMp > 0) ? (mp / maxMp) : 0.0f;
+    
+    if (mpRatio < 0.0f) mpRatio = 0.0f;
+    if (mpRatio > 1.0f) mpRatio = 1.0f;
+
+    Vector2 mpBarPos = {
+        tpl.position.x + tpl.mpBarOffset.x,
+        tpl.position.y + tpl.mpBarOffset.y
+    };
+
+    // MP条背景
+    if (tpl.mpBarEmpty.id != 0) {
+        Rectangle mpBgSource = {0, 0, (float)tpl.mpBarEmpty.width, (float)tpl.mpBarEmpty.height};
+        Rectangle mpBgDest = {mpBarPos.x, mpBarPos.y, barWidth, barHeight};
+        DrawTexturePro(tpl.mpBarEmpty, mpBgSource, mpBgDest, {0, 0}, 0.0f, WHITE);
+    }
+
+    // MP条填充
+    if (tpl.mpBarFill.id != 0 && mpRatio > 0) {
+        Rectangle mpFillSource = {
+            0, 0,
+            (float)tpl.mpBarFill.width * mpRatio,
+            (float)tpl.mpBarFill.height
+        };
+        
+        Rectangle mpFillDest = {
+            mpBarPos.x,
+            mpBarPos.y,
+            barWidth * mpRatio,
+            barHeight
+        };
+        
+        DrawTexturePro(tpl.mpBarFill, mpFillSource, mpFillDest, {0, 0}, 0.0f, BLUE);
+    }
+
+    // 8. 绘制 MP 文字数值
+    char mpText[32];
+    std::sprintf(mpText, "%d/%d", ctx.player.stats.mp, ctx.player.stats.maxMp);
+    DrawTextGlow(ctx.mainFont, mpText, 
+               {mpBarPos.x + 5, mpBarPos.y - 25}, 
+               20, 1, WHITE, BLUE);
+    
+    DrawTextGlow(ctx.mainFont, "MP", 
+               {mpBarPos.x - 40, mpBarPos.y}, 
+               20, 1, BLUE, DARKGRAY);
+               
 }
+
 
 void DrawDialogueWithTemplate(const DialogueBoxTemplate_Normal& tpl, const std::string& text,const std::string& speakerName,Texture2D portrait,int charsToShow){ // 修改：参数改用 std::string
     //准备一些矩形
