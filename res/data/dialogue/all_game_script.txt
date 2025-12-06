@@ -179,3 +179,7 @@ momoka,res/graphics/portraits/mmk.png,"顺带一提，剥离病毒时产生的�
 "敌人 对 Taffy 造成了 %d 点伤害！（防御减伤）"
 "敌人暴击，对 Taffy 造成了 %d 点伤害！"
 "敌人 对 Taffy 造成了 %d 点伤害！"
+
+返回
+
+操作指南

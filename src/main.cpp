@@ -313,7 +313,6 @@ int main(void)
         GameStateMachine_render(&ctx.state_machine, &ctx);
         
         //绘制额外的调试信息
-        DrawText("Exploration State Test", 10, 120, 14, DARKPURPLE);
         DrawFPS(10, 140);
         
         //绘制版本信息
