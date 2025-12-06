@@ -564,10 +564,10 @@ bool LoadLevelFromTiled(GameContext& ctx, const char* filepath){
                     if (propName == "eventType") {
                         if (propType == tmx::Property::Type::String) {
                             string typeStr = prop.getStringValue();
-                            if(typeStr == "DIALOGUE") event.eventType = DIALOGUE;
-                            else if(typeStr == "TELEPORT") event.eventType = TELEPORT;
-                            else if(typeStr == "COMBAT") event.eventType = COMBAT;
-                            else if(typeStr == "RECOVER") event.eventType = RECOVER;
+                            if(typeStr == "DIALOGUE") event.eventType = DIALOGUE;      // 对话事件
+                            else if(typeStr == "TELEPORT") event.eventType = TELEPORT; // 传送事件
+                            else if(typeStr == "COMBAT") event.eventType = COMBAT;     // 战斗事件
+                            else if(typeStr == "RECOVER") event.eventType = RECOVER;   // 恢复事件（满血）
                             else {
                                 TraceLog(LOG_WARNING, "[Map] 未知的事件类型: %s", typeStr.c_str());
                                 event.eventType = NONE;
@@ -587,7 +587,14 @@ bool LoadLevelFromTiled(GameContext& ctx, const char* filepath){
 
                 event.dialogue.push_back(dialogueData);
 
-                if(event.triggerType != ON_NONE && !event.scriptPath.empty()){
+                // 事件入队逻辑：
+                // 1. 必须有有效的触发方式（ON_INTERACT/ON_ENTER_ZONE/ON_AUTO_START）
+                // 2. DIALOGUE 类型必须提供脚本路径，其他类型（如 RECOVER）可以没有脚本
+                bool hasValidTrigger = (event.triggerType != ON_NONE);
+                bool requiresScript = (event.eventType == DIALOGUE);
+                bool scriptReady = !event.scriptPath.empty();
+
+                if (hasValidTrigger && (!requiresScript || scriptReady)) {
                     ctx.gameEvents.push_back(event);
                 }
             }
