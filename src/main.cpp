@@ -76,6 +76,8 @@ int main(void)
     ctx.player.moveTarget = ctx.player.visualPosition; // 目标位置初始化为当前位置
     ctx.player.stats.hp = 150;
     ctx.player.stats.maxHp = 150;
+    ctx.player.stats.mp = 100;
+    ctx.player.stats.maxMp = 100;
     ctx.player.stats.attack = 17;
     ctx.player.stats.defense = 10;
     

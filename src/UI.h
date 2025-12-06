@@ -47,6 +47,8 @@ struct HUDTemplate {
     Texture2D avatarFrame;  // 头像框图片
     Texture2D hpBarEmpty;   // 血条底图（空的/黑底）
     Texture2D hpBarFill;    // 血条填充图（红条）
+    Texture2D mpBarEmpty;   // 蓝条底图（空的/黑底）
+    Texture2D mpBarFill;    // 蓝条填充图（蓝条）
     // --- 位置与尺寸 (根据你的美术资源调整) ---
     Vector2 position = { 20.0f, 20.0f }; // 整体起始位置 (左上角)
     
@@ -54,7 +56,10 @@ struct HUDTemplate {
     Vector2 avatarOffset = { 10.0f, 10.0f }; 
     
     // 血条偏移
-    Vector2 hpBarOffset = { 120.0f, 20.0f }; 
+    Vector2 hpBarOffset = { 180.0f, 20.0f };
+    
+    // 蓝条偏移
+    Vector2 mpBarOffset = { 180.0f, 50.0f }; 
 };
 
 
