@@ -167,6 +167,17 @@ System_AI,nullptr,"韦义庭 (Wei Yiting) - System Integration & Gameplay"
 System_AI,nullptr,"------------------------------------------------"
 System_AI,nullptr,"Thank you for playing."
 
+System_AI,nullptr,"你小心翼翼地掀开了马桶盖..."
+System_AI,nullptr,"你发现了一坨不可名状的、甚至还在蠕动的物体。"
+Taffy,res/graphics/portraits/taffy.png,"......这是......排泄物吗？"
+System_AI,nullptr,"[分析结果] 否定。这是一段祖传的【屎山代码 (Spaghetti Code)】。"
+System_AI,nullptr,"它包含了 5000 个 if-else 嵌套和 200 个 goto 跳转。"
+System_AI,nullptr,"因为逻辑过于混乱，它已经产生了自我意识，试图抓住你的手请求重构。"
+Taffy,res/graphics/portraits/taffy.png,"噫！！！（重重地盖上马桶盖并冲水）"
+System_AI,nullptr,"[系统提示] 执行操作：git push --force。"
+System_AI,nullptr,"[系统提示] 屎山已被冲入生产环境。问题解决了。"
+Taffy,res/graphics/portraits/taffy.png,"......SIPC 的未来真令人担忧。"
+
 momoka,res/graphics/portraits/mmk.png,"顺带一提，剥离病毒时产生的能量回流已经被你的系统吸收，修复了部分损伤。别浪费了。"
 
 "代码风暴", "纳米注入"
