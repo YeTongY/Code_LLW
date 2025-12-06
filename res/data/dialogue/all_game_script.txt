@@ -166,3 +166,5 @@ System_AI,nullptr,"郭子博 (Guo Zibo) - Map Design & Assets"
 System_AI,nullptr,"韦义庭 (Wei Yiting) - System Integration & Gameplay"
 System_AI,nullptr,"------------------------------------------------"
 System_AI,nullptr,"Thank you for playing."
+
+momoka,res/graphics/portraits/mmk.png,"顺带一提，剥离病毒时产生的能量回流已经被你的系统吸收，修复了部分损伤。别浪费了。"

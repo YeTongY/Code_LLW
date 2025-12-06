@@ -567,6 +567,7 @@ bool LoadLevelFromTiled(GameContext& ctx, const char* filepath){
                             if(typeStr == "DIALOGUE") event.eventType = DIALOGUE;
                             else if(typeStr == "TELEPORT") event.eventType = TELEPORT;
                             else if(typeStr == "COMBAT") event.eventType = COMBAT;
+                            else if(typeStr == "RECOVER") event.eventType = RECOVER;
                             else {
                                 TraceLog(LOG_WARNING, "[Map] 未知的事件类型: %s", typeStr.c_str());
                                 event.eventType = NONE;
