@@ -462,7 +462,7 @@
   <object id="12" x="475" y="195">
    <properties>
     <property name="aggroRange" type="float" value="64"/>
-    <property name="attack" type="int" value="15"/>
+    <property name="attack" type="int" value="20"/>
     <property name="defense" type="int" value="5"/>
     <property name="enemyType" value="Boss"/>
     <property name="hp" type="int" value="200"/>

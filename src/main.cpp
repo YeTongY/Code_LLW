@@ -74,10 +74,10 @@ int main(void)
     ctx.player.isMoving = false;   // 初始状态：静止
     ctx.player.visualPosition = { (float)(ctx.player.gridX * 32), (float)(ctx.player.gridY * 32) }; // 初始视觉位置与网格位置对齐
     ctx.player.moveTarget = ctx.player.visualPosition; // 目标位置初始化为当前位置
-    ctx.player.stats.hp = 100;
-    ctx.player.stats.maxHp = 100;
-    ctx.player.stats.attack = 15;
-    ctx.player.stats.defense = 8;
+    ctx.player.stats.hp = 150;
+    ctx.player.stats.maxHp = 150;
+    ctx.player.stats.attack = 17;
+    ctx.player.stats.defense = 10;
     
     TraceLog(LOG_INFO, "[Main] 玩家初始化完成 - 位置: (%d, %d), HP: %d/%d, isRunning=%d", 
              ctx.player.gridX, ctx.player.gridY, 

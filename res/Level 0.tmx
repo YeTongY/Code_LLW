@@ -290,8 +290,8 @@
     <property name="attack" type="int" value="15"/>
     <property name="defense" type="int" value="5"/>
     <property name="enemyType" value="Pink"/>
-    <property name="hp" type="int" value="80"/>
-    <property name="maxHp" type="int" value="80"/>
+    <property name="hp" type="int" value="50"/>
+    <property name="maxHp" type="int" value="50"/>
     <property name="moveSpeed" type="float" value="160"/>
     <property name="patrolRange" type="float" value="256"/>
    </properties>

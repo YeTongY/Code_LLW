@@ -345,7 +345,7 @@
   <object id="11" x="958" y="199">
    <properties>
     <property name="aggroRange" type="float" value="128"/>
-    <property name="attack" type="int" value="10"/>
+    <property name="attack" type="int" value="15"/>
     <property name="defense" type="int" value="5"/>
     <property name="enemyType" value="Pink"/>
     <property name="hp" type="int" value="150"/>
