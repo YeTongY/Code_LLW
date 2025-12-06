@@ -75,4 +75,4 @@ GameState* CreateCombatState(GameContext* ctx, Enemy* targetEnemy);
 void ProcessPlayerAction(GameContext* ctx, CombatData* data, CombatAction action);
 void ProcessEnemyTurn(GameContext* ctx, CombatData* data);
 void CheckBattleEnd(GameContext* ctx, CombatData* data);
-void UseSkill(GameContext* ctx, CombatData* data, int skillIndex);
+bool UseSkill(GameContext* ctx, CombatData* data, int skillIndex);

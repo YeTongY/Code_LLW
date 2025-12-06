@@ -49,6 +49,7 @@ int main(void)
     const int screenHeight = 1080;
     
     InitWindow(screenWidth, screenHeight, "LLW Project - Exploration State Test");
+    SetExitKey(KEY_NULL); // 使用自定义逻辑处理 ESC，避免默认直接退出
 
     SetTraceLogLevel(LOG_WARNING); // 设置日志级别为 WARNING 及以上
     SetTargetFPS(60);

@@ -7,6 +7,11 @@
 #include <cstdio>
 #include <algorithm>
 
+static int GetSkillMpCost(int skillIndex);
+static const char* GetActionDescriptionText(int actionIndex);
+static const char* GetSkillDescriptionText(int skillIndex);
+static void DrawMultilineText(Font font, const char* text, Vector2 startPos, float fontSize, float lineSpacing, Color color);
+
 static GameState* CreateDialogueStateForScript(const std::string& scriptPath, GameState* nextState, bool destroyNextOnFailure)
 {
     if (scriptPath.empty() || !nextState) {
@@ -293,10 +298,51 @@ void combat_render(GameContext* ctx, void* state_data)
                 Color textColor = ((int)i == data->selectedSkillIndex) ? CYBER_LIME : WHITE;
                 const char* prefix = ((int)i == data->selectedSkillIndex) ? "> " : "  ";
                 char skillText[128];
-                std::sprintf(skillText, "%s%s", prefix, data->skillNames[i].c_str());
+                int cost = GetSkillMpCost((int)i);
+                if (cost > 0) {
+                    std::sprintf(skillText, "%s%s (消耗%dMP)", prefix, data->skillNames[i].c_str(), cost);
+                } else {
+                    std::sprintf(skillText, "%s%s", prefix, data->skillNames[i].c_str());
+                }
                 DrawTextEx(ctx->mainFont, skillText, {skillX, skillY + 30 + (float)i * 30}, 24, 1, textColor);
             }
             DrawTextEx(ctx->mainFont, "Esc 返回", {skillX, skillY + 120}, 20, 1, GRAY);
+
+            if (!data->skillNames.empty()) {
+                int selectedSkill = std::clamp(data->selectedSkillIndex, 0, (int)data->skillNames.size() - 1);
+                const char* skillDesc = GetSkillDescriptionText(selectedSkill);
+                if (skillDesc && skillDesc[0] != '\0') {
+                    float descWidth = 360.0f;
+                    float descHeight = 160.0f;
+                    float descX = skillX + 340.0f;
+                    float descY = skillY - 20.0f;
+                    Rectangle descRect = {descX, descY, descWidth, descHeight};
+                    DrawRectangleRec(descRect, UI_BACKGROUND);
+                    DrawRectangleLinesEx(descRect, 2.0f, CYBER_LIME);
+                    Vector2 descTitlePos = {descX + 16.0f, descY + 10.0f};
+                    DrawTextEx(ctx->mainFont, "技能说明", descTitlePos, 24, 1, CYBER_LIME);
+                    Vector2 textPos = {descX + 16.0f, descY + 42.0f};
+                    DrawMultilineText(ctx->mainFont, skillDesc, textPos, 22.0f, 26.0f, UI_TEXT);
+                }
+            }
+        }
+
+        if (!data->actionNames.empty()) {
+            int selected = std::clamp(data->selectedAction, 0, (int)data->actionNames.size() - 1);
+            const char* descText = GetActionDescriptionText(selected);
+            if (descText && descText[0] != '\0') {
+                float descWidth = 360.0f;
+                float descHeight = 160.0f;
+                float descX = menuX - descWidth - 40.0f;
+                float descY = menuY - 20.0f;
+                Rectangle descRect = {descX, descY, descWidth, descHeight};
+                DrawRectangleRec(descRect, UI_BACKGROUND);
+                DrawRectangleLinesEx(descRect, 2.0f, CYBER_CYAN);
+                Vector2 descTitlePos = {descX + 16.0f, descY + 10.0f};
+                DrawTextEx(ctx->mainFont, "行动说明", descTitlePos, 24, 1, CYBER_CYAN);
+                Vector2 textPos = {descX + 16.0f, descY + 42.0f};
+                DrawMultilineText(ctx->mainFont, descText, textPos, 22.0f, 26.0f, UI_TEXT);
+            }
         }
     }
     
@@ -312,6 +358,61 @@ void combat_render(GameContext* ctx, void* state_data)
 }
 
 //=========================战斗逻辑辅助函数=========================
+
+static const char* GetActionDescriptionText(int actionIndex)
+{
+    switch (actionIndex)
+    {
+        case ACTION_ATTACK:
+            return "发起常规攻击，伤害带有小幅浮动，\n并有15%概率暴击。";
+        case ACTION_SKILL:
+            return "打开技能面板，花费 MP 施放\n特殊能力。";
+        case ACTION_DEFEND:
+            return "进入防御姿态，下回合受到的\n伤害减半，同时为反击做准备。";
+        case ACTION_ESCAPE:
+            return "尝试撤离战斗，目前成功率50%。";
+        default:
+            return "选择一个行动来查看说明。";
+    }
+}
+
+static const char* GetSkillDescriptionText(int skillIndex)
+{
+    switch (skillIndex)
+    {
+        case 0:
+            return "代码风暴：调动算力对单体造成高额伤害，\n并有小概率超载追加打击。";
+        case 1:
+            return "纳米注入：释放纳米修复程序，\n立即回复自身少量生命值。";
+        default:
+            return "未知技能：效果未定义。";
+    }
+}
+
+static void DrawMultilineText(Font font, const char* text, Vector2 startPos, float fontSize, float lineSpacing, Color color)
+{
+    if (!text || !text[0]) return;
+
+    std::string currentLine;
+    Vector2 linePos = startPos;
+
+    for (const char* ptr = text;; ++ptr)
+    {
+        char ch = *ptr;
+        if (ch == '\n' || ch == '\0') {
+            if (!currentLine.empty()) {
+                DrawTextEx(font, currentLine.c_str(), linePos, fontSize, 1.0f, color);
+                currentLine.clear();
+            }
+            if (ch == '\0') {
+                break;
+            }
+            linePos.y += lineSpacing;
+        } else {
+            currentLine.push_back(ch);
+        }
+    }
+}
 
 void ProcessPlayerAction(GameContext* ctx, CombatData* data, CombatAction action)
 {
@@ -334,7 +435,7 @@ void ProcessPlayerAction(GameContext* ctx, CombatData* data, CombatAction action
             if (isCrit) {
                 damage *= 2;
             }
-            data->currentEnemy->stats.hp -= damage;
+            data->currentEnemy->stats.hp = std::max(0, data->currentEnemy->stats.hp - damage);
             data->damageDealt = damage;
             
             if (isCrit) {
@@ -394,18 +495,40 @@ void ProcessPlayerAction(GameContext* ctx, CombatData* data, CombatAction action
     }
 }
 
-void UseSkill(GameContext* ctx, CombatData* data, int skillIndex)
+static int GetSkillMpCost(int skillIndex)
 {
-    if (!ctx || !data) return;
+    switch (skillIndex)
+    {
+        case 0: return 30; // 代码风暴
+        case 1: return 20; // 纳米注入
+        default: return 0;
+    }
+}
 
-    data->skillMenuActive = false;
+bool UseSkill(GameContext* ctx, CombatData* data, int skillIndex)
+{
+    if (!ctx || !data) return false;
+
     char msg[256];
-//=================================12/6 Warning新增简单技能系统
+    const int mpCost = GetSkillMpCost(skillIndex);
+    if (mpCost > 0 && ctx->player.stats.mp < mpCost) {
+        std::snprintf(msg, sizeof(msg), "MP 不足，需要 %d", mpCost);
+        data->battleMessage = msg;
+        data->messageTimer = 1.2f;
+        data->skillMenuActive = true;
+        return false;
+    }
+
+    if (mpCost > 0) {
+        ctx->player.stats.mp = std::max(0, ctx->player.stats.mp - mpCost);
+    }
+    data->skillMenuActive = false;
+
     switch (skillIndex)
     {
         case 0: // 代码风暴：高伤害输出
         {
-            if (!data->currentEnemy) return;
+            if (!data->currentEnemy) return false;
             int baseDamage = std::max(1, static_cast<int>(ctx->player.stats.attack * 2.5f) - data->currentEnemy->stats.defense / 2);
             int variance = GetRandomValue(-3, 3);
             int damage = std::max(1, baseDamage + variance);
@@ -413,7 +536,7 @@ void UseSkill(GameContext* ctx, CombatData* data, int skillIndex)
             if (overload) {
                 damage = static_cast<int>(damage * 1.3f);
             }
-            data->currentEnemy->stats.hp -= damage;
+            data->currentEnemy->stats.hp = std::max(0, data->currentEnemy->stats.hp - damage);
             data->damageDealt = damage;
             if (overload) {
                 std::snprintf(msg, sizeof(msg), "代码风暴超载，对敌人造成 %d 点伤害！", damage);
@@ -426,7 +549,7 @@ void UseSkill(GameContext* ctx, CombatData* data, int skillIndex)
             data->playerAnimating = true;
             data->currentPhase = COMBAT_PHASE_ANIMATION;
             data->turnCount++;
-            break;
+            return true;
         }
         case 1: // 纳米注入：回复生命
         {
@@ -440,14 +563,14 @@ void UseSkill(GameContext* ctx, CombatData* data, int skillIndex)
             data->playerAnimating = false;
             data->currentPhase = COMBAT_PHASE_ENEMY_TURN;
             data->turnCount++;
-            break;
+            return true;
         }
         default:
         {
             data->battleMessage = "未知技能";
             data->messageTimer = 1.0f;
-            data->currentPhase = COMBAT_PHASE_PLAYER_TURN;
-            break;
+            data->skillMenuActive = true;
+            return false;
         }
     }
 }
