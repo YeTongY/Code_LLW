@@ -214,7 +214,7 @@ void combat_render(GameContext* ctx, void* state_data)
         DrawBattleSprite(ctx->combatPlayerSprite, ctx->screenWidth * 0.28f, spriteBaseY, targetSpriteHeight, false);
     }
     if (ctx->combatEnemySprite.id != 0) {
-        DrawBattleSprite(ctx->combatEnemySprite, ctx->screenWidth * 0.72f, spriteBaseY, targetSpriteHeight, true);
+        DrawBattleSprite(ctx->combatEnemySprite, ctx->screenWidth * 0.72f, spriteBaseY, targetSpriteHeight, false);
     }
     
     // 绘制标题
