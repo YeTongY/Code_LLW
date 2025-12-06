@@ -145,8 +145,6 @@ void combat_update(GameContext* ctx, void* state_data)
             
         case COMBAT_PHASE_VICTORY:
             // 胜利结算
-            ctx->player.stats.hp = std::min<int>(ctx->player.stats.hp + 0.4f * (ctx->player.stats.maxHp - ctx->player.stats.hp), ctx->player.stats.maxHp); //恢复40%已损血量
-
             if (IsKeyPressed(KEY_ENTER) || IsKeyPressed(KEY_SPACE)) {
                 // 返回探索状态
                 GameState* explorationState = createExplorationState();
@@ -381,6 +379,15 @@ void CheckBattleEnd(GameContext* ctx, CombatData* data)
     // 检查敌人是否被击败
     if (data->currentEnemy && data->currentEnemy->stats.hp <= 0) {
         data->currentEnemy->isActive = false;
+
+        // 战斗胜利时恢复 40% 已损失的生命值（只执行一次）
+        int missingHp = ctx->player.stats.maxHp - ctx->player.stats.hp;
+        if (missingHp > 0) {
+            int healAmount = static_cast<int>(0.4f * missingHp);
+            if (healAmount > 0) {
+                ctx->player.stats.hp = std::min(ctx->player.stats.hp + healAmount, ctx->player.stats.maxHp);
+            }
+        }
 
         if (!data->postDialogueScript.empty() && !data->postDialogueQueued) {
             GameState* nextState = createExplorationState();
