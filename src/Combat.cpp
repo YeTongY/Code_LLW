@@ -51,7 +51,7 @@ void combat_enter(GameContext* ctx, void* state_data)
     data->playerDefending = false;
     data->skillMenuActive = false;
     data->selectedSkillIndex = 0;
-    data->skillNames = {"代码风暴", "纳米注入"};
+    data->skillNames = {"代码风暴", "纳米注入", "终端湮灭"};
     
     // 初始化行动选项
     data->actionNames.clear();
@@ -384,6 +384,8 @@ static const char* GetSkillDescriptionText(int skillIndex)
             return "代码风暴：调动算力对单体造成高额伤害，\n并有小概率超载追加打击。";
         case 1:
             return "纳米注入：释放纳米修复程序，\n立即回复自身少量生命值。";
+        case 2:
+            return "终端湮灭：彩蛋级权限指令，\n效果未知。";
         default:
             return "未知技能：效果未定义。";
     }
@@ -501,6 +503,7 @@ static int GetSkillMpCost(int skillIndex)
     {
         case 0: return 30; // 代码风暴
         case 1: return 20; // 纳米注入
+        case 2: return 120; // 终端湮灭
         default: return 0;
     }
 }
@@ -562,6 +565,23 @@ bool UseSkill(GameContext* ctx, CombatData* data, int skillIndex)
             data->animationTimer = 0.0f;
             data->playerAnimating = false;
             data->currentPhase = COMBAT_PHASE_ENEMY_TURN;
+            data->turnCount++;
+            return true;
+        }
+        case 2: // 终端湮灭：彩蛋技能
+        {
+            if (!data->currentEnemy) return false;
+            int damage = std::max(1, data->currentEnemy->stats.hp);
+            data->currentEnemy->stats.hp = 0;
+            data->damageDealt = damage;
+            ctx->player.stats.hp = ctx->player.stats.maxHp;
+            ctx->player.stats.mp = ctx->player.stats.maxMp;
+            std::snprintf(msg, sizeof(msg), "终端湮灭执行，敌方瞬间被抹除！");
+            data->battleMessage = msg;
+            data->messageTimer = 2.5f;
+            data->animationTimer = 1.5f;
+            data->playerAnimating = true;
+            data->currentPhase = COMBAT_PHASE_ANIMATION;
             data->turnCount++;
             return true;
         }
