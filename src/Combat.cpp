@@ -145,6 +145,8 @@ void combat_update(GameContext* ctx, void* state_data)
             
         case COMBAT_PHASE_VICTORY:
             // 胜利结算
+            ctx->player.stats.hp = std::min<int>(ctx->player.stats.hp + 0.4f * (ctx->player.stats.maxHp - ctx->player.stats.hp), ctx->player.stats.maxHp); //恢复40%已损血量
+
             if (IsKeyPressed(KEY_ENTER) || IsKeyPressed(KEY_SPACE)) {
                 // 返回探索状态
                 GameState* explorationState = createExplorationState();
