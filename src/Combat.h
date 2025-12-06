@@ -44,6 +44,7 @@ struct CombatData
     
     // 动画/效果
     float animationTimer;       // 动画计时器
+    float animationDuration;    // 当前动画总时长（用于插值）
     bool playerAnimating;       // 玩家是否在播放动画
     bool enemyAnimating;        // 敌人是否在播放动画
     

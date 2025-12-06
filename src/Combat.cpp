@@ -11,6 +11,7 @@ static int GetSkillMpCost(int skillIndex);
 static const char* GetActionDescriptionText(int actionIndex);
 static const char* GetSkillDescriptionText(int skillIndex);
 static void DrawMultilineText(Font font, const char* text, Vector2 startPos, float fontSize, float lineSpacing, Color color);
+static void DrawBattleSprite(Texture2D sprite, float centerX, float baseY, float targetHeight, bool flipHorizontally);
 
 static GameState* CreateDialogueStateForScript(const std::string& scriptPath, GameState* nextState, bool destroyNextOnFailure)
 {
@@ -204,6 +205,16 @@ void combat_render(GameContext* ctx, void* state_data)
         DrawTexturePro(ctx->combatBackground, src, dest, Vector2{0.0f, 0.0f}, 0.0f, WHITE);
     } else {
         DrawRectangle(0, 0, ctx->screenWidth, ctx->screenHeight, (Color){10, 10, 20, 255});
+    }
+
+    // 绘制战斗中立绘
+    const float spriteBaseY = ctx->screenHeight * 0.82f;
+    const float targetSpriteHeight = ctx->screenHeight * 0.72f;
+    if (ctx->combatPlayerSprite.id != 0) {
+        DrawBattleSprite(ctx->combatPlayerSprite, ctx->screenWidth * 0.28f, spriteBaseY, targetSpriteHeight, false);
+    }
+    if (ctx->combatEnemySprite.id != 0) {
+        DrawBattleSprite(ctx->combatEnemySprite, ctx->screenWidth * 0.72f, spriteBaseY, targetSpriteHeight, true);
     }
     
     // 绘制标题
@@ -414,6 +425,30 @@ static void DrawMultilineText(Font font, const char* text, Vector2 startPos, flo
             currentLine.push_back(ch);
         }
     }
+}
+
+static void DrawBattleSprite(Texture2D sprite, float centerX, float baseY, float targetHeight, bool flipHorizontally)
+{
+    if (sprite.id == 0 || sprite.height == 0) return;
+
+    const float scale = targetHeight / static_cast<float>(sprite.height);
+    const float destWidth = static_cast<float>(sprite.width) * scale;
+    const float destHeight = targetHeight;
+
+    Rectangle src = {0.0f, 0.0f, static_cast<float>(sprite.width), static_cast<float>(sprite.height)};
+    if (flipHorizontally) {
+        src.x = static_cast<float>(sprite.width);
+        src.width = -src.width;
+    }
+
+    Rectangle dest = {
+        centerX - destWidth * 0.5f,
+        baseY - destHeight,
+        destWidth,
+        destHeight
+    };
+
+    DrawTexturePro(sprite, src, dest, Vector2{0.0f, 0.0f}, 0.0f, WHITE);
 }
 
 void ProcessPlayerAction(GameContext* ctx, CombatData* data, CombatAction action)

@@ -58,6 +58,8 @@ int main(void)
     GameContext ctx;
     ctx.currentCombatant = nullptr;
     ctx.combatBackground = Texture2D{0};
+    ctx.combatPlayerSprite = Texture2D{0};
+    ctx.combatEnemySprite = Texture2D{0};
     ctx.level0CombatDialogueTriggered = false;
     TraceLog(LOG_INFO, "[Main] GameContext 创建后，默认尺寸: %.0fx%.0f, isRunning=%d", ctx.screenWidth, ctx.screenHeight, ctx.isRunning);
     
@@ -173,6 +175,43 @@ int main(void)
 
     if (ctx.combatBackground.id == 0) {
         TraceLog(LOG_ERROR, "[Main] 未能加载战斗背景图，战斗画面将使用纯色背景");
+    }
+
+    //==========加载战斗立绘==========
+    const char* combatPlayerSpriteCandidates[] = {
+        "res/graphics/battle_charactors/Taffy.png",
+        "../res/graphics/battle_charactors/Taffy.png",
+        "../../res/graphics/battle_charactors/Taffy.png"
+    };
+    for (const char* path : combatPlayerSpriteCandidates) {
+        Texture2D candidate = LoadTexture(path);
+        if (candidate.id != 0) {
+            ctx.combatPlayerSprite = candidate;
+            TraceLog(LOG_INFO, "[Main] 战斗玩家立绘加载成功: %s", path);
+            break;
+        }
+        TraceLog(LOG_WARNING, "[Main] 战斗玩家立绘加载失败: %s", path);
+    }
+    if (ctx.combatPlayerSprite.id == 0) {
+        TraceLog(LOG_WARNING, "[Main] 未能加载战斗玩家立绘，战斗画面将使用文本信息");
+    }
+
+    const char* combatEnemySpriteCandidates[] = {
+        "res/graphics/battle_charactors/Enemy.png",
+        "../res/graphics/battle_charactors/Enemy.png",
+        "../../res/graphics/battle_charactors/Enemy.png"
+    };
+    for (const char* path : combatEnemySpriteCandidates) {
+        Texture2D candidate = LoadTexture(path);
+        if (candidate.id != 0) {
+            ctx.combatEnemySprite = candidate;
+            TraceLog(LOG_INFO, "[Main] 战斗敌人立绘加载成功: %s", path);
+            break;
+        }
+        TraceLog(LOG_WARNING, "[Main] 战斗敌人立绘加载失败: %s", path);
+    }
+    if (ctx.combatEnemySprite.id == 0) {
+        TraceLog(LOG_WARNING, "[Main] 未能加载战斗敌人立绘，战斗画面将使用文本信息");
     }
 
     //==========初始化音频设备==========
@@ -339,6 +378,14 @@ int main(void)
     if (ctx.combatBackground.id != 0) {
         UnloadTexture(ctx.combatBackground);
         TraceLog(LOG_INFO, "[Main] 战斗背景图资源已释放");
+    }
+    if (ctx.combatPlayerSprite.id != 0) {
+        UnloadTexture(ctx.combatPlayerSprite);
+        TraceLog(LOG_INFO, "[Main] 战斗玩家立绘已释放");
+    }
+    if (ctx.combatEnemySprite.id != 0) {
+        UnloadTexture(ctx.combatEnemySprite);
+        TraceLog(LOG_INFO, "[Main] 战斗敌人立绘已释放");
     }
     
     unloadGameFont(ctx);

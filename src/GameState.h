@@ -158,6 +158,8 @@ struct GameContext
     //标题图片
     Texture2D titleScreen;
     Texture2D combatBackground;    // 战斗场景背景
+    Texture2D combatPlayerSprite;  // 战斗画面玩家立绘
+    Texture2D combatEnemySprite;   // 战斗画面敌人立绘（默认）
 
 
     //静态事件列表
