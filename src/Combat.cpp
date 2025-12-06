@@ -44,6 +44,9 @@ void combat_enter(GameContext* ctx, void* state_data)
     data->enemyAnimating = false;
     data->damageDealt = 0;
     data->playerDefending = false;
+    data->skillMenuActive = false;
+    data->selectedSkillIndex = 0;
+    data->skillNames = {"代码风暴", "纳米注入"};
     
     // 初始化行动选项
     data->actionNames.clear();
@@ -118,14 +121,31 @@ void combat_update(GameContext* ctx, void* state_data)
             
         case COMBAT_PHASE_PLAYER_TURN:
             // 玩家回合 - 处理输入
-            if (IsKeyPressed(KEY_DOWN)) {
-                data->selectedAction = (data->selectedAction + 1) % 4;
-            }
-            else if (IsKeyPressed(KEY_UP)) {
-                data->selectedAction = (data->selectedAction - 1 + 4) % 4;
-            }
-            else if (IsKeyPressed(KEY_ENTER) || IsKeyPressed(KEY_SPACE)) {
-                ProcessPlayerAction(ctx, data, static_cast<CombatAction>(data->selectedAction));
+            if (data->skillMenuActive) {
+                if (IsKeyPressed(KEY_DOWN)) {
+                    data->selectedSkillIndex = (data->selectedSkillIndex + 1) % static_cast<int>(data->skillNames.size());
+                }
+                else if (IsKeyPressed(KEY_UP)) {
+                    int total = static_cast<int>(data->skillNames.size());
+                    data->selectedSkillIndex = (data->selectedSkillIndex - 1 + total) % total;
+                }
+                else if (IsKeyPressed(KEY_BACKSPACE) || IsKeyPressed(KEY_ESCAPE)) {
+                    data->skillMenuActive = false;
+                    data->battleMessage = "选择你的行动";
+                }
+                else if (IsKeyPressed(KEY_ENTER) || IsKeyPressed(KEY_SPACE)) {
+                    UseSkill(ctx, data, data->selectedSkillIndex);
+                }
+            } else {
+                if (IsKeyPressed(KEY_DOWN)) {
+                    data->selectedAction = (data->selectedAction + 1) % 4;
+                }
+                else if (IsKeyPressed(KEY_UP)) {
+                    data->selectedAction = (data->selectedAction - 1 + 4) % 4;
+                }
+                else if (IsKeyPressed(KEY_ENTER) || IsKeyPressed(KEY_SPACE)) {
+                    ProcessPlayerAction(ctx, data, static_cast<CombatAction>(data->selectedAction));
+                }
             }
             break;
             
@@ -240,6 +260,22 @@ void combat_render(GameContext* ctx, void* state_data)
             std::sprintf(optionText, "%s%s", prefix, data->actionNames[i].c_str());
             DrawTextEx(ctx->mainFont, optionText, {menuX, menuY + i * 40}, 32, 1, textColor);
         }
+
+        if (data->skillMenuActive) {
+            float skillX = menuX + 420;
+            float skillY = menuY;
+            DrawRectangle(skillX - 20, skillY - 20, 320, 160, UI_BACKGROUND);
+            DrawRectangleLines(skillX - 20, skillY - 20, 320, 160, CYBER_LIME);
+            DrawTextEx(ctx->mainFont, "选择技能", {skillX, skillY - 10}, 24, 1, CYBER_LIME);
+            for (size_t i = 0; i < data->skillNames.size(); ++i) {
+                Color textColor = ((int)i == data->selectedSkillIndex) ? CYBER_LIME : WHITE;
+                const char* prefix = ((int)i == data->selectedSkillIndex) ? "> " : "  ";
+                char skillText[128];
+                std::sprintf(skillText, "%s%s", prefix, data->skillNames[i].c_str());
+                DrawTextEx(ctx->mainFont, skillText, {skillX, skillY + 30 + (float)i * 30}, 24, 1, textColor);
+            }
+            DrawTextEx(ctx->mainFont, "Esc 返回", {skillX, skillY + 120}, 20, 1, GRAY);
+        }
     }
     
     // 绘制回合数
@@ -262,6 +298,7 @@ void ProcessPlayerAction(GameContext* ctx, CombatData* data, CombatAction action
     {
         data->playerDefending = false;
     }
+    bool consumesTurn = true;
     
     switch (action)
     {
@@ -294,9 +331,13 @@ void ProcessPlayerAction(GameContext* ctx, CombatData* data, CombatAction action
         
         case ACTION_SKILL:
         {
-            // 暂未实现技能系统
-            data->battleMessage = "技能系统尚未实现！";
-            data->messageTimer = 1.5f;
+            if (!data->skillMenuActive) {
+                data->skillMenuActive = true;
+                data->selectedSkillIndex = 0;
+                data->battleMessage = "选择技能";
+                data->messageTimer = 0.0f;
+            }
+            consumesTurn = false;
             break;
         }
         
@@ -325,8 +366,68 @@ void ProcessPlayerAction(GameContext* ctx, CombatData* data, CombatAction action
             break;
         }
     }
-    
-    data->turnCount++;
+
+    if (consumesTurn) {
+        data->turnCount++;
+    }
+}
+
+void UseSkill(GameContext* ctx, CombatData* data, int skillIndex)
+{
+    if (!ctx || !data) return;
+
+    data->skillMenuActive = false;
+    char msg[256];
+//=================================12/6 Warning新增简单技能系统
+    switch (skillIndex)
+    {
+        case 0: // 代码风暴：高伤害输出
+        {
+            if (!data->currentEnemy) return;
+            int baseDamage = std::max(1, static_cast<int>(ctx->player.stats.attack * 2.5f) - data->currentEnemy->stats.defense / 2);
+            int variance = GetRandomValue(-3, 3);
+            int damage = std::max(1, baseDamage + variance);
+            bool overload = GetRandomValue(0, 100) < 10; // 小概率额外超载
+            if (overload) {
+                damage = static_cast<int>(damage * 1.3f);
+            }
+            data->currentEnemy->stats.hp -= damage;
+            data->damageDealt = damage;
+            if (overload) {
+                std::snprintf(msg, sizeof(msg), "代码风暴超载，对敌人造成 %d 点伤害！", damage);
+            } else {
+                std::snprintf(msg, sizeof(msg), "代码风暴命中，造成 %d 点伤害！", damage);
+            }
+            data->battleMessage = msg;
+            data->messageTimer = 2.0f;
+            data->animationTimer = 1.2f;
+            data->playerAnimating = true;
+            data->currentPhase = COMBAT_PHASE_ANIMATION;
+            data->turnCount++;
+            break;
+        }
+        case 1: // 纳米注入：回复生命
+        {
+            int baseHeal = static_cast<int>(ctx->player.stats.maxHp * 0.1f);
+            baseHeal += GetRandomValue(0, 8);
+            ctx->player.stats.hp = std::min(ctx->player.stats.maxHp, ctx->player.stats.hp + baseHeal);
+            std::snprintf(msg, sizeof(msg), "纳米注入恢复 %d 点生命！", baseHeal);
+            data->battleMessage = msg;
+            data->messageTimer = 1.8f;
+            data->animationTimer = 0.0f;
+            data->playerAnimating = false;
+            data->currentPhase = COMBAT_PHASE_ENEMY_TURN;
+            data->turnCount++;
+            break;
+        }
+        default:
+        {
+            data->battleMessage = "未知技能";
+            data->messageTimer = 1.0f;
+            data->currentPhase = COMBAT_PHASE_PLAYER_TURN;
+            break;
+        }
+    }
 }
 
 void ProcessEnemyTurn(GameContext* ctx, CombatData* data)

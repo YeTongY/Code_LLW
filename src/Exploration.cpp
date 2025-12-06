@@ -192,29 +192,18 @@ void exploration_render(GameContext* ctx, void* state_data)
     DrawHUD(*ctx);
 
     //在 EndMode2D 之后，绘制 UI（不受摄像机和滤镜影响）
-    DrawTextEx(ctx->mainFont, "探索模式", Vector2{10, 10}, 30, 1, BLACK);
-    DrawTextEx(ctx->mainFont, "操作说明:", Vector2{10, 40}, 24, 1, DARKGRAY);
-    DrawTextEx(ctx->mainFont, "  WASD - 移动", Vector2{10, 60}, 24, 1, DARKGRAY);
-    DrawTextEx(ctx->mainFont, "  E - 交互", Vector2{10, 80}, 24, 1, DARKGRAY);
-    DrawTextEx(ctx->mainFont, "  ESC - 退出", Vector2{10, 100}, 24, 1, DARKGRAY);
-    
-    //显示玩家坐标
-    char posText[64]; // 玩家坐标文本缓冲
-    std::sprintf(posText, "(%d, %d)", ctx->player.gridX, ctx->player.gridY);
-    DrawTextEx(ctx->mainFont, "位置: ", Vector2{10, (float)ctx->screenHeight - 60}, 24, 1, DARKGREEN);
-    DrawText(posText, 80, static_cast<int>(ctx->screenHeight) - 60, 24, DARKGREEN);
-    
-    //显示玩家属性
-    char hpText[64]; // 玩家血量文本缓冲
-    std::sprintf(hpText, "%d/%d", ctx->player.stats.hp, ctx->player.stats.maxHp);
-    DrawTextEx(ctx->mainFont, "HP: ", Vector2{10, (float)ctx->screenHeight - 40}, 24, 1, RED);
-    DrawText(hpText, 80, static_cast<int>(ctx->screenHeight) - 40, 24, RED);
-    
-    //显示运行时间
-    char timeText[64]; // 运行时间文本缓冲
-    std::sprintf(timeText, "%.1fs", expd ? expd->elapsedTime : 0.0f);
-    DrawTextEx(ctx->mainFont, "时间: ", Vector2{10, (float)ctx->screenHeight - 20}, 20, 1, DARKGRAY);
-    DrawText(timeText, 80, static_cast<int>(ctx->screenHeight) - 20, 20, DARKGRAY);
+    // 右上角操作提示（更大、更醒目）
+    const float panelWidth = 360.0f;
+    const float panelHeight = 150.0f;
+    Vector2 panelPos = {ctx->screenWidth - panelWidth - 40.0f, 20.0f};
+    DrawRectangleV(panelPos, {panelWidth, panelHeight}, Fade(CYBER_CYAN, 0.25f));
+    DrawRectangleLines((int)panelPos.x, (int)panelPos.y, (int)panelWidth, (int)panelHeight, CYBER_CYAN);
+
+    Vector2 textPos = {panelPos.x + 20.0f, panelPos.y + 10.0f};
+    DrawTextEx(ctx->mainFont, "操作指南", textPos, 30, 1, CYBER_CYAN);
+    DrawTextEx(ctx->mainFont, "WASD  移动", {textPos.x, textPos.y + 40.0f}, 26, 1, WHITE);
+    DrawTextEx(ctx->mainFont, "E      交互", {textPos.x, textPos.y + 70.0f}, 26, 1, WHITE);
+    DrawTextEx(ctx->mainFont, "ESC  退出", {textPos.x, textPos.y + 100.0f}, 26, 1, WHITE);
 
 
 }
